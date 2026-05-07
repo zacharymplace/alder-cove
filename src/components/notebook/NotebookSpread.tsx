@@ -306,6 +306,14 @@ function Note({
   }
 
   if (
+    mutationPhase >= 5 &&
+    note.id === "eli-childhood-memory"
+  ) {
+    unstableText =
+      "maybe Eli changed because we kept writing him down wrong.";
+  }
+
+  if (
     collapseTriggered &&
     note.id === "going-salt-first"
   ) {
@@ -676,6 +684,7 @@ function Page({
         ) : (
           <>
             <CannerySketch />
+            <Note note={notes[0]} rotate="rotate-[0.4deg]" />
             <Note note={notes[1]} rotate="rotate-[-0.6deg]" />
     
         {instabilityLevel >= 4 && (
@@ -991,6 +1000,35 @@ function HiddenLayerPage() {
         </motion.div>
       )}
 
+
+      {mutationPhase >= 5 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-5 rounded-lg border border-red-900/30 bg-red-950/20 p-4 text-sm text-red-100/80"
+          >
+            Eli contradiction chain collapse
+
+            <div className="mt-4 space-y-3 text-xs">
+              <p>
+                • childhood fear was progressively reframed as behavioral instability
+              </p>
+
+              <p>
+                • archivist copies hardened emotional interpretation into preserved wording
+              </p>
+
+              <p>
+                • reconstruction layers increasingly prioritized social coherence over emotional accuracy
+              </p>
+
+              <p className="italic">
+                maybe the notebook changed him before the town did
+              </p>
+            </div>
+          </motion.div>
+        )}
+
       {collapseTriggered && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -1137,6 +1175,36 @@ function InspectionPanel() {
           </div>
         </motion.div>
       )}
+
+
+      {mutationPhase >= 5 &&
+        selected?.contradictionChain === "eli-tunnels" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-5 rounded-lg border border-red-900/30 bg-red-950/20 p-4 text-sm text-red-100/80"
+          >
+            Eli contradiction chain collapse
+
+            <div className="mt-4 space-y-3 text-xs">
+              <p>
+                • childhood fear was progressively reframed as behavioral instability
+              </p>
+
+              <p>
+                • archivist copies hardened emotional interpretation into preserved wording
+              </p>
+
+              <p>
+                • reconstruction layers increasingly prioritized social coherence over emotional accuracy
+              </p>
+
+              <p className="italic">
+                maybe the notebook changed him before the town did
+              </p>
+            </div>
+          </motion.div>
+        )}
 
       {collapseTriggered && (
         <motion.div

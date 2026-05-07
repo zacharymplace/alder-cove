@@ -12,6 +12,16 @@ export type NotebookNote = {
     | "margin";
   relatedNoteIds?: string[];
   memoryPressure?: "low" | "medium" | "high";
+  pressureReveal?: string;
+  originalText?: string;
+  reconstructedText?: string;
+  handwriting?: "coauthor" | "archivist" | "skeptic" | "sibling" | "chameleon";
+  copiedBy?: string;
+  recoveredFrom?: string;
+  authenticity?: "original" | "copied" | "damaged" | "reconstructed";
+  contradictionChain?: "eli-tunnels";
+  collapseStage?: number;
+  yearPhase?: "childhood" | "early-adolescence" | "late-adolescence";
 };
 
 export const notebookOneSpread = {
@@ -23,6 +33,12 @@ export const notebookOneSpread = {
       variant: "founding",
       text: "WRITE IT DOWN BEFORE YOU FORGET",
       author: "co-author",
+      handwriting: "coauthor",
+      recoveredFrom: "flood box 3",
+      authenticity: "damaged",
+      contradictionChain: "eli-tunnels",
+      collapseStage: 3,
+      yearPhase: "childhood",
       memoryPressure: "high",
     },
 
@@ -30,7 +46,11 @@ export const notebookOneSpread = {
       id: "later-rule",
       variant: "margin",
       text: "The town changes things when nobody checks.",
+      pressureReveal: "people too",
       author: "archivist",
+      handwriting: "archivist",
+      authenticity: "original",
+      yearPhase: "childhood",
       memoryPressure: "medium",
     },
 
@@ -62,6 +82,26 @@ export const notebookOneSpread = {
   ] satisfies NotebookNote[],
 
   rightPage: [
+
+    {
+      id: "eli-childhood-memory",
+      variant: "margin",
+      text: "Eli said the tunnels sounded wrong after storms.",
+      originalText: "he said they sounded wrong not dangerous",
+      reconstructedText: "Eli always tried to scare us after storms.",
+      handwriting: "coauthor",
+      authenticity: "damaged",
+      contradictionChain: "eli-tunnels",
+      collapseStage: 0,
+      yearPhase: "childhood",
+      memoryPressure: "medium",
+      pressureReveal: "he wasnt trying to scare us",
+      relatedNoteIds: [
+        "eli-contradiction-a",
+        "eli-contradiction-b",
+        "cannery-line"
+      ],
+    },
     {
       id: "cannery-sketch",
       variant: "map",
@@ -79,6 +119,8 @@ export const notebookOneSpread = {
       variant: "margin",
       text: "stop saying that",
       author: "skeptic",
+      handwriting: "skeptic",
+      yearPhase: "early-adolescence",
       memoryPressure: "medium",
     },
 
@@ -86,6 +128,16 @@ export const notebookOneSpread = {
       id: "eli-contradiction-a",
       variant: "contradiction",
       text: "Eli hates the tunnels after rain now.",
+      originalText: "Eli hates the tunnels after what happened",
+      reconstructedText: "Eli doesnt go below after storms anymore.",
+      handwriting: "archivist",
+      copiedBy: "archivist",
+      recoveredFrom: "damaged lower-level page",
+      authenticity: "copied",
+      contradictionChain: "eli-tunnels",
+      collapseStage: 1,
+      yearPhase: "late-adolescence",
+      pressureReveal: "after what happened after storms",
       relatedNoteIds: [
         "eli-contradiction-b",
         "cannery-sketch",
@@ -97,6 +149,15 @@ export const notebookOneSpread = {
       id: "eli-contradiction-b",
       variant: "contradiction",
       text: "no he doesnt. he always wanted to go first",
+      originalText: "he said he wasnt scared but he was",
+      reconstructedText: "he always wanted to go first",
+      handwriting: "sibling",
+      recoveredFrom: "pressure marks only",
+      authenticity: "reconstructed",
+      contradictionChain: "eli-tunnels",
+      collapseStage: 2,
+      yearPhase: "late-adolescence",
+      pressureReveal: "he said he wasnt scared but he was",
       relatedNoteIds: [
         "eli-contradiction-a",
       ],
@@ -107,6 +168,8 @@ export const notebookOneSpread = {
       id: "going-salt-first",
       variant: "warning",
       text: "Mara says my dad's going salt because he forgot the dock fire but I think he just lies now",
+      handwriting: "sibling",
+      yearPhase: "early-adolescence",
       relatedNoteIds: ["checkin-log"],
       memoryPressure: "medium",
     },
@@ -115,6 +178,11 @@ export const notebookOneSpread = {
       id: "cannery-line",
       variant: "margin",
       text: "The cannery gives things back wrong sometimes.",
+      originalText: "The cannery gives people back wrong sometimes.",
+      reconstructedText: "The cannery gives things back wrong sometimes.",
+      handwriting: "coauthor",
+      yearPhase: "childhood",
+      pressureReveal: "not things. people.",
       relatedNoteIds: [
         "cannery-sketch",
         "eli-contradiction-a",
