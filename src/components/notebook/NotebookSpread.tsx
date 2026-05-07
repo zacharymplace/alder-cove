@@ -9,15 +9,46 @@ import { notebookOneSpread, type NotebookNote } from "@/data/notebook/notebookOn
 type NotebookState = {
   selectedId: string | null;
   unstable: boolean;
+  memoryLayer: "recovered" | "original" | "reconstructed";
+  flashlight: boolean;
+  foldedOpen: boolean;
   select: (id: string | null) => void;
   toggleUnstable: () => void;
+  setMemoryLayer: (
+    layer: "recovered" | "original" | "reconstructed"
+  ) => void;
+  toggleFlashlight: () => void;
+  toggleFolded: () => void;
 };
 
 const useNotebookState = create<NotebookState>((set) => ({
   selectedId: null,
   unstable: false,
+  memoryLayer: "recovered",
+  flashlight: false,
+  foldedOpen: false,
+
   select: (id) => set({ selectedId: id }),
-  toggleUnstable: () => set((state) => ({ unstable: !state.unstable })),
+
+  toggleUnstable: () =>
+    set((state) => ({
+      unstable: !state.unstable,
+    })),
+
+  setMemoryLayer: (layer) =>
+    set({
+      memoryLayer: layer,
+    }),
+
+  toggleFlashlight: () =>
+    set((state) => ({
+      flashlight: !state.flashlight,
+    })),
+
+  toggleFolded: () =>
+    set((state) => ({
+      foldedOpen: !state.foldedOpen,
+    })),
 }));
 
 function noteClass(variant?: NotebookNote["variant"]) {
@@ -36,6 +67,38 @@ function noteClass(variant?: NotebookNote["variant"]) {
       return "bg-white/20";
     default:
       return "italic";
+  }
+}
+
+
+
+function handwritingClass(handwriting?: NotebookNote["handwriting"]) {
+  switch (handwriting) {
+    case "coauthor":
+      return "tracking-[0.02em] leading-[1.05] font-black";
+    case "archivist":
+      return "tracking-[0.08em]";
+    case "skeptic":
+      return "tracking-tight italic";
+    case "sibling":
+      return "tracking-wide";
+    case "chameleon":
+      return "tracking-normal";
+    default:
+      return "";
+  }
+}
+
+function phaseClass(phase?: NotebookNote["yearPhase"]) {
+  switch (phase) {
+    case "childhood":
+      return "opacity-100";
+    case "early-adolescence":
+      return "opacity-90";
+    case "late-adolescence":
+      return "opacity-80";
+    default:
+      return "";
   }
 }
 
@@ -92,16 +155,36 @@ function Note({
   note: NotebookNote;
   rotate?: string;
 }) {
-  const { selectedId, select, unstable } = useNotebookState();
+  const {
+    selectedId,
+    select,
+    unstable,
+    memoryLayer,
+  } = useNotebookState();
   const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
   const selectedNote = allNotes.find((candidate) => candidate.id === selectedId);
   const selected = selectedId === note.id;
   const related = selectedNote?.relatedNoteIds?.includes(note.id) ?? false;
 
-  const unstableText =
-    unstable && note.id === "eli-contradiction-a"
-      ? "Eli doesnt go below after storms anymore."
-      : note.text;
+  let unstableText = note.text;
+
+  if (memoryLayer === "original" && note.originalText) {
+    unstableText = note.originalText;
+  }
+
+  if (
+    memoryLayer === "reconstructed" &&
+    note.reconstructedText
+  ) {
+    unstableText = note.reconstructedText;
+  }
+
+  if (
+    unstable &&
+    note.id === "eli-contradiction-a"
+  ) {
+    unstableText = "Eli doesnt go below after storms anymore.";
+  }
 
   return (
     <motion.article
@@ -117,19 +200,55 @@ function Note({
         !selected && !related && "opacity-95 hover:opacity-100"
       )}
     >
+      {note.variant === "contradiction" && (
+        <HandlingSmudge className="-right-4 top-1" />
+      )}
+
       {selected && (
         <div className="absolute -right-2 -top-2 rounded-full bg-red-900 px-2 py-1 text-[10px] uppercase tracking-widest text-white">
           inspecting
         </div>
       )}
 
-      <p className="whitespace-pre-line text-neutral-950">{unstableText}</p>
+      <p
+        className={clsx(
+          "whitespace-pre-line text-neutral-950",
+          handwritingClass(note.handwriting),
+          phaseClass(note.yearPhase)
+        )}
+      >
+        {unstableText}
+      </p>
 
-      {note.author && (
-        <p className="mt-2 text-[10px] uppercase tracking-[0.25em] text-neutral-600">
-          {note.author}
-        </p>
-      )}
+      <div className="mt-2 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.25em] text-neutral-600">
+        {note.author && <span>{note.author}</span>}
+
+        {note.copiedBy && (
+          <span className="rounded bg-neutral-900/10 px-2 py-1">
+            copied by {note.copiedBy}
+          </span>
+        )}
+
+        {note.yearPhase && (
+          <span className="italic opacity-70">
+            {note.yearPhase.replace("-", " ")}
+          </span>
+        )}
+
+        {note.authenticity && (
+          <span
+            className={clsx(
+              "rounded px-2 py-1",
+              note.authenticity === "original" && "bg-green-950/20",
+              note.authenticity === "copied" && "bg-blue-950/20",
+              note.authenticity === "damaged" && "bg-amber-950/20",
+              note.authenticity === "reconstructed" && "bg-red-950/20"
+            )}
+          >
+            {note.authenticity}
+          </span>
+        )}
+      </div>
 
       {selected && (
         <motion.div
@@ -138,6 +257,16 @@ function Note({
           className="mt-3 border-t border-neutral-800/20 pt-2 text-xs italic text-neutral-700"
         >
           preserved memory fragment
+          {note.pressureReveal && (
+            <motion.p
+              initial={{ opacity: 0, filter: "blur(3px)" }}
+              animate={{ opacity: 0.58, filter: "blur(0px)" }}
+              transition={{ delay: 0.35, duration: 0.8 }}
+              className="mt-3 rotate-[-0.6deg] text-[13px] text-neutral-600 line-through decoration-neutral-500/60"
+            >
+              {note.pressureReveal}
+            </motion.p>
+          )}
         </motion.div>
       )}
     </motion.article>
@@ -304,6 +433,9 @@ function Page({
       <div className="absolute inset-0 bg-[linear-gradient(rgba(80,60,25,.06)_1px,transparent_1px)] bg-[size:100%_28px]" />
       <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_20%_10%,rgba(255,255,255,.7),transparent_22%),radial-gradient(circle_at_82%_75%,rgba(92,64,28,.24),transparent_24%),radial-gradient(circle_at_12%_88%,rgba(30,64,175,.14),transparent_16%)]" />
       <div className="absolute inset-y-0 left-7 w-px bg-red-900/20" />
+      <DamageOverlay intensity={side === "right" ? "medium" : "light"} />
+      <EdgeWear />
+      {side === "right" && <ArgumentMarks />}
 
       <div
         className="relative z-10 space-y-6"
@@ -339,8 +471,219 @@ function Page({
   );
 }
 
+function DamageOverlay({
+  intensity = "medium",
+}: {
+  intensity?: "light" | "medium" | "heavy";
+}) {
+  const opacity =
+    intensity === "heavy" ? "opacity-70" : intensity === "medium" ? "opacity-45" : "opacity-25";
+
+  return (
+    <div className={clsx("pointer-events-none absolute inset-0", opacity)}>
+      <div className="absolute -right-10 top-10 h-48 w-32 rotate-12 rounded-full bg-amber-900/10 blur-2xl" />
+      <div className="absolute bottom-12 left-2 h-40 w-24 rounded-full bg-blue-900/10 blur-xl" />
+      <div className="absolute left-6 top-1/3 h-px w-[85%] rotate-[-1deg] bg-neutral-800/10" />
+      <div className="absolute right-8 top-2/3 h-px w-[65%] rotate-[1.2deg] bg-neutral-800/10" />
+    </div>
+  );
+}
+
+function HandlingSmudge({ className }: { className?: string }) {
+  return (
+    <span
+      className={clsx(
+        "pointer-events-none absolute h-16 w-28 rounded-full bg-neutral-800/10 blur-md",
+        className
+      )}
+    />
+  );
+}
+
+function ArgumentMarks() {
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <p className="absolute right-8 top-[42%] rotate-[8deg] text-xs font-black text-red-950/35">
+        NO
+      </p>
+      <p className="absolute right-14 top-[48%] rotate-[-4deg] text-[10px] italic text-neutral-800/35">
+        ask him then
+      </p>
+      <p className="absolute left-8 top-[52%] rotate-[-7deg] text-xs text-neutral-800/30">
+        wait no
+      </p>
+      <svg className="absolute right-12 top-[50%] h-16 w-28" viewBox="0 0 120 70">
+        <path
+          d="M8 55 C38 10, 70 12, 112 18"
+          fill="none"
+          stroke="rgba(127,29,29,.35)"
+          strokeWidth="2"
+          strokeDasharray="4 5"
+        />
+      </svg>
+    </div>
+  );
+}
+
+function EdgeWear() {
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <div className="absolute left-0 top-0 h-full w-5 bg-gradient-to-r from-neutral-900/10 to-transparent" />
+      <div className="absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-amber-950/10 to-transparent" />
+      <div className="absolute bottom-0 left-0 h-8 w-full bg-gradient-to-t from-blue-950/10 to-transparent" />
+      <div className="absolute -right-1 top-32 h-20 w-4 rounded-l-full bg-neutral-950/10" />
+      <div className="absolute -left-1 bottom-40 h-16 w-3 rounded-r-full bg-neutral-950/10" />
+    </div>
+  );
+}
+
+function HiddenLayerPage() {
+  const {
+    flashlight,
+    foldedOpen,
+    toggleFlashlight,
+    toggleFolded,
+  } = useNotebookState();
+
+  return (
+    <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#eadcb1] p-8 shadow-2xl">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(80,60,25,.06)_1px,transparent_1px)] bg-[size:100%_28px]" />
+      <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_70%_25%,rgba(30,64,175,.14),transparent_18%),radial-gradient(circle_at_20%_80%,rgba(92,64,28,.28),transparent_26%)]" />
+      <div className="absolute inset-y-0 left-7 w-px bg-red-900/20" />
+      <DamageOverlay intensity="heavy" />
+      <EdgeWear />
+
+      {flashlight && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_48%_35%,rgba(255,255,220,.28),transparent_28%),radial-gradient(circle_at_55%_70%,rgba(255,255,220,.18),transparent_22%)]"
+        />
+      )}
+
+      <div
+        className="relative z-10 space-y-6"
+        style={{ fontFamily: "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive" }}
+      >
+        <p className="text-xs uppercase tracking-[0.35em] text-neutral-700">
+          unstable recovered page
+        </p>
+
+        <div className="rotate-[-0.7deg]">
+          <p className="text-xs uppercase tracking-[0.25em] text-neutral-700">
+            Route: Echo Tunnel
+          </p>
+          <h2 className="mt-2 text-2xl font-black uppercase leading-tight text-neutral-950">
+            after rain only if two people go
+          </h2>
+          <p className="mt-2 text-sm italic text-neutral-700">
+            copied from old rules because the first one got wet
+          </p>
+        </div>
+
+        <div className="relative rounded-sm border border-neutral-700/30 bg-blue-50/20 p-5">
+          <Tape className="-top-2 left-12" />
+          <p className="text-sm">
+            If the water is past the third stair, dont go below.
+          </p>
+          <p className="mt-2 text-sm">
+            If someone says they remember different, mark it and wait.
+          </p>
+          <p className="mt-2 text-sm line-through decoration-red-900/60 decoration-2">
+            ask Eli because he knows the tunnel best
+          </p>
+          <p className="mt-2 text-sm">
+            ask two people. not just Eli.
+          </p>
+
+          {flashlight && (
+            <>
+              <motion.p
+                initial={{ opacity: 0, filter: "blur(5px)" }}
+                animate={{ opacity: 0.42, filter: "blur(0px)" }}
+                transition={{ duration: 1 }}
+                className="absolute left-12 top-24 rotate-[-1deg] text-lg text-neutral-600"
+              >
+                he was scared before we were
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, filter: "blur(4px)" }}
+                animate={{ opacity: 0.32, filter: "blur(0px)" }}
+                transition={{ delay: 0.4, duration: 1 }}
+                className="absolute bottom-4 right-8 rotate-[2deg] text-xs text-neutral-700 line-through"
+              >
+                not just Eli because Eli remembers wrong
+              </motion.p>
+            </>
+          )}
+        </div>
+
+        <button
+          onClick={toggleFolded}
+          className="relative block w-full cursor-pointer rounded-sm bg-[#f3e2ab] p-5 text-left shadow-lg transition hover:scale-[1.01]"
+        >
+          <Tape className="-top-2 left-10" />
+          <HandlingSmudge className="right-6 top-5" />
+          <p className="text-xs uppercase tracking-[0.25em] text-neutral-600">
+            folded note under tape
+          </p>
+          <p className="mt-2 text-sm text-neutral-900">
+            {foldedOpen
+              ? "Mara said the cannery gives people back wrong but made me change it to things because people sounds too mean."
+              : "do not open unless the story changes again"}
+          </p>
+
+          {foldedOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 border-t border-neutral-800/20 pt-3 text-xs italic text-neutral-700"
+            >
+              back side: if we write it nicer does that make it less true?
+            </motion.div>
+          )}
+        </button>
+
+        <div className="rounded-sm border border-dashed border-neutral-700/40 p-4">
+          <p className="text-sm">
+            official wording:
+            <span className="ml-2 font-bold">things</span>
+          </p>
+          <p className="mt-2 text-sm">
+            original wording:
+            <span className="ml-2 font-bold italic">people</span>
+          </p>
+          <p className="mt-3 text-xs uppercase tracking-[0.25em] text-neutral-600">
+            discrepancy unresolved
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3 pt-2">
+          <button
+            onClick={toggleFlashlight}
+            className="rounded-lg border border-neutral-700 bg-neutral-950 px-4 py-2 text-xs text-neutral-100 hover:bg-neutral-800"
+          >
+            {flashlight ? "turn off side light" : "use side light"}
+          </button>
+
+          <span className="rounded bg-neutral-900/10 px-3 py-2 text-xs uppercase tracking-[0.2em] text-neutral-700">
+            recovered from flood box 3
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function InspectionPanel() {
-  const { selectedId, unstable, toggleUnstable } = useNotebookState();
+  const {
+    selectedId,
+    unstable,
+    toggleUnstable,
+    memoryLayer,
+    setMemoryLayer,
+  } = useNotebookState();
   const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
   const selected = allNotes.find((note) => note.id === selectedId);
   const related = selected?.relatedNoteIds
@@ -356,7 +699,7 @@ function InspectionPanel() {
   }
 
   return (
-    <aside className="rounded-xl border border-neutral-700 bg-neutral-900/90 p-5 shadow-xl">
+    <aside className="rounded-xl border border-neutral-700 bg-neutral-950/95 p-5 shadow-xl">
       <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
         Inspecting Fragment
       </p>
@@ -365,11 +708,24 @@ function InspectionPanel() {
         {selected.variant ?? "fragment"}
       </h2>
 
-      <p className="mt-3 whitespace-pre-line rounded-lg bg-neutral-950/70 p-3 text-sm text-neutral-200">
-        {unstable && selected.id === "eli-contradiction-a"
-          ? "Eli doesnt go below after storms anymore."
-          : selected.text}
-      </p>
+      <div className="mt-3 rounded-lg bg-neutral-950/70 p-3 text-sm text-neutral-200">
+        <p className="whitespace-pre-line">
+          {unstable && selected.id === "eli-contradiction-a"
+            ? "Eli doesnt go below after storms anymore."
+            : selected.text}
+        </p>
+
+        {selected.pressureReveal && (
+          <motion.p
+            initial={{ opacity: 0, filter: "blur(4px)" }}
+            animate={{ opacity: 0.55, filter: "blur(0px)" }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="mt-4 text-xs italic text-neutral-500 line-through decoration-neutral-600"
+          >
+            pressure reveal: {selected.pressureReveal}
+          </motion.p>
+        )}
+      </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
         <div className="rounded-lg border border-neutral-800 p-3">
@@ -399,12 +755,62 @@ function InspectionPanel() {
       )}
 
       <p className="mt-5 border-t border-neutral-800 pt-4 text-xs italic text-neutral-400">
-        Interpretation unresolved. The notebook preserves fragments, not certainty.
+        Interpretation unresolved. Source confidence degraded by revision, handling, and recovery context.
       </p>
+
+      <div className="mt-4 space-y-3">
+        <div className="rounded-lg border border-neutral-800 bg-neutral-950/40 p-3 text-[11px] text-neutral-500">
+          visible pressure marks suggest multiple revisions over time
+        </div>
+
+        {selected.recoveredFrom && (
+          <div className="rounded-lg border border-amber-900/20 bg-amber-950/10 p-3 text-[11px] text-amber-100/80">
+            recovered from: {selected.recoveredFrom}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          onClick={() => setMemoryLayer("recovered")}
+          className={clsx(
+            "rounded border px-3 py-2 text-xs",
+            memoryLayer === "recovered"
+              ? "border-blue-400 bg-blue-950/30"
+              : "border-neutral-700"
+          )}
+        >
+          recovered
+        </button>
+
+        <button
+          onClick={() => setMemoryLayer("original")}
+          className={clsx(
+            "rounded border px-3 py-2 text-xs",
+            memoryLayer === "original"
+              ? "border-amber-400 bg-amber-950/30"
+              : "border-neutral-700"
+          )}
+        >
+          original
+        </button>
+
+        <button
+          onClick={() => setMemoryLayer("reconstructed")}
+          className={clsx(
+            "rounded border px-3 py-2 text-xs",
+            memoryLayer === "reconstructed"
+              ? "border-red-400 bg-red-950/30"
+              : "border-neutral-700"
+          )}
+        >
+          reconstructed
+        </button>
+      </div>
 
       <button
         onClick={toggleUnstable}
-        className="mt-4 rounded-lg border border-neutral-700 bg-neutral-950 px-4 py-2 text-xs hover:bg-neutral-800"
+        className="mt-3 rounded-lg border border-neutral-700 bg-neutral-950 px-4 py-2 text-xs hover:bg-neutral-800"
       >
         {unstable ? "stabilize memory" : "destabilize memory"}
       </button>
@@ -426,9 +832,13 @@ export function NotebookSpread() {
         </header>
 
         <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Page side="left" notes={notebookOneSpread.leftPage} />
-            <Page side="right" notes={notebookOneSpread.rightPage} />
+          <div className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Page side="left" notes={notebookOneSpread.leftPage} />
+              <Page side="right" notes={notebookOneSpread.rightPage} />
+            </div>
+
+            <HiddenLayerPage />
           </div>
 
           <InspectionPanel />
