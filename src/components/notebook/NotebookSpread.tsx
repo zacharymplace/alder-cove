@@ -93,7 +93,10 @@ function Note({
   rotate?: string;
 }) {
   const { selectedId, select, unstable } = useNotebookState();
+  const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
+  const selectedNote = allNotes.find((candidate) => candidate.id === selectedId);
   const selected = selectedId === note.id;
+  const related = selectedNote?.relatedNoteIds?.includes(note.id) ?? false;
 
   const unstableText =
     unstable && note.id === "eli-contradiction-a"
@@ -109,7 +112,9 @@ function Note({
         "relative cursor-pointer rounded-sm p-3 transition-all duration-300",
         noteClass(note.variant),
         rotate,
-        selected ? "ring-2 ring-red-900/50 shadow-xl" : "opacity-95 hover:opacity-100"
+        selected && "ring-2 ring-red-900/50 shadow-xl",
+        related && "animate-pulse ring-2 ring-blue-900/40",
+        !selected && !related && "opacity-95 hover:opacity-100"
       )}
     >
       {selected && (
@@ -334,32 +339,99 @@ function Page({
   );
 }
 
-export function NotebookSpread() {
-  const { unstable, toggleUnstable } = useNotebookState();
+function InspectionPanel() {
+  const { selectedId, unstable, toggleUnstable } = useNotebookState();
+  const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
+  const selected = allNotes.find((note) => note.id === selectedId);
+  const related = selected?.relatedNoteIds
+    ?.map((id) => allNotes.find((note) => note.id === id))
+    .filter(Boolean) as NotebookNote[] | undefined;
 
+  if (!selected) {
+    return (
+      <aside className="rounded-xl border border-neutral-800 bg-neutral-900/70 p-5 text-sm text-neutral-400">
+        Select a note to inspect preserved memory pressure.
+      </aside>
+    );
+  }
+
+  return (
+    <aside className="rounded-xl border border-neutral-700 bg-neutral-900/90 p-5 shadow-xl">
+      <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
+        Inspecting Fragment
+      </p>
+
+      <h2 className="mt-3 text-xl font-semibold text-neutral-100">
+        {selected.variant ?? "fragment"}
+      </h2>
+
+      <p className="mt-3 whitespace-pre-line rounded-lg bg-neutral-950/70 p-3 text-sm text-neutral-200">
+        {unstable && selected.id === "eli-contradiction-a"
+          ? "Eli doesnt go below after storms anymore."
+          : selected.text}
+      </p>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+        <div className="rounded-lg border border-neutral-800 p-3">
+          <p className="uppercase tracking-widest text-neutral-500">Memory Pressure</p>
+          <p className="mt-2 text-neutral-100">{selected.memoryPressure ?? "unknown"}</p>
+        </div>
+
+        <div className="rounded-lg border border-neutral-800 p-3">
+          <p className="uppercase tracking-widest text-neutral-500">State</p>
+          <p className="mt-2 text-neutral-100">{unstable ? "drifting" : "stable"}</p>
+        </div>
+      </div>
+
+      {related && related.length > 0 && (
+        <div className="mt-5">
+          <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
+            Related Fragments
+          </p>
+          <ul className="mt-3 space-y-2">
+            {related.map((note) => (
+              <li key={note.id} className="rounded border border-neutral-800 bg-neutral-950/50 p-2 text-xs text-neutral-300">
+                {note.text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <p className="mt-5 border-t border-neutral-800 pt-4 text-xs italic text-neutral-400">
+        Interpretation unresolved. The notebook preserves fragments, not certainty.
+      </p>
+
+      <button
+        onClick={toggleUnstable}
+        className="mt-4 rounded-lg border border-neutral-700 bg-neutral-950 px-4 py-2 text-xs hover:bg-neutral-800"
+      >
+        {unstable ? "stabilize memory" : "destabilize memory"}
+      </button>
+    </aside>
+  );
+}
+
+
+export function NotebookSpread() {
   return (
     <main className="min-h-screen bg-neutral-950 px-6 py-10 text-neutral-100">
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8 flex items-end justify-between gap-6">
-          <div>
-            <p className="text-sm uppercase tracking-[0.35em] text-neutral-500">Alder Cove</p>
-            <h1 className="mt-2 text-4xl font-semibold">{notebookOneSpread.title}</h1>
-            <p className="mt-3 max-w-2xl text-neutral-300">
-              First sacred spread prototype: care systems, contradiction logic, and emotional preservation.
-            </p>
-          </div>
-
-          <button
-            onClick={toggleUnstable}
-            className="rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-2 text-sm hover:bg-neutral-800"
-          >
-            {unstable ? "stabilize memory" : "destabilize memory"}
-          </button>
+        <header className="mb-8">
+          <p className="text-sm uppercase tracking-[0.35em] text-neutral-500">Alder Cove</p>
+          <h1 className="mt-2 text-4xl font-semibold">{notebookOneSpread.title}</h1>
+          <p className="mt-3 max-w-2xl text-neutral-300">
+            First sacred spread prototype: care systems, contradiction logic, and emotional preservation.
+          </p>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Page side="left" notes={notebookOneSpread.leftPage} />
-          <Page side="right" notes={notebookOneSpread.rightPage} />
+        <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Page side="left" notes={notebookOneSpread.leftPage} />
+            <Page side="right" notes={notebookOneSpread.rightPage} />
+          </div>
+
+          <InspectionPanel />
         </div>
       </div>
     </main>

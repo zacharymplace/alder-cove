@@ -2,71 +2,124 @@ export type NotebookNote = {
   id: string;
   text: string;
   author?: string;
-  variant?: "founding" | "map" | "log" | "symbol" | "contradiction" | "warning" | "margin";
+  variant?:
+    | "founding"
+    | "map"
+    | "log"
+    | "symbol"
+    | "contradiction"
+    | "warning"
+    | "margin";
+  relatedNoteIds?: string[];
+  memoryPressure?: "low" | "medium" | "high";
 };
 
 export const notebookOneSpread = {
   title: "Notebook One — First Spread",
+
   leftPage: [
     {
       id: "founding-phrase",
       variant: "founding",
       text: "WRITE IT DOWN BEFORE YOU FORGET",
       author: "co-author",
+      memoryPressure: "high",
     },
+
     {
       id: "later-rule",
       variant: "margin",
       text: "The town changes things when nobody checks.",
       author: "archivist",
+      memoryPressure: "medium",
     },
+
     {
       id: "map-labels",
       variant: "map",
-      text: "Alder Cove map: ferry dock, cannery, cliff trail, safe rocks, tunnel entrance, echo place, fast way home, DON'T GO IF FOG.",
+      text: "Alder Cove map",
+      relatedNoteIds: [
+        "cannery-sketch",
+        "eli-contradiction-a",
+      ],
+      memoryPressure: "medium",
     },
+
     {
       id: "symbol-legend",
       variant: "symbol",
-      text: "Blue fish = someone checked already. Silver star = still feels normal. Lighthouse = checked in. Tide slash = don't go alone.",
+      text: "Blue fish = someone checked already.",
+      memoryPressure: "low",
     },
+
     {
       id: "checkin-log",
       variant: "log",
-      text: "Eli → cannery roof w/ Mara → before lights\nJune → ferry hill alone → after dinner\nNora → tide pools w/ Ben → when horn goes\nCal → lower trail → dont tell parents → probably late",
+      text: "check-in system",
+      relatedNoteIds: ["going-salt-first"],
+      memoryPressure: "medium",
     },
   ] satisfies NotebookNote[],
+
   rightPage: [
     {
       id: "cannery-sketch",
       variant: "map",
-      text: "Flooded lower level circled: WATERLINE ROOM. water moves weird after storms.",
+      text: "water moves weird after storms",
+      relatedNoteIds: [
+        "eli-contradiction-a",
+        "eli-contradiction-b",
+        "cannery-line",
+      ],
+      memoryPressure: "high",
     },
+
     {
       id: "stop-saying-that",
       variant: "margin",
       text: "stop saying that",
       author: "skeptic",
+      memoryPressure: "medium",
     },
+
     {
       id: "eli-contradiction-a",
       variant: "contradiction",
       text: "Eli hates the tunnels after rain now.",
+      relatedNoteIds: [
+        "eli-contradiction-b",
+        "cannery-sketch",
+      ],
+      memoryPressure: "high",
     },
+
     {
       id: "eli-contradiction-b",
       variant: "contradiction",
       text: "no he doesnt. he always wanted to go first",
+      relatedNoteIds: [
+        "eli-contradiction-a",
+      ],
+      memoryPressure: "high",
     },
+
     {
       id: "going-salt-first",
       variant: "warning",
       text: "Mara says my dad's going salt because he forgot the dock fire but I think he just lies now",
+      relatedNoteIds: ["checkin-log"],
+      memoryPressure: "medium",
     },
+
     {
       id: "cannery-line",
       variant: "margin",
       text: "The cannery gives things back wrong sometimes.",
+      relatedNoteIds: [
+        "cannery-sketch",
+        "eli-contradiction-a",
+      ],
+      memoryPressure: "high",
     },
   ] satisfies NotebookNote[],
 };
