@@ -15,7 +15,7 @@ type NotebookState = {
   pinnedEvidence: string[];
   instabilityLevel: number;
   collapseTriggered: boolean;
-  mutationPhase: number;
+  revisionPhase: number;
   select: (id: string | null) => void;
   toggleUnstable: () => void;
   setMemoryLayer: (
@@ -26,7 +26,7 @@ type NotebookState = {
   pinEvidence: (evidence: string) => void;
   increaseInstability: () => void;
   triggerCollapse: () => void;
-  advanceMutation: () => void;
+  advanceRevision: () => void;
 };
 
 const useNotebookState = create<NotebookState>((set) => ({
@@ -39,6 +39,9 @@ const useNotebookState = create<NotebookState>((set) => ({
   instabilityLevel: 0,
   collapseTriggered: false,
   mutationPhase: 0,
+  spreadIndex: 0,
+  zoomedPage: null,
+  pageTurnDirection: null,
 
   select: (id) => set({ selectedId: id }),
 
@@ -84,6 +87,30 @@ const useNotebookState = create<NotebookState>((set) => ({
     set((state) => ({
       mutationPhase: Math.min(state.mutationPhase + 1, 5),
     })),
+
+  nextSpread: () =>
+    set((state) => ({
+      spreadIndex: Math.min(state.spreadIndex + 1, 1),
+      zoomedPage: null,
+      pageTurnDirection: "next",
+    })),
+
+  previousSpread: () =>
+    set((state) => ({
+      spreadIndex: Math.max(state.spreadIndex - 1, 0),
+      zoomedPage: null,
+      pageTurnDirection: "previous",
+    })),
+
+  setZoomedPage: (page) =>
+    set({
+      zoomedPage: page,
+    }),
+
+  clearPageTurn: () =>
+    set({
+      pageTurnDirection: null,
+    }),
 }));
 
 function noteClass(variant?: NotebookNote["variant"]) {
@@ -91,7 +118,7 @@ function noteClass(variant?: NotebookNote["variant"]) {
     case "founding":
       return "text-4xl font-black uppercase leading-tight";
     case "contradiction":
-      return "border border-dashed border-neutral-700/40 bg-white/20";
+      return "border border-dashed border-neutral-700/20 bg-white/10";
     case "warning":
       return "border-l-2 border-red-900/50 bg-red-100/20";
     case "map":
@@ -197,8 +224,8 @@ function Note({
     memoryLayer,
     instabilityLevel,
     collapseTriggered,
-    mutationPhase,
-    advanceMutation,
+    revisionPhase,
+    advanceRevision,
   } = useNotebookState();
   const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
   const selectedNote = allNotes.find((candidate) => candidate.id === selectedId);
@@ -268,21 +295,21 @@ function Note({
   }
 
   if (
-    mutationPhase >= 1 &&
+    revisionPhase >= 1 &&
     note.id === "stop-saying-that"
   ) {
     unstableText = "stop writing that down";
   }
 
   if (
-    mutationPhase >= 2 &&
+    revisionPhase >= 2 &&
     note.id === "later-rule"
   ) {
     unstableText = "The town changes people when nobody checks.";
   }
 
   if (
-    mutationPhase >= 3 &&
+    revisionPhase >= 3 &&
     note.id === "going-salt-first"
   ) {
     unstableText =
@@ -290,7 +317,7 @@ function Note({
   }
 
   if (
-    mutationPhase >= 4 &&
+    revisionPhase >= 4 &&
     note.id === "eli-contradiction-a"
   ) {
     unstableText =
@@ -298,7 +325,7 @@ function Note({
   }
 
   if (
-    mutationPhase >= 5 &&
+    revisionPhase >= 5 &&
     note.id === "eli-contradiction-b"
   ) {
     unstableText =
@@ -306,11 +333,11 @@ function Note({
   }
 
   if (
-    mutationPhase >= 5 &&
+    revisionPhase >= 5 &&
     note.id === "eli-childhood-memory"
   ) {
     unstableText =
-      "maybe Eli changed because we kept writing him down wrong.";
+      "maybe we already decided what he was becoming.";
   }
 
   if (
@@ -346,6 +373,28 @@ function Note({
         <HandlingSmudge className="-right-4 top-1" />
       )}
 
+
+
+        {note.contradictionChain === "eli-tunnels" && (
+          <div className="pointer-events-none absolute -left-2 top-0 h-full w-4 rounded-r-full bg-red-950/3 blur-[1px]" />
+        )}
+
+
+      {note.contradictionChain === "eli-tunnels" && (
+        <>
+          <HandlingSmudge className="-left-5 top-2 h-24 w-32 bg-neutral-900/12" />
+
+          <div className="pointer-events-none absolute -right-3 bottom-3 h-16 w-28 rotate-[4deg] rounded-full bg-red-950/6 blur-md" />
+
+          <div className="pointer-events-none absolute left-4 top-2 h-px w-[78%] rotate-[0.4deg] bg-neutral-950/10" />
+
+          <div className="pointer-events-none absolute right-8 top-[62%] rotate-[3deg] text-[10px] italic text-neutral-800/16">
+            ask him then
+          </div>
+        </>
+      )}
+
+
       {instabilityLevel >= 3 && note.variant === "contradiction" && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -355,7 +404,7 @@ function Note({
       )}
 
 
-      {mutationPhase >= 2 && (
+      {revisionPhase >= 2 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.08 }}
@@ -363,7 +412,7 @@ function Note({
         />
       )}
 
-      {mutationPhase >= 4 && (
+      {revisionPhase >= 4 && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.22 }}
@@ -372,6 +421,29 @@ function Note({
           wording changed after recovery
         </motion.p>
       )}
+
+
+        {note.contradictionChain === "eli-tunnels" && (
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.08]"
+            viewBox="0 0 500 220"
+          >
+            <path
+              d="M42 88 C120 84, 210 96, 340 78"
+              fill="none"
+              stroke="black"
+              strokeWidth="1.5"
+            />
+
+            <path
+              d="M70 120 C180 132, 290 126, 410 118"
+              fill="none"
+              stroke="black"
+              strokeWidth="1"
+            />
+          </svg>
+        )}
+
 
       {collapseTriggered &&
         note.contradictionChain === "eli-tunnels" && (
@@ -410,7 +482,7 @@ function Note({
         {unstableText}
       </p>
 
-      <div className="mt-2 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.25em] text-neutral-600">
+      <div className="mt-2 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.25em] text-neutral-700">
         {note.author && <span>{note.author}</span>}
 
         {note.copiedBy && (
@@ -464,19 +536,32 @@ function Note({
           </motion.div>
         )}
 
+
+      {selected &&
+        note.contradictionChain === "eli-tunnels" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.55 }}
+            transition={{ delay: 2.5, duration: 2.5 }}
+            className="mt-3 text-[11px] italic text-neutral-700/70"
+          >
+            the longer this is held, the less certain the wording feels
+          </motion.div>
+        )}
+
       {selected && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="mt-3 border-t border-neutral-800/20 pt-2 text-xs italic text-neutral-700"
         >
-          preserved memory fragment
+          preserved fragment
           {note.pressureReveal && (
             <motion.p
               initial={{ opacity: 0, filter: "blur(3px)" }}
               animate={{ opacity: 0.58, filter: "blur(0px)" }}
               transition={{ delay: 0.35, duration: 0.8 }}
-              className="mt-3 rotate-[-0.6deg] text-[13px] text-neutral-600 line-through decoration-neutral-500/60"
+              className="mt-3 rotate-[-0.6deg] text-[13px] text-neutral-700 line-through decoration-neutral-500/60"
             >
               {note.pressureReveal}
             </motion.p>
@@ -642,10 +727,10 @@ function Page({
   side: "left" | "right";
   notes: NotebookNote[];
 }) {
-  const { instabilityLevel, mutationPhase } = useNotebookState();
+  const { instabilityLevel, revisionPhase } = useNotebookState();
 
   return (
-    <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#ecdfb7] p-8 shadow-2xl">
+    <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#ecdfb7] p-8 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(80,60,25,.06)_1px,transparent_1px)] bg-[size:100%_28px]" />
       <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_20%_10%,rgba(255,255,255,.7),transparent_22%),radial-gradient(circle_at_82%_75%,rgba(92,64,28,.24),transparent_24%),radial-gradient(circle_at_12%_88%,rgba(30,64,175,.14),transparent_16%)]" />
       <div className="absolute inset-y-0 left-7 w-px bg-red-900/20" />
@@ -654,7 +739,7 @@ function Page({
       {side === "right" && <ArgumentMarks />}
 
 
-        {mutationPhase >= 3 && (
+        {revisionPhase >= 3 && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.22 }}
@@ -663,6 +748,21 @@ function Page({
             maybe we changed him first
           </motion.p>
         )}
+
+
+
+      <div className="pointer-events-none absolute left-16 top-[58%] rotate-[-2deg] text-[11px] italic text-neutral-700/26">
+        he wasnt trying to scare us
+      </div>
+
+
+        <div className="pointer-events-none absolute left-10 top-6 rotate-[-2deg] text-[11px] text-neutral-800/24">
+          18
+        </div>
+
+        <div className="pointer-events-none absolute right-12 top-6 rotate-[1deg] text-[10px] italic text-neutral-800/10">
+          renumbered later
+        </div>
 
 
       <div
@@ -684,8 +784,16 @@ function Page({
         ) : (
           <>
             <CannerySketch />
-            <Note note={notes[0]} rotate="rotate-[0.4deg]" />
-            <Note note={notes[1]} rotate="rotate-[-0.6deg]" />
+            <div className="mb-10">
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-0 rounded bg-amber-950/5" />
+                <Note note={notes[0]} rotate="rotate-[0.4deg]" />
+              </div>
+            </div>
+
+            <div className="mb-10">
+              <Note note={notes[1]} rotate="rotate-[-0.6deg]" />
+            </div>
     
         {instabilityLevel >= 4 && (
           <motion.p
@@ -777,6 +885,54 @@ function EdgeWear() {
   );
 }
 
+function TapeGhost({
+  className,
+}: {
+  className?: string;
+}) {
+  return (
+    <div
+      className={clsx(
+        "pointer-events-none absolute rounded-sm border border-neutral-900/6 bg-neutral-900/3",
+        className
+      )}
+    />
+  );
+}
+
+function RemovedFragmentResidue() {
+  return (
+    <div className="pointer-events-none absolute right-8 top-[18%]">
+      <TapeGhost className="h-10 w-24 rotate-[4deg]" />
+
+      <p className="mt-2 rotate-[1deg] text-[10px] italic text-neutral-800/16">
+        page removed after ferry week
+      </p>
+    </div>
+  );
+}
+
+function RepeatedHandlingWear() {
+  return (
+    <>
+      <div className="pointer-events-none absolute left-0 top-[32%] h-36 w-5 rounded-r-full bg-neutral-950/6 blur-[1px]" />
+
+      <div className="pointer-events-none absolute right-0 top-[42%] h-44 w-5 rounded-l-full bg-neutral-950/5 blur-[1px]" />
+
+      <div className="pointer-events-none absolute bottom-12 left-[18%] h-2 w-52 rotate-[0.4deg] bg-neutral-950/4 blur-sm" />
+    </>
+  );
+}
+
+function MissingPageReference() {
+  return (
+    <div className="pointer-events-none absolute bottom-14 right-10 rotate-[2deg] text-[10px] italic text-neutral-800/10">
+      see missing page 19 for original version
+    </div>
+  );
+}
+
+
 function HiddenLayerPage() {
   const {
     flashlight,
@@ -787,17 +943,20 @@ function HiddenLayerPage() {
     increaseInstability,
     instabilityLevel,
     collapseTriggered,
-    mutationPhase,
-    advanceMutation,
+    revisionPhase,
+    advanceRevision,
   } = useNotebookState();
 
   return (
-    <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#eadcb1] p-8 shadow-2xl">
+    <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#eadcb1] p-8 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(80,60,25,.06)_1px,transparent_1px)] bg-[size:100%_28px]" />
       <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_70%_25%,rgba(30,64,175,.14),transparent_18%),radial-gradient(circle_at_20%_80%,rgba(92,64,28,.28),transparent_26%)]" />
       <div className="absolute inset-y-0 left-7 w-px bg-red-900/20" />
       <DamageOverlay intensity="heavy" />
       <EdgeWear />
+      <RepeatedHandlingWear />
+      <RemovedFragmentResidue />
+      <MissingPageReference />
 
       {flashlight && (
         <motion.div
@@ -808,7 +967,7 @@ function HiddenLayerPage() {
       )}
 
 
-        {mutationPhase >= 3 && (
+        {revisionPhase >= 3 && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.22 }}
@@ -818,6 +977,11 @@ function HiddenLayerPage() {
           </motion.p>
         )}
 
+
+
+      <div className="pointer-events-none absolute left-16 top-[58%] rotate-[-2deg] text-[11px] italic text-neutral-700/26">
+        he wasnt trying to scare us
+      </div>
 
       <div
         className="relative z-10 space-y-6"
@@ -860,7 +1024,7 @@ function HiddenLayerPage() {
                 type="button"
                 initial={{ opacity: 0, filter: "blur(5px)" }}
                 animate={{ opacity: 0.42, filter: "blur(0px)" }}
-                transition={{ duration: 1 }}
+                transition={{ duration: 4.8 }}
                 onClick={() => {
                   pinEvidence("he was scared before we were");
                   increaseInstability();
@@ -869,7 +1033,7 @@ function HiddenLayerPage() {
                     triggerCollapse();
                   }
                 }}
-                className="absolute left-12 top-24 rotate-[-1deg] text-left text-lg text-neutral-600 hover:opacity-80"
+                className="absolute left-12 top-24 rotate-[-1deg] text-left text-lg text-neutral-700/68 hover:opacity-90"
               >
                 he was scared before we were
               </motion.button>
@@ -878,12 +1042,12 @@ function HiddenLayerPage() {
                 type="button"
                 initial={{ opacity: 0, filter: "blur(4px)" }}
                 animate={{ opacity: 0.32, filter: "blur(0px)" }}
-                transition={{ delay: 0.4, duration: 1 }}
+                transition={{ delay: 3.0, duration: 5.2 }}
                 onClick={() => {
                   pinEvidence("not just Eli because Eli remembers wrong");
                   increaseInstability();
                 }}
-                className="absolute bottom-4 right-8 rotate-[2deg] text-left text-xs text-neutral-700 line-through hover:opacity-80"
+                className="absolute bottom-4 right-8 rotate-[2deg] text-left text-xs text-neutral-700/60 line-through hover:opacity-90"
               >
                 not just Eli because Eli remembers wrong
               </motion.button>
@@ -905,11 +1069,16 @@ function HiddenLayerPage() {
           <Tape className="-top-2 left-10" />
           <HandlingSmudge className="right-6 top-5" />
 
-          <p className="text-xs uppercase tracking-[0.25em] text-neutral-600">
+          <div className="pointer-events-none absolute right-10 top-7 rotate-[5deg] text-[10px] italic text-neutral-900/20">
+            dont lose this one
+          </div>
+
+
+          <p className="text-xs uppercase tracking-[0.25em] text-neutral-700">
             folded note under tape
           </p>
 
-          <p className="mt-2 text-sm text-neutral-900">
+          <p className="mt-2 text-sm leading-relaxed text-neutral-950">
             {foldedOpen
               ? "Mara said the cannery gives people back wrong but made me change it to things because people sounds too mean."
               : "do not open unless the story changes again"}
@@ -948,7 +1117,7 @@ function HiddenLayerPage() {
             original wording:
             <span className="ml-2 font-bold italic">people</span>
           </p>
-          <p className="mt-3 text-xs uppercase tracking-[0.25em] text-neutral-600">
+          <p className="mt-3 text-xs uppercase tracking-[0.25em] text-neutral-700">
             discrepancy unresolved
           </p>
         </div>
@@ -970,60 +1139,60 @@ function HiddenLayerPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-4 text-xs text-red-100/80"
+          className="mt-5 rounded-lg border border-red-900/10 bg-red-950/3 p-4 text-xs text-red-100/60"
         >
-          notebook coherence failing
+          preservation layers no longer fully agree
 
           <div className="mt-3 space-y-2">
-            <p>• preserved wording drifting across unrelated entries</p>
-            <p>• social corrections propagating into archived memory</p>
-            <p>• reconstruction layers no longer align</p>
-            <p>• emotional mediation overriding original language</p>
+            <p>• preserved wording varies between layers</p>
+            <p>• social corrections appear within recovered memory</p>
+            <p>• reconstruction layers preserve conflicting emphasis</p>
+            <p>• later wording may soften earlier phrasing</p>
           </div>
         </motion.div>
       )}
 
 
-      {mutationPhase >= 1 && (
+      {revisionPhase >= 1 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-4 text-xs text-red-100/80"
+          className="mt-5 rounded-lg border border-red-900/10 bg-red-950/3 p-4 text-xs text-red-100/60"
         >
-          passive notebook mutation detected
+          preserved wording differs slightly across recovery layers
 
           <div className="mt-3 space-y-2">
-            <p>• wording drift occurring outside direct excavation</p>
-            <p>• archivist copies diverging from recovered originals</p>
-            <p>• contradiction language spreading across linked fragments</p>
+            <p>• recovered wording differs between review passes</p>
+            <p>• archivist copies differ slightly from recovered wording</p>
+            <p>• related fragments preserve different emotional interpretations</p>
           </div>
         </motion.div>
       )}
 
 
-      {mutationPhase >= 5 && (
+      {revisionPhase >= 5 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-5 rounded-lg border border-red-900/30 bg-red-950/20 p-4 text-sm text-red-100/80"
+            className="mt-5 rounded-lg bg-red-950/8 p-4 text-sm text-red-100/55"
           >
-            Eli contradiction chain collapse
+            Eli preservation discrepancy
 
             <div className="mt-4 space-y-3 text-xs">
               <p>
-                • childhood fear was progressively reframed as behavioral instability
+                • childhood fear gradually became categorized behavior
               </p>
 
               <p>
-                • archivist copies hardened emotional interpretation into preserved wording
+                • archivist copies preserved a narrower emotional framing
               </p>
 
               <p>
-                • reconstruction layers increasingly prioritized social coherence over emotional accuracy
+                • later copies appear emotionally softened
               </p>
 
               <p className="italic">
-                maybe the notebook changed him before the town did
+                maybe the notebook got there first
               </p>
             </div>
           </motion.div>
@@ -1039,7 +1208,13 @@ function HiddenLayerPage() {
           </motion.div>
         )}
 
-        <div className="flex flex-wrap gap-3 pt-2">
+  
+      <div className="pointer-events-none absolute left-[22%] top-[76%] rotate-[-4deg] text-[11px] italic text-neutral-700/8">
+        he said the tunnels remembered us wrong
+      </div>
+
+
+      <div className="flex flex-wrap gap-3 pt-2">
           <button
             onClick={toggleFlashlight}
             className="rounded-lg border border-neutral-700 bg-neutral-950 px-4 py-2 text-xs text-neutral-100 hover:bg-neutral-800"
@@ -1056,6 +1231,55 @@ function HiddenLayerPage() {
   );
 }
 
+function EliChainProgress({ revisionPhase }: { revisionPhase: number }) {
+  const stages = [
+    ["1", "first wording", "Eli notices the tunnels feel wrong."],
+    ["2", "later wording", "The group starts documenting his behavior."],
+    ["3", "copied wording", "The archivist preserves a narrower version."],
+    ["4", "softened wording", "Kinder wording begins replacing sharper truth."],
+    ["5", "preserved identity", "The preserved versions no longer agree on where Eli ends and the story begins."],
+  ];
+
+  const activeStage = Math.min(Math.max(revisionPhase, 0), stages.length - 1);
+
+  return (
+    <div className="mt-5 rounded-lg border border-neutral-800 bg-neutral-950/40 p-4">
+      <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-400">
+        Eli Review Notes
+      </p>
+
+      <div className="mt-4 space-y-3">
+        {stages.map(([number, label, description], index) => (
+          <div
+            key={label}
+            className={clsx(
+              "rounded border p-3 transition-all duration-700",
+              index <= activeStage
+                ? "border-red-900/30 bg-red-950/10 text-red-100/80"
+                : "border-neutral-800 bg-neutral-950/30 text-neutral-400"
+            )}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[10px] uppercase tracking-[0.25em]">
+                {number}. {label}
+              </span>
+
+              {index === activeStage && (
+                <span className="rounded bg-red-900/15 px-2 py-1 text-[9px] uppercase tracking-[0.2em] text-red-100/50">
+                  held
+                </span>
+              )}
+            </div>
+
+            <p className="mt-2 text-xs italic">{description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
 function InspectionPanel() {
   const {
     selectedId,
@@ -1066,8 +1290,8 @@ function InspectionPanel() {
     pinnedEvidence,
     instabilityLevel,
     collapseTriggered,
-    mutationPhase,
-    advanceMutation,
+    revisionPhase,
+    advanceRevision,
   } = useNotebookState();
   const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
   const selected = allNotes.find((note) => note.id === selectedId);
@@ -1077,15 +1301,17 @@ function InspectionPanel() {
 
   if (!selected) {
     return (
-      <aside className="rounded-xl border border-neutral-800 bg-neutral-900/70 p-5 text-sm text-neutral-400">
-        Select a note to inspect preserved memory pressure.
+      <aside className="rounded-xl border border-neutral-900/5 bg-neutral-950/14 p-5 text-sm text-neutral-400 backdrop-blur-[1px]">
+        <p className="italic opacity-70">
+          deeper review becomes available after the page is handled long enough
+        </p>
       </aside>
     );
   }
 
   return (
-    <aside className="rounded-xl border border-neutral-700 bg-neutral-950/95 p-5 shadow-xl">
-      <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
+    <aside className="rounded-xl border border-neutral-900/40 bg-neutral-950/70 p-5 shadow-xl backdrop-blur-[1px]">
+      <p className="text-xs uppercase tracking-[0.3em] text-neutral-400">
         Inspecting Fragment
       </p>
 
@@ -1104,8 +1330,8 @@ function InspectionPanel() {
           <motion.p
             initial={{ opacity: 0, filter: "blur(4px)" }}
             animate={{ opacity: 0.55, filter: "blur(0px)" }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="mt-4 text-xs italic text-neutral-500 line-through decoration-neutral-600"
+            transition={{ delay: 1.0, duration: 2.4 }}
+            className="mt-4 text-xs italic text-neutral-400 line-through decoration-neutral-600"
           >
             pressure reveal: {selected.pressureReveal}
           </motion.p>
@@ -1114,19 +1340,23 @@ function InspectionPanel() {
 
       <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
         <div className="rounded-lg border border-neutral-800 p-3">
-          <p className="uppercase tracking-widest text-neutral-500">Memory Pressure</p>
+          <p className="uppercase tracking-widest text-neutral-400">Memory Pressure</p>
           <p className="mt-2 text-neutral-100">{selected.memoryPressure ?? "unknown"}</p>
         </div>
 
         <div className="rounded-lg border border-neutral-800 p-3">
-          <p className="uppercase tracking-widest text-neutral-500">State</p>
+          <p className="uppercase tracking-widest text-neutral-400">State</p>
           <p className="mt-2 text-neutral-100">{unstable ? "drifting" : "stable"}</p>
         </div>
       </div>
 
+      {selected.contradictionChain === "eli-tunnels" && (
+        <EliChainProgress revisionPhase={revisionPhase} />
+      )}
+
       {related && related.length > 0 && (
         <div className="mt-5">
-          <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
+          <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">
             Related Fragments
           </p>
           <ul className="mt-3 space-y-2">
@@ -1146,61 +1376,61 @@ function InspectionPanel() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-4 text-xs text-red-100/80"
+          className="mt-5 rounded-lg border border-red-900/10 bg-red-950/3 p-4 text-xs text-red-100/60"
         >
-          notebook coherence failing
+          preservation layers no longer fully agree
 
           <div className="mt-3 space-y-2">
-            <p>• preserved wording drifting across unrelated entries</p>
-            <p>• social corrections propagating into archived memory</p>
-            <p>• reconstruction layers no longer align</p>
-            <p>• emotional mediation overriding original language</p>
+            <p>• preserved wording varies between layers</p>
+            <p>• social corrections appear within recovered memory</p>
+            <p>• reconstruction layers preserve conflicting emphasis</p>
+            <p>• later wording may soften earlier phrasing</p>
           </div>
         </motion.div>
       )}
 
 
-      {mutationPhase >= 1 && (
+      {revisionPhase >= 1 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-4 text-xs text-red-100/80"
+          className="mt-5 rounded-lg border border-red-900/10 bg-red-950/3 p-4 text-xs text-red-100/60"
         >
-          passive notebook mutation detected
+          preserved wording differs slightly across recovery layers
 
           <div className="mt-3 space-y-2">
-            <p>• wording drift occurring outside direct excavation</p>
-            <p>• archivist copies diverging from recovered originals</p>
-            <p>• contradiction language spreading across linked fragments</p>
+            <p>• recovered wording differs between review passes</p>
+            <p>• archivist copies differ slightly from recovered wording</p>
+            <p>• related fragments preserve different emotional interpretations</p>
           </div>
         </motion.div>
       )}
 
 
-      {mutationPhase >= 5 &&
+      {revisionPhase >= 5 &&
         selected?.contradictionChain === "eli-tunnels" && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-5 rounded-lg border border-red-900/30 bg-red-950/20 p-4 text-sm text-red-100/80"
+            className="mt-5 rounded-lg bg-red-950/8 p-4 text-sm text-red-100/55"
           >
-            Eli contradiction chain collapse
+            Eli preservation discrepancy
 
             <div className="mt-4 space-y-3 text-xs">
               <p>
-                • childhood fear was progressively reframed as behavioral instability
+                • childhood fear gradually became categorized behavior
               </p>
 
               <p>
-                • archivist copies hardened emotional interpretation into preserved wording
+                • archivist copies preserved a narrower emotional framing
               </p>
 
               <p>
-                • reconstruction layers increasingly prioritized social coherence over emotional accuracy
+                • later copies appear emotionally softened
               </p>
 
               <p className="italic">
-                maybe the notebook changed him before the town did
+                maybe the notebook got there first
               </p>
             </div>
           </motion.div>
@@ -1212,7 +1442,7 @@ function InspectionPanel() {
           animate={{ opacity: 1 }}
           className="mt-5 rounded-lg border border-red-900/30 bg-red-950/20 p-4 text-xs text-red-100/80"
         >
-          contradiction chain collapse detected
+          preservation conflict unresolved
 
           <div className="mt-3 space-y-2">
             <p>• recovered wording no longer aligns with archivist copy</p>
@@ -1225,20 +1455,20 @@ function InspectionPanel() {
 
       {instabilityLevel >= 1 && (
         <div className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-3 text-[11px] text-red-100/70">
-          archival confidence degrading through repeated excavation
+          source confidence affected by repeated handling
         </div>
       )}
 
       {pinnedEvidence.length > 0 && (
         <div className="mt-5">
-          <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
+          <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">
             Pinned Excavation Evidence
           </p>
           <ul className="mt-3 space-y-2">
             {pinnedEvidence.map((evidence) => (
               <li
                 key={evidence}
-                className="rounded border border-amber-900/30 bg-amber-950/10 p-2 text-xs italic text-amber-100/80"
+                className="rounded bg-amber-950/5 p-2 text-xs italic text-amber-100/55"
               >
                 {evidence}
               </li>
@@ -1252,8 +1482,8 @@ function InspectionPanel() {
       </p>
 
       <div className="mt-4 space-y-3">
-        <div className="rounded-lg border border-neutral-800 bg-neutral-950/40 p-3 text-[11px] text-neutral-500">
-          visible pressure marks suggest multiple revisions over time
+        <div className="rounded-lg border border-neutral-800 bg-neutral-950/40 p-3 text-[11px] text-neutral-400">
+          pressure marks indicate repeated handling
         </div>
 
         {selected.recoveredFrom && (
@@ -1303,8 +1533,8 @@ function InspectionPanel() {
 
 
       <div className="mt-4 rounded-lg border border-neutral-800 bg-neutral-950/40 p-3">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-500">
-          instability drift
+        <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-400">
+          reconstruction divergence
         </p>
 
         <div className="mt-3 flex gap-2">
@@ -1325,10 +1555,10 @@ function InspectionPanel() {
 
 
       <button
-        onClick={advanceMutation}
+        onClick={advanceRevision}
         className="mt-3 rounded-lg border border-red-900/30 bg-red-950/10 px-4 py-2 text-xs text-red-100/80 hover:bg-red-950/20"
       >
-        advance passive mutation
+        re-read
       </button>
 
 
@@ -1336,11 +1566,261 @@ function InspectionPanel() {
         onClick={toggleUnstable}
         className="mt-3 rounded-lg border border-neutral-700 bg-neutral-950 px-4 py-2 text-xs hover:bg-neutral-800"
       >
-        {unstable ? "stabilize memory" : "destabilize memory"}
+        {unstable ? "return to recovered wording" : "compare recovered wording"}
       </button>
     </aside>
   );
 }
+
+
+function HandledPage({
+  children,
+  side,
+  focused,
+}: {
+  children: React.ReactNode;
+  side: "left" | "right";
+  focused?: boolean;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10, rotateY: side === "left" ? -2 : 2 }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        rotateY: 0,
+        scale: focused ? 1.08 : 1,
+      }}
+      transition={{
+        duration: 0.7,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      className={clsx(
+        "relative origin-center transition-transform",
+        side === "left" ? "drop-shadow-[8px_18px_18px_rgba(0,0,0,0.35)]" : "drop-shadow-[-8px_18px_18px_rgba(0,0,0,0.35)]"
+      )}
+      style={{
+        transformStyle: "preserve-3d",
+      }}
+    >
+      <div
+        className={clsx(
+          "pointer-events-none absolute inset-y-3 z-20 w-6 rounded-full blur-md",
+          side === "left"
+            ? "-right-2 bg-neutral-950/10"
+            : "-left-2 bg-neutral-950/10"
+        )}
+      />
+
+      <div
+        className={clsx(
+          "pointer-events-none absolute inset-0 z-20 rounded-xl",
+          side === "left"
+            ? "bg-gradient-to-l from-neutral-950/8 via-transparent to-transparent"
+            : "bg-gradient-to-r from-neutral-950/8 via-transparent to-transparent"
+        )}
+      />
+
+      {children}
+    </motion.div>
+  );
+}
+
+function PageTurnVeil({ direction }: { direction: "previous" | "next" | null }) {
+  if (!direction) return null;
+
+  return (
+    <motion.div
+      key={direction}
+      initial={{
+        opacity: 0,
+        x: direction === "next" ? 80 : -80,
+        rotateY: direction === "next" ? -12 : 12,
+      }}
+      animate={{
+        opacity: [0, 0.18, 0],
+        x: 0,
+        rotateY: 0,
+      }}
+      transition={{ duration: 0.9, ease: "easeInOut" }}
+      className="pointer-events-none absolute inset-0 z-30 rounded-xl bg-[#f0dfad]"
+    />
+  );
+}
+
+function NotebookReader() {
+  const { spreadIndex, zoomedPage, pageTurnDirection, clearPageTurn } = useNotebookState();
+
+  const leftPage =
+    spreadIndex === 0 ? (
+      <Page side="left" notes={notebookOneSpread.leftPage} />
+    ) : (
+      <HiddenLayerPage />
+    );
+
+  const rightPage =
+    spreadIndex === 0 ? (
+      <Page side="right" notes={notebookOneSpread.rightPage} />
+    ) : (
+      <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#eadcb1] p-8 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
+        <DamageOverlay intensity="medium" />
+        <EdgeWear />
+        <div
+          className="relative z-10 space-y-6"
+          style={{ fontFamily: "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive" }}
+        >
+          <p className="text-xs uppercase tracking-[0.35em] text-neutral-700">
+            facing page
+          </p>
+
+          <p className="mt-20 rotate-[-1deg] text-sm italic text-neutral-800/62">
+            this page was left mostly blank after storm week
+          </p>
+
+          <p className="mt-40 rotate-[2deg] text-xs italic text-neutral-800/30">
+            see missing page 19 for original version
+          </p>
+        </div>
+      </section>
+    );
+
+  return (
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div
+        className={clsx(
+          "relative grid gap-6 transition-all duration-700",
+          zoomedPage ? "grid-cols-1" : "lg:grid-cols-2"
+        )}
+      >
+        <PageTurnVeil direction={pageTurnDirection} />
+
+        {pageTurnDirection && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ delay: 0.9, duration: 0.1 }}
+            onAnimationComplete={clearPageTurn}
+            className="pointer-events-none absolute inset-0"
+          />
+        )}
+
+        {(!zoomedPage || zoomedPage === "left") && (
+          <div className={clsx("mx-auto w-full max-w-[430px]", !zoomedPage && "max-w-none")}>
+            <HandledPage side="left" focused={zoomedPage === "left"}>
+              {leftPage}
+            </HandledPage>
+          </div>
+        )}
+
+        {(!zoomedPage || zoomedPage === "right") && (
+          <div className={clsx("mx-auto w-full max-w-[430px]", !zoomedPage && "max-w-none")}>
+            <HandledPage side="right" focused={zoomedPage === "right"}>
+              {rightPage}
+            </HandledPage>
+          </div>
+        )}
+      </div>
+
+      <InspectionPanel />
+    </div>
+  );
+}
+
+
+function NotebookReaderControls() {
+  const {
+    spreadIndex,
+    zoomedPage,
+    previousSpread,
+    nextSpread,
+    setZoomedPage,
+  } = useNotebookState();
+
+  const toggleFocus = () => {
+    setZoomedPage(zoomedPage ? null : "left");
+  };
+
+  const moveFocus = (direction: "previous" | "next") => {
+    if (!zoomedPage) {
+      if (direction === "previous") previousSpread();
+      if (direction === "next") nextSpread();
+      return;
+    }
+
+    if (zoomedPage === "left" && direction === "next") {
+      setZoomedPage("right");
+      return;
+    }
+
+    if (zoomedPage === "right" && direction === "previous") {
+      setZoomedPage("left");
+      return;
+    }
+
+    if (zoomedPage === "right" && direction === "next") {
+      nextSpread();
+      setZoomedPage("left");
+      return;
+    }
+
+    if (zoomedPage === "left" && direction === "previous") {
+      previousSpread();
+      setZoomedPage("right");
+    }
+  };
+
+  return (
+    <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-900/20 bg-neutral-950/25 px-4 py-3 text-xs text-neutral-400">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => moveFocus("previous")}
+          disabled={!zoomedPage && spreadIndex === 0}
+          className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-30"
+        >
+          ← previous page
+        </button>
+
+        <span className="px-2 uppercase tracking-[0.25em]">
+          {zoomedPage
+            ? `${zoomedPage} page focus · spread ${spreadIndex + 1} / 2`
+            : `lay flat ${spreadIndex + 1} / 2`}
+        </span>
+
+        <button
+          onClick={() => moveFocus("next")}
+          disabled={!zoomedPage && spreadIndex === 1}
+          className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-30"
+        >
+          next page →
+        </button>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={toggleFocus}
+          className={clsx(
+            "rounded border px-3 py-2",
+            zoomedPage
+              ? "border-amber-700 bg-amber-950/20 text-amber-100/70"
+              : "border-neutral-800"
+          )}
+        >
+          {zoomedPage ? "lay flat" : "lift page closer"}
+        </button>
+
+        {zoomedPage && (
+          <button
+            onClick={() => setZoomedPage(zoomedPage === "left" ? "right" : "left")}
+            className="rounded border border-neutral-800 px-3 py-2"
+          >
+            switch facing page
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 
 
 export function NotebookSpread() {
@@ -1348,25 +1828,16 @@ export function NotebookSpread() {
     <main className="min-h-screen bg-neutral-950 px-6 py-10 text-neutral-100">
       <div className="mx-auto max-w-7xl">
         <header className="mb-8">
-          <p className="text-sm uppercase tracking-[0.35em] text-neutral-500">Alder Cove</p>
+          <p className="text-sm uppercase tracking-[0.35em] text-neutral-400">Alder Cove</p>
           <h1 className="mt-2 text-4xl font-semibold">{notebookOneSpread.title}</h1>
-          <p className="mt-3 max-w-2xl text-neutral-300">
+          <p className="mt-3 max-w-[430px] text-neutral-300">
             First sacred spread prototype: care systems, contradiction logic, and emotional preservation.
           </p>
         </header>
 
-        <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-          <div className="space-y-6">
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Page side="left" notes={notebookOneSpread.leftPage} />
-              <Page side="right" notes={notebookOneSpread.rightPage} />
-            </div>
+        <NotebookReaderControls />
 
-            <HiddenLayerPage />
-          </div>
-
-          <InspectionPanel />
-        </div>
+        <NotebookReader />
       </div>
     </main>
   );
