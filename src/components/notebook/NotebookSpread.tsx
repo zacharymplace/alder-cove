@@ -467,7 +467,7 @@ function Note({
         )}
 
       {selected && (
-        <div className="absolute -right-2 -top-2 rounded-full bg-red-900 px-2 py-1 text-[10px] uppercase tracking-widest text-white">
+        <div className="absolute -right-2 -top-2 rounded-full bg-red-900 px-2 py-1 text-[10px] uppercase tracking-widest text-neutral-900/80">
           inspecting
         </div>
       )}
@@ -730,7 +730,7 @@ function Page({
   const { instabilityLevel, revisionPhase } = useNotebookState();
 
   return (
-    <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#ecdfb7] p-8 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
+    <section className="relative h-[900px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#ecdfb7] p-9 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(80,60,25,.06)_1px,transparent_1px)] bg-[size:100%_28px]" />
       <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_20%_10%,rgba(255,255,255,.7),transparent_22%),radial-gradient(circle_at_82%_75%,rgba(92,64,28,.24),transparent_24%),radial-gradient(circle_at_12%_88%,rgba(30,64,175,.14),transparent_16%)]" />
       <div className="absolute inset-y-0 left-7 w-px bg-red-900/20" />
@@ -766,7 +766,7 @@ function Page({
 
 
       <div
-        className="relative z-10 space-y-6"
+        className="relative z-10 h-full space-y-6 overflow-hidden"
         style={{ fontFamily: "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive" }}
       >
         <p className="text-xs uppercase tracking-[0.35em] text-neutral-700">{side} page</p>
@@ -948,7 +948,7 @@ function HiddenLayerPage() {
   } = useNotebookState();
 
   return (
-    <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#eadcb1] p-8 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
+    <section className="relative h-[900px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#eadcb1] p-9 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(80,60,25,.06)_1px,transparent_1px)] bg-[size:100%_28px]" />
       <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_70%_25%,rgba(30,64,175,.14),transparent_18%),radial-gradient(circle_at_20%_80%,rgba(92,64,28,.28),transparent_26%)]" />
       <div className="absolute inset-y-0 left-7 w-px bg-red-900/20" />
@@ -984,7 +984,7 @@ function HiddenLayerPage() {
       </div>
 
       <div
-        className="relative z-10 space-y-6"
+        className="relative z-10 h-full space-y-6 overflow-hidden"
         style={{ fontFamily: "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive" }}
       >
         <p className="text-xs uppercase tracking-[0.35em] text-neutral-700">
@@ -1589,7 +1589,7 @@ function HandledPage({
         opacity: 1,
         y: 0,
         rotateY: 0,
-        scale: focused ? 1.08 : 1,
+        scale: focused ? 1.06 : 1,
       }}
       transition={{
         duration: 0.7,
@@ -1660,13 +1660,15 @@ function NotebookReader() {
 
   const rightPage =
     spreadIndex === 0 ? (
-      <Page side="right" notes={notebookOneSpread.rightPage} />
+      <div className="h-full origin-top scale-[0.96]">
+        <Page side="right" notes={notebookOneSpread.rightPage} />
+      </div>
     ) : (
-      <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#eadcb1] p-8 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
+      <section className="relative h-[900px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#eadcb1] p-9 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
         <DamageOverlay intensity="medium" />
         <EdgeWear />
         <div
-          className="relative z-10 space-y-6"
+          className="relative z-10 h-full space-y-6 overflow-hidden"
           style={{ fontFamily: "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive" }}
         >
           <p className="text-xs uppercase tracking-[0.35em] text-neutral-700">
@@ -1685,7 +1687,12 @@ function NotebookReader() {
     );
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+    <div
+      className={clsx(
+        "grid gap-6 transition-all duration-700 xl:grid-cols-[minmax(0,1fr)_340px]",
+        zoomedPage && "bg-neutral-950/30"
+      )}
+    >
       <div
         className={clsx(
           "relative grid gap-6 transition-all duration-700",
@@ -1702,6 +1709,10 @@ function NotebookReader() {
             onAnimationComplete={clearPageTurn}
             className="pointer-events-none absolute inset-0"
           />
+        )}
+
+        {zoomedPage && (
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_45%_35%,rgba(255,255,220,.05),transparent_34%),radial-gradient(circle_at_50%_50%,rgba(0,0,0,.35),transparent_60%)]" />
         )}
 
         {(!zoomedPage || zoomedPage === "left") && (
@@ -1721,7 +1732,14 @@ function NotebookReader() {
         )}
       </div>
 
-      <InspectionPanel />
+      <div
+        className={clsx(
+          "transition-opacity duration-700",
+          zoomedPage && "opacity-55"
+        )}
+      >
+        <InspectionPanel />
+      </div>
     </div>
   );
 }
@@ -1770,12 +1788,15 @@ function NotebookReaderControls() {
   };
 
   return (
-    <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-900/20 bg-neutral-950/25 px-4 py-3 text-xs text-neutral-400">
+    <div className={clsx(
+        "mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-900/20 bg-neutral-950/18 px-4 py-3 text-xs text-neutral-500 transition-opacity duration-700",
+        zoomedPage && "opacity-60 hover:opacity-100"
+      )}>
       <div className="flex items-center gap-2">
         <button
           onClick={() => moveFocus("previous")}
           disabled={!zoomedPage && spreadIndex === 0}
-          className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-30"
+          className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-20"
         >
           ← previous page
         </button>
@@ -1789,7 +1810,7 @@ function NotebookReaderControls() {
         <button
           onClick={() => moveFocus("next")}
           disabled={!zoomedPage && spreadIndex === 1}
-          className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-30"
+          className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-20"
         >
           next page →
         </button>
