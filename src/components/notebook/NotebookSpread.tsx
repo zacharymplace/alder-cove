@@ -12,6 +12,10 @@ type NotebookState = {
   memoryLayer: "recovered" | "original" | "reconstructed";
   flashlight: boolean;
   foldedOpen: boolean;
+  pinnedEvidence: string[];
+  instabilityLevel: number;
+  collapseTriggered: boolean;
+  mutationPhase: number;
   select: (id: string | null) => void;
   toggleUnstable: () => void;
   setMemoryLayer: (
@@ -19,6 +23,10 @@ type NotebookState = {
   ) => void;
   toggleFlashlight: () => void;
   toggleFolded: () => void;
+  pinEvidence: (evidence: string) => void;
+  increaseInstability: () => void;
+  triggerCollapse: () => void;
+  advanceMutation: () => void;
 };
 
 const useNotebookState = create<NotebookState>((set) => ({
@@ -27,6 +35,10 @@ const useNotebookState = create<NotebookState>((set) => ({
   memoryLayer: "recovered",
   flashlight: false,
   foldedOpen: false,
+  pinnedEvidence: [],
+  instabilityLevel: 0,
+  collapseTriggered: false,
+  mutationPhase: 0,
 
   select: (id) => set({ selectedId: id }),
 
@@ -48,6 +60,29 @@ const useNotebookState = create<NotebookState>((set) => ({
   toggleFolded: () =>
     set((state) => ({
       foldedOpen: !state.foldedOpen,
+    })),
+
+  pinEvidence: (evidence) =>
+    set((state) => ({
+      pinnedEvidence: state.pinnedEvidence.includes(evidence)
+        ? state.pinnedEvidence
+        : [...state.pinnedEvidence, evidence],
+    })),
+
+  increaseInstability: () =>
+    set((state) => ({
+      instabilityLevel: Math.min(state.instabilityLevel + 1, 5),
+    })),
+
+  triggerCollapse: () =>
+    set({
+      collapseTriggered: true,
+      instabilityLevel: 5,
+    }),
+
+  advanceMutation: () =>
+    set((state) => ({
+      mutationPhase: Math.min(state.mutationPhase + 1, 5),
     })),
 }));
 
@@ -160,6 +195,10 @@ function Note({
     select,
     unstable,
     memoryLayer,
+    instabilityLevel,
+    collapseTriggered,
+    mutationPhase,
+    advanceMutation,
   } = useNotebookState();
   const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
   const selectedNote = allNotes.find((candidate) => candidate.id === selectedId);
@@ -186,6 +225,101 @@ function Note({
     unstableText = "Eli doesnt go below after storms anymore.";
   }
 
+  if (
+    instabilityLevel >= 2 &&
+    note.id === "eli-contradiction-b"
+  ) {
+    unstableText = "he always wanted to go first";
+  }
+
+  if (
+    instabilityLevel >= 3 &&
+    note.id === "cannery-line"
+  ) {
+    unstableText = "The cannery gives people back wrong sometimes.";
+  }
+
+  if (
+    instabilityLevel >= 4 &&
+    note.id === "later-rule"
+  ) {
+    unstableText = "The town changes people when nobody checks.";
+  }
+
+  if (
+    collapseTriggered &&
+    note.id === "eli-contradiction-a"
+  ) {
+    unstableText = "Eli said the tunnels remembered things wrong.";
+  }
+
+  if (
+    collapseTriggered &&
+    note.id === "eli-contradiction-b"
+  ) {
+    unstableText = "he wasnt scared until after the cannery";
+  }
+
+  if (
+    collapseTriggered &&
+    note.id === "cannery-line"
+  ) {
+    unstableText = "The cannery gives people back wrong sometimes.";
+  }
+
+  if (
+    mutationPhase >= 1 &&
+    note.id === "stop-saying-that"
+  ) {
+    unstableText = "stop writing that down";
+  }
+
+  if (
+    mutationPhase >= 2 &&
+    note.id === "later-rule"
+  ) {
+    unstableText = "The town changes people when nobody checks.";
+  }
+
+  if (
+    mutationPhase >= 3 &&
+    note.id === "going-salt-first"
+  ) {
+    unstableText =
+      "Mara said my dad remembered the dock fire wrong before he started going salt.";
+  }
+
+  if (
+    mutationPhase >= 4 &&
+    note.id === "eli-contradiction-a"
+  ) {
+    unstableText =
+      "Eli said the tunnels remembered things wrong.";
+  }
+
+  if (
+    mutationPhase >= 5 &&
+    note.id === "eli-contradiction-b"
+  ) {
+    unstableText =
+      "he wasnt scared until after the cannery";
+  }
+
+  if (
+    collapseTriggered &&
+    note.id === "going-salt-first"
+  ) {
+    unstableText =
+      "Mara said my dad remembered the dock fire wrong before he started going salt.";
+  }
+
+  if (
+    instabilityLevel >= 4 &&
+    note.id === "stop-saying-that"
+  ) {
+    unstableText = "stop writing that down";
+  }
+
   return (
     <motion.article
       whileHover={{ scale: 1.01 }}
@@ -203,6 +337,54 @@ function Note({
       {note.variant === "contradiction" && (
         <HandlingSmudge className="-right-4 top-1" />
       )}
+
+      {instabilityLevel >= 3 && note.variant === "contradiction" && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.22 }}
+          className="pointer-events-none absolute inset-0 border border-red-900/30"
+        />
+      )}
+
+
+      {mutationPhase >= 2 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.08 }}
+          className="pointer-events-none absolute inset-0 bg-red-950/10"
+        />
+      )}
+
+      {mutationPhase >= 4 && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.22 }}
+          className="pointer-events-none absolute bottom-2 right-3 rotate-[2deg] text-[10px] italic text-red-950"
+        >
+          wording changed after recovery
+        </motion.p>
+      )}
+
+      {collapseTriggered &&
+        note.contradictionChain === "eli-tunnels" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.28 }}
+            className="pointer-events-none absolute inset-0 bg-red-950/10"
+          />
+        )}
+
+
+      {instabilityLevel >= 3 &&
+        note.contradictionChain === "eli-tunnels" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.55 }}
+            className="mt-2 rounded border border-red-900/20 bg-red-950/10 p-2 text-[10px] uppercase tracking-[0.18em] text-red-100/70"
+          >
+            archival confidence degraded after excavation
+          </motion.div>
+        )}
 
       {selected && (
         <div className="absolute -right-2 -top-2 rounded-full bg-red-900 px-2 py-1 text-[10px] uppercase tracking-widest text-white">
@@ -238,17 +420,41 @@ function Note({
         {note.authenticity && (
           <span
             className={clsx(
-              "rounded px-2 py-1",
+              "rounded px-2 py-1 transition-all duration-700",
               note.authenticity === "original" && "bg-green-950/20",
               note.authenticity === "copied" && "bg-blue-950/20",
               note.authenticity === "damaged" && "bg-amber-950/20",
-              note.authenticity === "reconstructed" && "bg-red-950/20"
+              note.authenticity === "reconstructed" && "bg-red-950/20",
+
+              instabilityLevel >= 3 &&
+                note.contradictionChain === "eli-tunnels" &&
+                "border border-red-900/40 bg-red-950/20 text-red-100/80"
             )}
           >
-            {note.authenticity}
+            {instabilityLevel >= 3 &&
+            note.authenticity === "copied" &&
+            note.contradictionChain === "eli-tunnels"
+              ? "disputed copy"
+              : instabilityLevel >= 4 &&
+                note.authenticity === "reconstructed" &&
+                note.contradictionChain === "eli-tunnels"
+              ? "unstable reconstruction"
+              : note.authenticity}
           </span>
         )}
       </div>
+
+
+      {instabilityLevel >= 3 &&
+        note.contradictionChain === "eli-tunnels" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.55 }}
+            className="mt-2 rounded border border-red-900/20 bg-red-950/10 p-2 text-[10px] uppercase tracking-[0.18em] text-red-100/70"
+          >
+            archival confidence degraded after excavation
+          </motion.div>
+        )}
 
       {selected && (
         <motion.div
@@ -428,6 +634,8 @@ function Page({
   side: "left" | "right";
   notes: NotebookNote[];
 }) {
+  const { instabilityLevel, mutationPhase } = useNotebookState();
+
   return (
     <section className="relative min-h-[860px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#ecdfb7] p-8 shadow-2xl">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(80,60,25,.06)_1px,transparent_1px)] bg-[size:100%_28px]" />
@@ -436,6 +644,18 @@ function Page({
       <DamageOverlay intensity={side === "right" ? "medium" : "light"} />
       <EdgeWear />
       {side === "right" && <ArgumentMarks />}
+
+
+        {mutationPhase >= 3 && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.22 }}
+            className="pointer-events-none absolute left-12 top-12 rotate-[-5deg] text-sm italic text-red-950"
+          >
+            maybe we changed him first
+          </motion.p>
+        )}
+
 
       <div
         className="relative z-10 space-y-6"
@@ -457,7 +677,18 @@ function Page({
           <>
             <CannerySketch />
             <Note note={notes[1]} rotate="rotate-[-0.6deg]" />
-            <div className="grid gap-3">
+    
+        {instabilityLevel >= 4 && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.28 }}
+            className="pointer-events-none absolute right-10 top-24 rotate-[4deg] text-sm italic text-red-950"
+          >
+            maybe the notebook changed him too
+          </motion.p>
+        )}
+
+        <div className="grid gap-3">
               <Note note={notes[2]} rotate="rotate-[0.5deg]" />
               <Note note={notes[3]} rotate="rotate-[-0.3deg]" />
             </div>
@@ -543,6 +774,12 @@ function HiddenLayerPage() {
     foldedOpen,
     toggleFlashlight,
     toggleFolded,
+    pinEvidence,
+    increaseInstability,
+    instabilityLevel,
+    collapseTriggered,
+    mutationPhase,
+    advanceMutation,
   } = useNotebookState();
 
   return (
@@ -560,6 +797,18 @@ function HiddenLayerPage() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_48%_35%,rgba(255,255,220,.28),transparent_28%),radial-gradient(circle_at_55%_70%,rgba(255,255,220,.18),transparent_22%)]"
         />
       )}
+
+
+        {mutationPhase >= 3 && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.22 }}
+            className="pointer-events-none absolute left-12 top-12 rotate-[-5deg] text-sm italic text-red-950"
+          >
+            maybe we changed him first
+          </motion.p>
+        )}
+
 
       <div
         className="relative z-10 space-y-6"
@@ -598,36 +847,59 @@ function HiddenLayerPage() {
 
           {flashlight && (
             <>
-              <motion.p
+              <motion.button
+                type="button"
                 initial={{ opacity: 0, filter: "blur(5px)" }}
                 animate={{ opacity: 0.42, filter: "blur(0px)" }}
                 transition={{ duration: 1 }}
-                className="absolute left-12 top-24 rotate-[-1deg] text-lg text-neutral-600"
+                onClick={() => {
+                  pinEvidence("he was scared before we were");
+                  increaseInstability();
+
+                  if (instabilityLevel >= 2) {
+                    triggerCollapse();
+                  }
+                }}
+                className="absolute left-12 top-24 rotate-[-1deg] text-left text-lg text-neutral-600 hover:opacity-80"
               >
                 he was scared before we were
-              </motion.p>
+              </motion.button>
 
-              <motion.p
+              <motion.button
+                type="button"
                 initial={{ opacity: 0, filter: "blur(4px)" }}
                 animate={{ opacity: 0.32, filter: "blur(0px)" }}
                 transition={{ delay: 0.4, duration: 1 }}
-                className="absolute bottom-4 right-8 rotate-[2deg] text-xs text-neutral-700 line-through"
+                onClick={() => {
+                  pinEvidence("not just Eli because Eli remembers wrong");
+                  increaseInstability();
+                }}
+                className="absolute bottom-4 right-8 rotate-[2deg] text-left text-xs text-neutral-700 line-through hover:opacity-80"
               >
                 not just Eli because Eli remembers wrong
-              </motion.p>
+              </motion.button>
             </>
           )}
         </div>
 
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={toggleFolded}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              toggleFolded();
+            }
+          }}
           className="relative block w-full cursor-pointer rounded-sm bg-[#f3e2ab] p-5 text-left shadow-lg transition hover:scale-[1.01]"
         >
           <Tape className="-top-2 left-10" />
           <HandlingSmudge className="right-6 top-5" />
+
           <p className="text-xs uppercase tracking-[0.25em] text-neutral-600">
             folded note under tape
           </p>
+
           <p className="mt-2 text-sm text-neutral-900">
             {foldedOpen
               ? "Mara said the cannery gives people back wrong but made me change it to things because people sounds too mean."
@@ -640,10 +912,23 @@ function HiddenLayerPage() {
               animate={{ opacity: 1, y: 0 }}
               className="mt-4 border-t border-neutral-800/20 pt-3 text-xs italic text-neutral-700"
             >
-              back side: if we write it nicer does that make it less true?
+              <span className="block">
+                back side:{" "}
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    pinEvidence("if we write it nicer does that make it less true?");
+                    increaseInstability();
+                  }}
+                  className="text-left underline decoration-dotted underline-offset-4 hover:text-neutral-950"
+                >
+                  if we write it nicer does that make it less true?
+                </button>
+              </span>
             </motion.div>
           )}
-        </button>
+        </div>
 
         <div className="rounded-sm border border-dashed border-neutral-700/40 p-4">
           <p className="text-sm">
@@ -658,6 +943,63 @@ function HiddenLayerPage() {
             discrepancy unresolved
           </p>
         </div>
+
+
+        {instabilityLevel >= 2 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="rounded border border-red-900/20 bg-red-950/10 p-3 text-xs italic text-red-100/70"
+          >
+            recovered wording diverging from archived wording
+          </motion.div>
+        )}
+
+
+  
+      {instabilityLevel >= 4 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-4 text-xs text-red-100/80"
+        >
+          notebook coherence failing
+
+          <div className="mt-3 space-y-2">
+            <p>• preserved wording drifting across unrelated entries</p>
+            <p>• social corrections propagating into archived memory</p>
+            <p>• reconstruction layers no longer align</p>
+            <p>• emotional mediation overriding original language</p>
+          </div>
+        </motion.div>
+      )}
+
+
+      {mutationPhase >= 1 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-4 text-xs text-red-100/80"
+        >
+          passive notebook mutation detected
+
+          <div className="mt-3 space-y-2">
+            <p>• wording drift occurring outside direct excavation</p>
+            <p>• archivist copies diverging from recovered originals</p>
+            <p>• contradiction language spreading across linked fragments</p>
+          </div>
+        </motion.div>
+      )}
+
+      {collapseTriggered && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.45 }}
+            className="pointer-events-none absolute bottom-10 right-16 rotate-[-3deg] text-sm italic text-red-950"
+          >
+            maybe none of us remembered him right
+          </motion.div>
+        )}
 
         <div className="flex flex-wrap gap-3 pt-2">
           <button
@@ -683,6 +1025,11 @@ function InspectionPanel() {
     toggleUnstable,
     memoryLayer,
     setMemoryLayer,
+    pinnedEvidence,
+    instabilityLevel,
+    collapseTriggered,
+    mutationPhase,
+    advanceMutation,
   } = useNotebookState();
   const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
   const selected = allNotes.find((note) => note.id === selectedId);
@@ -754,6 +1101,84 @@ function InspectionPanel() {
         </div>
       )}
 
+
+
+
+      {instabilityLevel >= 4 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-4 text-xs text-red-100/80"
+        >
+          notebook coherence failing
+
+          <div className="mt-3 space-y-2">
+            <p>• preserved wording drifting across unrelated entries</p>
+            <p>• social corrections propagating into archived memory</p>
+            <p>• reconstruction layers no longer align</p>
+            <p>• emotional mediation overriding original language</p>
+          </div>
+        </motion.div>
+      )}
+
+
+      {mutationPhase >= 1 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-4 text-xs text-red-100/80"
+        >
+          passive notebook mutation detected
+
+          <div className="mt-3 space-y-2">
+            <p>• wording drift occurring outside direct excavation</p>
+            <p>• archivist copies diverging from recovered originals</p>
+            <p>• contradiction language spreading across linked fragments</p>
+          </div>
+        </motion.div>
+      )}
+
+      {collapseTriggered && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-5 rounded-lg border border-red-900/30 bg-red-950/20 p-4 text-xs text-red-100/80"
+        >
+          contradiction chain collapse detected
+
+          <div className="mt-3 space-y-2">
+            <p>• recovered wording no longer aligns with archivist copy</p>
+            <p>• sibling reconstruction diverges from preserved version</p>
+            <p>• cannery references spreading across unrelated fragments</p>
+            <p>• source confidence critically degraded</p>
+          </div>
+        </motion.div>
+      )}
+
+      {instabilityLevel >= 1 && (
+        <div className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-3 text-[11px] text-red-100/70">
+          archival confidence degrading through repeated excavation
+        </div>
+      )}
+
+      {pinnedEvidence.length > 0 && (
+        <div className="mt-5">
+          <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
+            Pinned Excavation Evidence
+          </p>
+          <ul className="mt-3 space-y-2">
+            {pinnedEvidence.map((evidence) => (
+              <li
+                key={evidence}
+                className="rounded border border-amber-900/30 bg-amber-950/10 p-2 text-xs italic text-amber-100/80"
+              >
+                {evidence}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <p className="mt-5 border-t border-neutral-800 pt-4 text-xs italic text-neutral-400">
         Interpretation unresolved. Source confidence degraded by revision, handling, and recovery context.
       </p>
@@ -807,6 +1232,37 @@ function InspectionPanel() {
           reconstructed
         </button>
       </div>
+
+
+      <div className="mt-4 rounded-lg border border-neutral-800 bg-neutral-950/40 p-3">
+        <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+          instability drift
+        </p>
+
+        <div className="mt-3 flex gap-2">
+          {[0,1,2,3,4].map((level) => (
+            <div
+              key={level}
+              className={clsx(
+                "h-2 flex-1 rounded-full",
+                instabilityLevel > level
+                  ? "bg-red-700"
+                  : "bg-neutral-800"
+              )}
+            />
+          ))}
+        </div>
+      </div>
+
+
+
+      <button
+        onClick={advanceMutation}
+        className="mt-3 rounded-lg border border-red-900/30 bg-red-950/10 px-4 py-2 text-xs text-red-100/80 hover:bg-red-950/20"
+      >
+        advance passive mutation
+      </button>
+
 
       <button
         onClick={toggleUnstable}
