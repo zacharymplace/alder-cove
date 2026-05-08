@@ -6,10 +6,38 @@ import { motion } from "framer-motion";
 import clsx from "clsx";
 
 import { notebookOneSpread, type NotebookNote } from "@/data/notebook/notebookOne";
+import { getSpreadDefinition, spreadDefinitions } from "@/data/notebook/spreadDefinitions";
+import { getArchiveDocument } from "@/data/archive/archiveDocuments";
+import { getNotebookPage } from "@/data/notebook/pages";
 
 
 
 
+
+
+function spreadShellClass(paperTone?: "aged" | "water-damaged" | "warm") {
+  switch (paperTone) {
+    case "water-damaged":
+      return "bg-[#e2d0a2]";
+    case "warm":
+      return "bg-[#f0dfad]";
+    case "aged":
+    default:
+      return "bg-[#ecdfb7]";
+  }
+}
+
+function spreadResidueClass(residueDensity?: "light" | "heavy" | "soft") {
+  switch (residueDensity) {
+    case "heavy":
+      return "opacity-70";
+    case "soft":
+      return "opacity-25";
+    case "light":
+    default:
+      return "opacity-40";
+  }
+}
 
 function noteClass(variant?: NotebookNote["variant"]) {
   switch (variant) {
@@ -108,7 +136,7 @@ function TapedFragment({
   );
 }
 
-function Note({
+export function Note({
   note,
   rotate,
 }: {
@@ -127,6 +155,10 @@ function Note({
   } = useNotebookState();
   const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
   const selectedNote = allNotes.find((candidate) => candidate.id === selectedId);
+  if (!note) {
+    return null;
+  }
+
   const selected = selectedId === note.id;
   const related = selectedNote?.relatedNoteIds?.includes(note.id) ?? false;
 
@@ -481,7 +513,7 @@ function FoundingPhrase({ note }: { note: NotebookNote }) {
   );
 }
 
-function RuleEdits() {
+export function RuleEdits() {
   return (
     <TapedFragment className="rotate-[1deg] text-sm">
       <h3 className="mb-2 text-xs uppercase tracking-[0.22em]">if someone doesnt check in</h3>
@@ -531,7 +563,7 @@ function ChildMap() {
   );
 }
 
-function SymbolLegend() {
+export function SymbolLegend() {
   const symbols = [
     ["🐟", "safe route / someone checked"],
     ["⭐", "still feels normal"],
@@ -559,7 +591,7 @@ function SymbolLegend() {
   );
 }
 
-function CheckInTable() {
+export function CheckInTable() {
   const rows = [
     ["Eli", "cannery roof", "Mara", "before lights"],
     ["June", "ferry hill", "alone", "after dinner"],
@@ -620,102 +652,124 @@ function CannerySketch() {
 
 function Page({
   side,
+  title,
+  pageNumber,
   notes,
+  components = [],
+  provenance,
+  paperTone = "aged",
+  residueDensity = "light",
 }: {
   side: "left" | "right";
+  title?: string;
+  pageNumber?: number;
   notes: NotebookNote[];
+  components?: Array<"map" | "cannerySketch" | "symbolLegend" | "checkInLog" | "missingPhoto">;
+  provenance?: {
+    source: "original notebook" | "flood recovery" | "archivist copy" | "reconstructed packet";
+    confidence: "high" | "medium" | "low" | "disputed";
+    handledBy?: string;
+    note?: string;
+    conflictingSource?: string;
+  };
+  paperTone?: "aged" | "water-damaged" | "warm";
+  residueDensity?: "light" | "heavy" | "soft";
 }) {
-  const { instabilityLevel, revisionPhase } = useNotebookState();
-
   return (
-    <section className="relative h-[900px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#ecdfb7] p-9 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(80,60,25,.06)_1px,transparent_1px)] bg-[size:100%_28px]" />
-      <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_20%_10%,rgba(255,255,255,.7),transparent_22%),radial-gradient(circle_at_82%_75%,rgba(92,64,28,.24),transparent_24%),radial-gradient(circle_at_12%_88%,rgba(30,64,175,.14),transparent_16%)]" />
+    <section
+      className={clsx(
+        "relative h-[900px] overflow-hidden rounded-xl border border-neutral-500/40 p-9 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]",
+        spreadShellClass(paperTone)
+      )}
+    >
       <div className="absolute inset-y-0 left-7 w-px bg-red-900/20" />
-      <DamageOverlay intensity={side === "right" ? "medium" : "light"} />
-      <EdgeWear />
-      {side === "right" && <ArgumentMarks />}
 
-
-        {revisionPhase >= 3 && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.22 }}
-            className="pointer-events-none absolute left-12 top-12 rotate-[-5deg] text-sm italic text-red-950"
-          >
-            maybe we changed him first
-          </motion.p>
-        )}
-
-
-
-      <div className="pointer-events-none absolute left-16 top-[58%] rotate-[-2deg] text-[11px] italic text-neutral-700/26">
-        he wasnt trying to scare us
+      <div className={spreadResidueClass(residueDensity)}>
+        <DamageOverlay intensity={residueDensity === "heavy" ? "heavy" : "medium"} />
       </div>
 
-
-        <div className="pointer-events-none absolute left-10 top-6 rotate-[-2deg] text-[11px] text-neutral-800/24">
-          18
-        </div>
-
-        <div className="pointer-events-none absolute right-12 top-6 rotate-[1deg] text-[10px] italic text-neutral-800/10">
-          renumbered later
-        </div>
+      <EdgeWear />
 
 
       <div
-        className="relative z-10 h-full space-y-6 overflow-hidden"
-        style={{ fontFamily: "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive" }}
+        className="relative z-10 h-full space-y-4 overflow-hidden"
+        style={{
+          fontFamily:
+            "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive",
+        }}
       >
-        <p className="text-xs uppercase tracking-[0.35em] text-neutral-700">{side} page</p>
+        <div className="flex items-start justify-between text-xs uppercase tracking-[0.28em] text-neutral-700/75">
+          <span>{title ?? ""}</span>
+          <span className="text-[10px] italic normal-case tracking-normal text-neutral-700/25">
+            {pageNumber ? `page ${pageNumber}` : "renumbered later"}
+          </span>
+        </div>
 
-        {side === "left" ? (
-          <>
-            <FoundingPhrase note={notes[0]} />
-            <Note note={notes[1]} rotate="rotate-[0.4deg]" />
-            <ChildMap />
-            <div className="grid gap-5 md:grid-cols-[0.85fr_1.15fr]">
-              <SymbolLegend />
-              <CheckInTable />
+        <div className="space-y-4">
+          {components.includes("cannerySketch") && <CannerySketch />}
+
+          {notes.filter(Boolean).map((note, index) => (
+            <Note
+              key={note.id}
+              note={note}
+              rotate={
+                [
+                  "rotate-[0.2deg]",
+                  "rotate-[-0.2deg]",
+                  "rotate-[0.1deg]",
+                  "rotate-[-0.1deg]",
+                ][index % 4]
+              }
+            />
+          ))}
+
+          {components.includes("map") && (
+            <div className="pt-4">
+              <ChildMap />
             </div>
-          </>
-        ) : (
-          <>
-            <CannerySketch />
-            <div className="mb-10">
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-0 rounded bg-amber-950/5" />
-                <Note note={notes[0]} rotate="rotate-[0.4deg]" />
+          )}
+
+        {provenance && (
+          <div className="mt-auto rounded border border-neutral-800/10 bg-neutral-950/5 p-3 text-[10px] text-neutral-800/55">
+            <div className="flex items-center justify-between gap-3 uppercase tracking-[0.22em]">
+              <span>{provenance.source}</span>
+              <span>{provenance.confidence}</span>
+            </div>
+
+            {provenance.handledBy && (
+              <p className="mt-2 italic">later later handled by: {provenance.handledBy}</p>
+            )}
+
+            {provenance.note && (
+              <p className="mt-2 italic leading-relaxed">{provenance.note}</p>
+            )}
+
+
+            <p className="mt-3 italic leading-relaxed text-neutral-800/40">
+              some wording appears emotionally softened in later copies
+            </p>
+
+            {provenance.conflictingSource && (
+              <div className="mt-3 rounded border border-red-900/10 bg-red-950/5 p-2">
+                <p className="uppercase tracking-[0.18em] text-red-100/35">
+                  later handling note
+                </p>
+
+                <p className="mt-2 italic leading-relaxed text-red-100/45">
+                  {provenance.conflictingSource}
+                </p>
               </div>
-            </div>
+            )}
 
-            <div className="mb-10">
-              <Note note={notes[1]} rotate="rotate-[-0.6deg]" />
-            </div>
-    
-        {instabilityLevel >= 4 && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.28 }}
-            className="pointer-events-none absolute right-10 top-24 rotate-[4deg] text-sm italic text-red-950"
-          >
-            maybe the notebook changed him too
-          </motion.p>
+          </div>
         )}
 
-        <div className="grid gap-3">
-              <Note note={notes[2]} rotate="rotate-[0.5deg]" />
-              <Note note={notes[3]} rotate="rotate-[-0.3deg]" />
-            </div>
-            <RuleEdits />
-            <Note note={notes[4]} rotate="rotate-[0.4deg]" />
-            <Note note={notes[5]} rotate="rotate-[-0.7deg]" />
-          </>
-        )}
+        </div>
       </div>
     </section>
   );
 }
+
 
 function DamageOverlay({
   intensity = "medium",
@@ -881,8 +935,9 @@ function HiddenLayerPage() {
         he wasnt trying to scare us
       </div>
 
+
       <div
-        className="relative z-10 h-full space-y-6 overflow-hidden"
+        className="relative z-10 h-full space-y-4 overflow-hidden"
         style={{ fontFamily: "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive" }}
       >
         <p className="text-xs uppercase tracking-[0.35em] text-neutral-700">
@@ -1074,7 +1129,7 @@ function HiddenLayerPage() {
             animate={{ opacity: 1 }}
             className="mt-5 rounded-lg bg-red-950/8 p-4 text-sm text-red-100/55"
           >
-            Eli preservation discrepancy
+            Eli wording differs here
 
             <div className="mt-4 space-y-3 text-xs">
               <p>
@@ -1312,7 +1367,7 @@ function InspectionPanel() {
             animate={{ opacity: 1 }}
             className="mt-5 rounded-lg bg-red-950/8 p-4 text-sm text-red-100/55"
           >
-            Eli preservation discrepancy
+            Eli wording differs here
 
             <div className="mt-4 space-y-3 text-xs">
               <p>
@@ -1353,7 +1408,7 @@ function InspectionPanel() {
 
       {instabilityLevel >= 1 && (
         <div className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-3 text-[11px] text-red-100/70">
-          source confidence affected by repeated handling
+          some wording became less certain after repeated handling
         </div>
       )}
 
@@ -1547,41 +1602,132 @@ function PageTurnVeil({ direction }: { direction: "previous" | "next" | null }) 
 }
 
 function NotebookReader() {
-  const { spreadIndex, zoomedPage, pageTurnDirection, clearPageTurn } = useNotebookState();
+  const {
+    spreadIndex,
+    zoomedPage,
+    pageTurnDirection,
+    clearPageTurn,
+    activeDocumentId,
+  } = useNotebookState();
+
+  const activeDocument = getArchiveDocument(activeDocumentId);
+
+  const totalSpreads = spreadDefinitions.length;
+  const spread = getSpreadDefinition(spreadIndex);
+
+  const leftPageDefinition = getNotebookPage(spread.leftPageId);
+  const rightPageDefinition = getNotebookPage(spread.rightPageId);
+
+  const allNotes = [
+    ...notebookOneSpread.leftPage,
+    ...notebookOneSpread.rightPage,
+  ];
+
+  const leftNotes = allNotes.filter((note) =>
+    leftPageDefinition.noteIds.includes(note.id)
+  );
+
+  const rightNotes = allNotes.filter((note) =>
+    rightPageDefinition.noteIds.includes(note.id)
+  );
 
   const leftPage =
-    spreadIndex === 0 ? (
-      <Page side="left" notes={notebookOneSpread.leftPage} />
-    ) : (
+    leftPageDefinition.role === "recovered-rules" ? (
       <HiddenLayerPage />
+    ) : (
+      <Page
+        side="left"
+        title={leftPageDefinition.title}
+        pageNumber={spreadIndex * 2 + 18}
+        notes={leftNotes}
+        components={leftPageDefinition.components}
+        provenance={leftPageDefinition.provenance}
+        paperTone={spread.paperTone}
+        residueDensity={spread.residueDensity}
+      />
     );
 
   const rightPage =
-    spreadIndex === 0 ? (
-      <div className="h-full origin-top scale-[0.96]">
-        <Page side="right" notes={notebookOneSpread.rightPage} />
-      </div>
-    ) : (
+    rightPageDefinition.role === "continuation-support" ? (
       <section className="relative h-[900px] overflow-hidden rounded-xl border border-neutral-500/40 bg-[#eadcb1] p-9 shadow-2xl transition-transform duration-700 hover:translate-y-[-2px]">
-        <DamageOverlay intensity="medium" />
+        <div className={spreadResidueClass(spread.residueDensity)}>
+        <DamageOverlay intensity={spread.residueDensity === "heavy" ? "heavy" : "medium"} />
+      </div>
         <EdgeWear />
+
         <div
-          className="relative z-10 h-full space-y-6 overflow-hidden"
-          style={{ fontFamily: "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive" }}
+          className="relative z-10 h-full space-y-4 overflow-hidden"
+          style={{
+            fontFamily:
+              "Comic Sans MS, Bradley Hand, Chalkboard SE, cursive",
+          }}
         >
           <p className="text-xs uppercase tracking-[0.35em] text-neutral-700">
             facing page
           </p>
 
-          <p className="mt-20 rotate-[-1deg] text-sm italic text-neutral-800/62">
-            this page was left mostly blank after storm week
+          <p className="mt-10 rotate-[-1deg] text-sm italic text-neutral-800/62">
+            continuation copied here after the first spread got too crowded
           </p>
 
-          <p className="mt-40 rotate-[2deg] text-xs italic text-neutral-800/30">
-            see missing page 19 for original version
-          </p>
+          <div className="mt-8 space-y-5">
+            {rightNotes.map((note, index) => (
+              <Note
+                key={note.id}
+                note={note}
+                rotate={
+                  [
+                    "rotate-[0.2deg]",
+                    "rotate-[-0.2deg]",
+                    "rotate-[0.1deg]",
+                  ][index % 3]
+                }
+              />
+            ))}
+          </div>
+
+          <div className="mt-8 rotate-[-0.5deg]">
+            <SymbolLegend />
+          </div>
+
+          <div className="mt-14 rounded border border-dashed border-neutral-700/20 p-4">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-700/55">
+              archivist note
+            </p>
+
+            <p className="mt-3 text-sm italic text-neutral-800/68">
+              several pages from this section were separated during drying
+            </p>
+          </div>
+
+          <div className="mt-12 flex h-[180px] items-center justify-center rounded border border-neutral-700/12 bg-neutral-950/3">
+            <p className="rotate-[-2deg] text-xs italic text-neutral-700/35">
+              photo missing from recovery envelope
+            </p>
+          </div>
+
+          <div className="mt-10 flex items-center justify-between">
+            <p className="rotate-[1deg] text-xs italic text-neutral-800/30">
+              see missing page 19 for original version
+            </p>
+
+            <div className="rounded bg-neutral-900/8 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-neutral-700/45">
+              re-read later
+            </div>
+          </div>
         </div>
       </section>
+    ) : (
+      <Page
+        side="right"
+        title={rightPageDefinition.title}
+        pageNumber={spreadIndex * 2 + 19}
+        notes={rightNotes}
+        components={rightPageDefinition.components}
+        provenance={rightPageDefinition.provenance}
+        paperTone={spread.paperTone}
+        residueDensity={spread.residueDensity}
+      />
     );
 
   return (
@@ -1630,27 +1776,83 @@ function NotebookReader() {
         )}
       </div>
 
-      <div
+      <aside
         className={clsx(
-          "transition-opacity duration-700",
-          zoomedPage && "opacity-55"
+          "relative min-h-[900px] overflow-hidden rounded-xl border border-neutral-800/40 bg-[#16130f] px-6 py-8 shadow-2xl transition-opacity duration-700",
+          zoomedPage && "opacity-65"
         )}
       >
-        <InspectionPanel />
-      </div>
+        <div className="absolute inset-y-0 left-5 w-px bg-neutral-700/20" />
+
+        <div className="absolute right-5 top-10 rotate-[3deg] rounded bg-[#f0dfad]/8 px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-neutral-500">
+          review copy
+        </div>
+
+        <div className="relative z-10">
+          <p className="text-[10px] uppercase tracking-[0.38em] text-neutral-600">
+            preservation review
+          </p>
+
+          <div className="mt-10 space-y-8">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-neutral-600">
+                handling notes
+              </p>
+
+              <p className="mt-3 max-w-[220px] text-sm italic leading-relaxed text-neutral-400/85">
+                deeper review becomes available after the page is handled long enough
+              </p>
+            </div>
+
+            <div className="rounded border border-neutral-700/20 bg-black/10 p-4">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-600">
+                archivist concern
+              </p>
+
+              <p className="mt-3 text-sm italic leading-relaxed text-neutral-400/75">
+                contradiction language appears to spread between revisions after repeated reconstruction work
+              </p>
+            </div>
+
+            <div className="rounded border border-dashed border-neutral-700/20 p-4">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-600">
+                preservation state
+              </p>
+
+              <div className="mt-4 flex gap-2">
+                <div className="h-2 w-12 rounded-full bg-neutral-700/60" />
+                <div className="h-2 w-12 rounded-full bg-neutral-700/30" />
+                <div className="h-2 w-12 rounded-full bg-neutral-700/15" />
+              </div>
+
+              <p className="mt-4 text-xs italic text-neutral-500/70">
+                original sequence confidence degraded
+              </p>
+            </div>
+
+            <div className="pt-10 text-[10px] uppercase tracking-[0.3em] text-neutral-700/30">
+              copied for flood recovery review
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
   );
 }
 
 
 function NotebookReaderControls() {
+  const totalSpreads = 3;
   const {
     spreadIndex,
     zoomedPage,
     previousSpread,
     nextSpread,
     setZoomedPage,
+    activeDocumentId,
   } = useNotebookState();
+
+  const activeDocument = getArchiveDocument(activeDocumentId);
 
   const toggleFocus = () => {
     setZoomedPage(zoomedPage ? null : "left");
@@ -1699,15 +1901,28 @@ function NotebookReaderControls() {
           ← previous page
         </button>
 
-        <span className="px-2 uppercase tracking-[0.25em]">
+        <div className="flex flex-col px-2">
+          <span className="text-[10px] uppercase tracking-[0.3em] text-neutral-600">
+            {activeDocument.title}
+          </span>
+
+          <span className="uppercase tracking-[0.25em]">
           {zoomedPage
-            ? `${zoomedPage} page focus · spread ${spreadIndex + 1} / 2`
-            : `lay flat ${spreadIndex + 1} / 2`}
-        </span>
+            ? `${zoomedPage} page focus · spread ${spreadIndex + 1} / ${totalSpreads}`
+            : `lay flat ${spreadIndex + 1} / ${totalSpreads}`}
+          </span>
+
+          {activeDocument.ethicalPressure && (
+            <p className="mt-2 max-w-[220px] text-[10px] italic leading-relaxed text-neutral-600/70">
+              {activeDocument.ethicalPressure}
+            </p>
+          )}
+
+        </div>
 
         <button
           onClick={() => moveFocus("next")}
-          disabled={!zoomedPage && spreadIndex === 1}
+          disabled={!zoomedPage && spreadIndex === totalSpreads - 1}
           className="rounded border border-neutral-800 px-3 py-2 disabled:opacity-20"
         >
           next page →

@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+export const TOTAL_NOTEBOOK_SPREADS = 3;
+
 export type NotebookState = {
   selectedId: string | null;
   unstable: boolean;
@@ -36,6 +38,9 @@ export const useNotebookState = create<NotebookState>((set) => ({
   spreadIndex: 0,
   zoomedPage: null,
   pageTurnDirection: null,
+  lingerReveal: false,
+  rememberedDrift: false,
+  activeDocumentId: "notebook-one-shared",
 
   select: (id) => set({ selectedId: id }),
 
@@ -84,7 +89,7 @@ export const useNotebookState = create<NotebookState>((set) => ({
 
   nextSpread: () =>
     set((state) => ({
-      spreadIndex: Math.min(state.spreadIndex + 1, 1),
+      spreadIndex: Math.min(state.spreadIndex + 1, 2),
       zoomedPage: null,
       pageTurnDirection: "next",
     })),
@@ -104,5 +109,22 @@ export const useNotebookState = create<NotebookState>((set) => ({
   clearPageTurn: () =>
     set({
       pageTurnDirection: null,
+    }),
+
+  setLingerReveal: (value) =>
+    set({
+      lingerReveal: value,
+    }),
+
+  setRememberedDrift: (value) =>
+    set({
+      rememberedDrift: value,
+    }),
+
+  setActiveDocumentId: (id) =>
+    set({
+      activeDocumentId: id,
+      spreadIndex: 0,
+      zoomedPage: null,
     }),
 }));
