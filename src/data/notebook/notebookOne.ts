@@ -83,6 +83,64 @@ export const notebookOneSpread = {
 
   rightPage: [
 
+  {
+    id: "summer-rules",
+    variant: "margin",
+    text: "SUMMER RULES:\n1. nobody leaves someone at the dock alone\n2. no dares during fog\n3. dont tell parents about the roof ladder",
+    handwriting: "coauthor",
+    authenticity: "original",
+    yearPhase: "childhood",
+    memoryPressure: "low",
+  },
+  {
+    id: "dock-dares",
+    variant: "margin",
+    text: "Cal owes Mara 3 sodas because he wouldnt jump from the third post",
+    handwriting: "sibling",
+    authenticity: "original",
+    yearPhase: "childhood",
+    memoryPressure: "low",
+  },
+  {
+    id: "ferry-bet",
+    variant: "margin",
+    text: "Eli said he could tell the ferry horn apart from every other boat even during storms",
+    handwriting: "coauthor",
+    authenticity: "damaged",
+    yearPhase: "childhood",
+    memoryPressure: "medium",
+    pressureReveal: "he was right every time",
+  },
+  {
+    id: "nickname-list",
+    variant: "margin",
+    text: "Worst nicknames:\n- gull boy\n- fish hands\n- cannery goblin\n- ferry brain",
+    handwriting: "sibling",
+    authenticity: "original",
+    yearPhase: "childhood",
+    memoryPressure: "low",
+  },
+  {
+    id: "cannery-game",
+    variant: "margin",
+    text: "game:\nwhoever gets caught by the flashlight in the lower hall loses and has to carry batteries next time",
+    handwriting: "coauthor",
+    authenticity: "copied",
+    yearPhase: "childhood",
+    memoryPressure: "medium",
+  },
+  {
+    id: "tiny-drift-line",
+    variant: "margin",
+    text: "Eli stopped playing after the tunnel argument",
+    handwriting: "archivist",
+    authenticity: "reconstructed",
+    yearPhase: "early-adolescence",
+    memoryPressure: "medium",
+    pressureReveal: "nobody wrote down why",
+  },
+
+
     {
       id: "eli-childhood-memory",
       variant: "margin",
