@@ -58,19 +58,6 @@ export const archiveDocuments: ArchiveDocument[] = [
     ethicalPressure:
       "The notebook was shared, but later reconstruction may include material the group did not intend to preserve permanently.",
   },
-  {
-    id: "mara-private-journal-fragment",
-    title: "Mara — Private Journal Fragment",
-    type: "private-journal",
-    accessClass: "private",
-    acquisitionMethod: "copied-without-permission",
-    emotionalRisk: "intrusive",
-    pageIds: [],
-    description:
-      "Loose private journal fragments believed to belong to Mara. Some pages appear partially recopied by hand after water exposure.",
-    ethicalPressure:
-      "The archive contains material that may never have been intended for anyone else to read.",
-  },
 
 ];
 

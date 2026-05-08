@@ -61,28 +61,3 @@ not only:
 The archive is not a villain system.
 
 It is a survival system built by emotionally compromised people trying to preserve versions of memory they can live with.
-
----
-
-## Private Artifact Principle
-
-Not every document in the archive should feel ethically equivalent.
-
-Some materials:
-- were shared intentionally
-- were copied later
-- were reconstructed communally
-
-Others should feel:
-- invasive
-- emotionally dangerous
-- difficult to justify preserving
-
-The player should gradually realize:
-the archive does not only preserve memory.
-
-It also preserves:
-- shame
-- avoidance
-- emotional self-protection
-- things people may never have wanted rediscovered
