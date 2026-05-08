@@ -32,6 +32,13 @@ export type ArchiveDocument = {
   accessClass: ArchiveAccessClass;
   acquisitionMethod: ArchiveAcquisitionMethod;
   emotionalRisk: "low" | "medium" | "high" | "intrusive";
+  handlingState:
+    | "stable"
+    | "drying"
+    | "over-handled"
+    | "reconstructed"
+    | "awaiting-review"
+    | "sealed";
   pageIds: NotebookPageId[];
   description: string;
   ethicalPressure?: string;
@@ -45,6 +52,7 @@ export const archiveDocuments: ArchiveDocument[] = [
     accessClass: "shared",
     acquisitionMethod: "kept-by-group",
     emotionalRisk: "medium",
+    handlingState: "over-handled",
     pageIds: [
       "opening-left",
       "opening-right",
