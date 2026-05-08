@@ -61,3 +61,69 @@ not only:
 The archive is not a villain system.
 
 It is a survival system built by emotionally compromised people trying to preserve versions of memory they can live with.
+
+---
+
+## Withheld Readability
+
+Some documents should exist in the archive before they become readable.
+
+This creates:
+- ethical hesitation
+- emotional anticipation
+- preservation tension
+- respect for boundaries
+
+The player should sometimes encounter:
+- physically preserved material
+- cataloged fragments
+- handling notes
+- restoration residue
+
+without immediate textual access.
+
+The archive can preserve presence before preserving legibility.
+
+---
+
+## Withheld Readability
+
+Some documents should exist in the archive before they become readable.
+
+This creates:
+- ethical hesitation
+- emotional anticipation
+- preservation tension
+- respect for boundaries
+
+The player should sometimes encounter:
+- physically preserved material
+- cataloged fragments
+- handling notes
+- restoration residue
+
+without immediate textual access.
+
+The archive can preserve presence before preserving legibility.
+
+---
+
+## Withheld Readability
+
+Some documents should exist in the archive before they become readable.
+
+This creates:
+- ethical hesitation
+- emotional anticipation
+- preservation tension
+- respect for boundaries
+
+The player should sometimes encounter:
+- physically preserved material
+- cataloged fragments
+- handling notes
+- restoration residue
+
+without immediate textual access.
+
+The archive can preserve presence before preserving legibility.

@@ -249,6 +249,7 @@ export default function ArchiveIndexPage() {
   const [inspectionIntentId, setInspectionIntentId] = useState<string | null>(
     null
   );
+  const [accessFilter, setAccessFilter] = useState<string>("all");
 
   function markHandled(id: string) {
     setHandledArtifactIds((current) => {
@@ -311,8 +312,19 @@ export default function ArchiveIndexPage() {
     },
   ];
 
-  const focusedArtifact = displayArtifacts.find(
+  const visibleArtifacts =
+    accessFilter === "all"
+      ? displayArtifacts
+      : displayArtifacts.filter(
+          (document) => document.accessClass === accessFilter
+        );
+
+  const focusedArtifact = visibleArtifacts.find(
     (document) => document.id === focusedArtifactId
+  );
+
+  const inspectedArtifact = visibleArtifacts.find(
+    (document) => document.id === inspectionIntentId
   );
 
   return (
@@ -346,13 +358,32 @@ export default function ArchiveIndexPage() {
                 Filter by access
               </p>
 
-              <div className="mt-5 space-y-4 text-sm text-neutral-300/80">
-                {["shared", "semi-private", "private", "illicitly-acquired"].map(
+              <div className="mt-5 space-y-3 text-sm text-neutral-300/80">
+                {["all", "shared", "semi-private", "private", "illicitly-acquired"].map(
                   (item) => (
-                    <div key={item} className="flex items-center gap-3">
-                      <span className={`h-3 w-3 rounded-full ${dotClass(item)}`} />
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => {
+                        setAccessFilter(item);
+                        setFocusedArtifactId(null);
+                        setInspectionIntentId(null);
+                      }}
+                      className={[
+                        "flex w-full items-center gap-3 rounded px-2 py-1 text-left transition",
+                        accessFilter === item
+                          ? "bg-neutral-100/10 text-neutral-100"
+                          : "hover:bg-neutral-100/5",
+                      ].join(" ")}
+                    >
+                      <span
+                        className={[
+                          "h-3 w-3 rounded-full",
+                          item === "all" ? "bg-neutral-300" : dotClass(item),
+                        ].join(" ")}
+                      />
                       <span>{item.replaceAll("-", " ")}</span>
-                    </div>
+                    </button>
                   )
                 )}
               </div>
@@ -377,7 +408,7 @@ export default function ArchiveIndexPage() {
 
 
             <div className="relative grid gap-x-14 gap-y-16 xl:grid-cols-3">
-              {displayArtifacts.map((document) => (
+              {visibleArtifacts.map((document) => (
                 <article
                   key={document.id}
                   onMouseEnter={() => setFocusedArtifactId(document.id)}
@@ -786,43 +817,52 @@ export default function ArchiveIndexPage() {
 
 
 
-        {inspectionIntentId && focusedArtifact && (
-          <div
-            className={[
-              "absolute bottom-24 right-12 z-50 max-w-[420px] border bg-[#11100d]/90 p-5 text-sm text-neutral-200 shadow-[0_30px_90px_rgba(0,0,0,0.75)] backdrop-blur-md",
-              focusedArtifact.accessClass === "private"
-                ? "border-red-100/15"
-                : focusedArtifact.accessClass === "illicitly-acquired"
-                ? "border-violet-100/15"
-                : "border-amber-100/15",
-            ].join(" ")}
-          >
+        {inspectedArtifact && (
+          <aside className="fixed right-8 top-24 z-50 max-h-[calc(100vh-8rem)] w-[380px] overflow-y-auto border border-amber-100/15 bg-[#11100d]/95 p-5 text-sm text-neutral-200 shadow-[0_30px_90px_rgba(0,0,0,0.8)] backdrop-blur-md">
+            <button
+              type="button"
+              onClick={() => setInspectionIntentId(null)}
+              className="mb-5 text-[10px] uppercase tracking-[0.28em] text-neutral-500 hover:text-neutral-300"
+            >
+              set down
+            </button>
+
             <p className="text-[10px] uppercase tracking-[0.35em] text-amber-100/45">
               handling note
             </p>
 
             <h2 className="mt-3 font-serif text-2xl italic text-neutral-100">
-              {focusedArtifact.title}
+              {inspectedArtifact.title}
             </h2>
 
             <p className="mt-4 leading-relaxed text-neutral-400">
-              {focusedArtifact.description}
+              {inspectedArtifact.description}
             </p>
 
-            {focusedArtifact.ethicalPressure && (
+            {inspectedArtifact.ethicalPressure && (
               <p className="mt-4 border-l border-red-200/15 pl-4 italic leading-relaxed text-red-100/55">
-                {focusedArtifact.ethicalPressure}
+                {inspectedArtifact.ethicalPressure}
               </p>
             )}
 
-            <p className="mt-4 text-[10px] uppercase tracking-[0.25em] text-neutral-500">
-              click artifact again to set it down
-            </p>
-          </div>
+            <div className="mt-5 space-y-2 border-t border-neutral-800 pt-4 text-xs text-neutral-500">
+              <p>access: {inspectedArtifact.accessClass.replaceAll("-", " ")}</p>
+              <p>
+                acquisition:{" "}
+                {inspectedArtifact.acquisitionMethod.replaceAll("-", " ")}
+              </p>
+              <p>
+                handling:{" "}
+                {handlingStateLabel(inspectedArtifact.handlingState)}
+              </p>
+              <p>risk: {inspectedArtifact.emotionalRisk}</p>
+              <p>{inspectedArtifact.pageIds.length} pages indexed</p>
+            </div>
+          </aside>
         )}
 
         {focusedArtifact && !inspectionIntentId && (
-          <div className="pointer-events-none absolute bottom-14 right-12 max-w-[360px] rounded border border-amber-100/10 bg-black/30 px-5 py-4 text-xs text-neutral-300/80 shadow-2xl backdrop-blur-sm">
+          <div className="pointer-events-none fixed right-8 top-24 z-40 max-w-[320px] rounded border border-amber-100/10 bg-black/35 px-4 py-3 text-xs text-neutral-300/80 shadow-2xl backdrop-blur-sm">
             <p className="uppercase tracking-[0.28em] text-amber-100/45">
               handling focus
             </p>
