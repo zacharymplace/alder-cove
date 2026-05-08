@@ -90,12 +90,30 @@ function artifactVisual(type: string, title: string) {
 }
 
 export default function ArchiveIndexPage() {
-  const displayArtifacts = [
-
+  const privateJournal =
     archiveDocuments.find(
       (document) => document.id === "mara-private-journal-fragment"
-    )!,
-    ...archiveDocuments.filter((d) => d.id !== "mara-private-journal-fragment"),
+    ) ?? {
+      id: "mara-private-journal-fragment",
+      title: "Mara — Private Journal Fragment",
+      type: "private-journal",
+      accessClass: "private",
+      acquisitionMethod: "copied-without-permission",
+      emotionalRisk: "intrusive",
+      pageIds: [],
+      description:
+        "Loose private journal fragments believed to belong to Mara.",
+      ethicalPressure:
+        "The archive contains material that may never have been intended for anyone else to read.",
+    };
+
+  const displayArtifacts = [
+    ...archiveDocuments.filter(
+      (document) => document.id !== "mara-private-journal-fragment"
+    ),
+
+    privateJournal,
+
     {
       id: "east-shore-shelter-map",
       title: "East Shore — Shelter Map Draft",
@@ -108,6 +126,7 @@ export default function ArchiveIndexPage() {
         "A copied map draft with shoreline marks and higher-ground notes.",
       ethicalPressure: undefined,
     },
+
     {
       id: "council-meeting-fragments",
       title: "Council Meeting Fragments",
@@ -177,7 +196,7 @@ export default function ArchiveIndexPage() {
             <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_45%_25%,rgba(255,218,150,0.09),transparent_30%)]" />
 
             <div className="relative grid gap-x-10 gap-y-12 xl:grid-cols-3">
-              {displayArtifacts.filter(Boolean).map((document) => (
+              {displayArtifacts.map((document) => (
                 <article
                   key={document.id}
                   className={[
