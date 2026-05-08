@@ -44,6 +44,51 @@ function handlingStateLabel(state?: string) {
   return (state ?? "awaiting-review").replaceAll("-", " ");
 }
 
+
+function artifactInteractionClass(document: {
+  accessClass: string;
+  type: string;
+  handlingState?: string;
+}) {
+  if (document.accessClass === "private") {
+    return "duration-700 ease-out group-hover:translate-y-[-3px] group-hover:rotate-[-0.3deg]";
+  }
+
+  if (document.accessClass === "illicitly-acquired") {
+    return "duration-1000 ease-out group-hover:translate-y-[-2px] group-hover:rotate-[0.2deg]";
+  }
+
+  if (document.handlingState === "over-handled") {
+    return "duration-300 ease-out group-hover:translate-y-[-7px] group-hover:rotate-[0.4deg]";
+  }
+
+  return "duration-300 ease-out group-hover:translate-y-[-5px]";
+}
+
+function focusLanguage(document: {
+  accessClass: string;
+  type: string;
+  handlingState?: string;
+}) {
+  if (document.accessClass === "private") {
+    return "the archive slows before this one";
+  }
+
+  if (document.accessClass === "illicitly-acquired") {
+    return "the record does not explain how this arrived";
+  }
+
+  if (document.handlingState === "drying") {
+    return "paper still remembers water";
+  }
+
+  if (document.handlingState === "over-handled") {
+    return "edges lift slightly from repeated handling";
+  }
+
+  return "handling notes shift into view";
+}
+
 function artifactVisual(type: string, title: string) {
   if (type === "shared-notebook") {
     return (
@@ -368,6 +413,14 @@ export default function ArchiveIndexPage() {
                     <div className="pointer-events-none absolute inset-x-4 top-[-10px] z-30 h-px bg-amber-100/30" />
                   )}
 
+                  {document.accessClass === "private" && (
+                    <div className="pointer-events-none absolute inset-x-8 top-8 z-20 h-px bg-red-100/10" />
+                  )}
+
+                  {document.accessClass === "illicitly-acquired" && (
+                    <div className="pointer-events-none absolute inset-6 z-20 border border-violet-200/10" />
+                  )}
+
                   <div className="absolute right-6 top-5 z-20 flex h-6 w-6 items-center justify-center rounded-full border border-neutral-950/40 bg-black/25 shadow">
                     <span
                       className={`h-4 w-4 rounded-full ${dotClass(
@@ -378,12 +431,13 @@ export default function ArchiveIndexPage() {
 
                   <div
                     className={[
-                      "relative z-10 transition duration-300",
+                      "relative z-10 transition",
+                      artifactInteractionClass(document),
                       inspectionIntentId === document.id
-                        ? "translate-y-[-12px] rotate-[0.4deg] drop-shadow-2xl"
+                        ? "translate-y-[-10px] rotate-[0.4deg] drop-shadow-2xl"
                         : focusedArtifactId === document.id
-                        ? "translate-y-[-7px] rotate-[0.2deg] drop-shadow-2xl"
-                        : "group-hover:translate-y-[-5px]",
+                        ? "drop-shadow-2xl"
+                        : "",
                     ].join(" ")}
                   >
                     {artifactVisual(document.type, document.title)}
@@ -436,13 +490,7 @@ export default function ArchiveIndexPage() {
                     {(focusedArtifactId === document.id ||
                       inspectionIntentId === document.id) && (
                       <p className="mt-3 border-l border-neutral-900/20 pl-3 text-[10px] italic leading-relaxed text-neutral-800/55">
-                        {document.id === "notebook-one-shared"
-                          ? "edges lift slightly from repeated handling"
-                          : document.type === "private-journal"
-                          ? "the archive hesitates around this one"
-                          : document.handlingState === "drying"
-                          ? "paper still remembers water"
-                          : "handling notes shift into view"}
+                        {focusLanguage(document)}
                       </p>
                     )}
 
@@ -739,7 +787,16 @@ export default function ArchiveIndexPage() {
 
 
         {inspectionIntentId && focusedArtifact && (
-          <div className="absolute bottom-24 right-12 z-50 max-w-[420px] border border-amber-100/15 bg-[#11100d]/90 p-5 text-sm text-neutral-200 shadow-[0_30px_90px_rgba(0,0,0,0.75)] backdrop-blur-md">
+          <div
+            className={[
+              "absolute bottom-24 right-12 z-50 max-w-[420px] border bg-[#11100d]/90 p-5 text-sm text-neutral-200 shadow-[0_30px_90px_rgba(0,0,0,0.75)] backdrop-blur-md",
+              focusedArtifact.accessClass === "private"
+                ? "border-red-100/15"
+                : focusedArtifact.accessClass === "illicitly-acquired"
+                ? "border-violet-100/15"
+                : "border-amber-100/15",
+            ].join(" ")}
+          >
             <p className="text-[10px] uppercase tracking-[0.35em] text-amber-100/45">
               handling note
             </p>
@@ -775,6 +832,11 @@ export default function ArchiveIndexPage() {
             <p className="mt-2 leading-relaxed text-neutral-400">
               {focusedArtifact.accessClass.replaceAll("-", " ")} ·{" "}
               {handlingStateLabel(focusedArtifact.handlingState)}
+              {focusedArtifact.accessClass === "private"
+                ? " · approach slowly"
+                : focusedArtifact.accessClass === "illicitly-acquired"
+                ? " · acquisition unclear"
+                : ""}
             </p>
           </div>
         )}
