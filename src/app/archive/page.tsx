@@ -317,6 +317,7 @@ export default function ArchiveIndexPage() {
 
 
   const handledArtifactIdList = Array.from(handledArtifactIds).sort();
+  const handledArtifactIdKey = handledArtifactIdList.join("|");
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -325,7 +326,9 @@ export default function ArchiveIndexPage() {
         prefaceDismissed,
         controlledRevealSeen,
         microLegibilitySeen,
-        handledArtifactIds: handledArtifactIdList,
+        handledArtifactIds: handledArtifactIdKey
+          ? handledArtifactIdKey.split("|")
+          : [],
       })
     );
   }, [prefaceDismissed, controlledRevealSeen, microLegibilitySeen]);
