@@ -11,6 +11,11 @@ import Link from "next/link";
 import { archiveDocuments } from "@/data/archive/archiveDocuments";
 import { ArchiveAmbientLayer } from "@/components/archive/ArchiveAmbientLayer";
 import { ArchivePrefaceOverlay } from "@/components/archive/ArchivePrefaceOverlay";
+import {
+  archiveEventRegistry,
+  getArchiveEvent,
+  type ArchiveEventId,
+} from "@/components/archive/events/archiveEventRegistry";
 
 function dotClass(accessClass: string) {
   switch (accessClass) {
@@ -209,6 +214,27 @@ function artifactVisual(type: string, title: string) {
         <div className="absolute bottom-7 right-8 rotate-[-4deg] text-[10px] uppercase tracking-[0.24em] text-red-100/25">
           not copied into index
         </div>
+      </div>
+    );
+  }
+
+  if (type === "recovery-packet") {
+    return (
+      <div className="relative h-[350px] rotate-[-1deg] rounded-lg border border-neutral-900/30 bg-[#7f7258] shadow-[0_35px_90px_rgba(0,0,0,0.7)]">
+        <div className="absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_35%_20%,rgba(255,255,255,0.12),transparent_28%),radial-gradient(circle_at_70%_80%,rgba(20,20,20,0.32),transparent_38%)]" />
+        <div className="absolute left-10 right-10 top-16 h-24 rotate-[1deg] border border-neutral-900/15 bg-[#c8b88f]/45 shadow" />
+        <div className="absolute left-14 right-16 top-28 h-24 rotate-[-2deg] border border-neutral-900/15 bg-[#b9a77e]/55 shadow" />
+        <div className="absolute left-20 top-24 rotate-[-4deg] font-serif text-3xl italic leading-tight text-neutral-950/75">
+          Flood
+          <br />
+          Recovery
+          <br />
+          Packet
+        </div>
+        <div className="absolute bottom-12 left-14 rotate-[2deg] rounded bg-blue-950/30 px-4 py-1 text-[10px] uppercase tracking-[0.24em] text-blue-100/60">
+          drying
+        </div>
+        <div className="absolute right-10 bottom-16 h-16 w-28 rotate-[8deg] bg-[#e2d1aa]/18 shadow" />
       </div>
     );
   }

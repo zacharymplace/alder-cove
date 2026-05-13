@@ -67,6 +67,21 @@ export const archiveDocuments: ArchiveDocument[] = [
       "The notebook was shared, but later reconstruction may include material the group did not intend to preserve permanently.",
   },
 
+  {
+    id: "flood-recovery-packet-001",
+    title: "Flood Recovery Packet — Box 1",
+    type: "recovery-packet",
+    accessClass: "semi-private",
+    acquisitionMethod: "found-after-flood",
+    emotionalRisk: "high",
+    handlingState: "drying",
+    pageIds: [],
+    description:
+      "A drying packet of separated pages, copied labels, and flattened scraps recovered after the waterline reached the lower storage room.",
+    ethicalPressure:
+      "The packet preserves fragments that were never meant to sit together, but became adjacent during recovery.",
+  },
+
 ];
 
 export function getArchiveDocument(id: string) {
