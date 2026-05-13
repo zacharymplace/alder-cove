@@ -32,7 +32,6 @@ function dotClass(accessClass: string) {
   }
 }
 
-
 function handlingStateClass(state: string) {
   switch (state) {
     case "stable":
@@ -55,7 +54,6 @@ function handlingStateClass(state: string) {
 function handlingStateLabel(state?: string) {
   return (state ?? "awaiting-review").replaceAll("-", " ");
 }
-
 
 function artifactInteractionClass(document: {
   accessClass: string;
@@ -260,7 +258,6 @@ function artifactVisual(type: string, title: string) {
       <div className="absolute right-10 bottom-14 h-10 w-24 rotate-[5deg] bg-[#d8c7a2]/24 shadow" />
       <div className="absolute right-10 bottom-14 h-10 w-24 rotate-[5deg] bg-[#d8c7a2]/24 shadow" />
 
-
       <p className="absolute left-12 top-24 rotate-[-2deg] max-w-[220px] font-serif text-3xl italic leading-tight text-neutral-950">
         {title.replace(" — ", "\n")}
       </p>
@@ -313,24 +310,33 @@ export default function ArchiveIndexPage() {
     useState<ArchiveEventId | null>(null);
   const [seenEventIds, setSeenEventIds] = useState<ArchiveEventId[]>(() => {
     if (typeof window === "undefined") {
-      return false;
+      return [];
     }
 
     try {
       const saved = window.localStorage.getItem("alder-cove.archive.reveals");
-      const parsed = saved ? JSON.parse(saved) : {};
-      return Array.isArray(parsed.seenEventIds)
+
+      if (!saved) {
+        return [];
+      }
+
+      const parsed = JSON.parse(saved);
+
+      return Array.isArray(parsed?.seenEventIds)
         ? parsed.seenEventIds
         : [];
     } catch {
-      return false;
+      return [];
     }
   });
 
-
   const handledArtifactIdList = Array.from(handledArtifactIds).sort();
   const handledArtifactIdKey = handledArtifactIdList.join("|");
-  const seenEventIdKey = [...seenEventIds].sort().join("|");
+  const normalizedSeenEventIds = Array.isArray(seenEventIds)
+    ? seenEventIds
+    : [];
+
+  const seenEventIdKey = [...normalizedSeenEventIds].sort().join("|");
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -347,8 +353,8 @@ export default function ArchiveIndexPage() {
 
    const unlockedRevealIds: ArchiveRevealId[] = [
     "archive-preface",
-    ...(seenEventIds.includes("unresolved-wording") ? (["unresolved-wording"] as ArchiveRevealId[]) : []),
-    ...(seenEventIds.includes("partial-fragment") ? (["partial-fragment"] as ArchiveRevealId[]) : []),
+    ...(normalizedSeenEventIds.includes("unresolved-wording") ? (["unresolved-wording"] as ArchiveRevealId[]) : []),
+    ...(normalizedSeenEventIds.includes("partial-fragment") ? (["partial-fragment"] as ArchiveRevealId[]) : []),
   ];
 
   const archiveStage = getHighestUnlockedStage(unlockedRevealIds);
@@ -363,15 +369,14 @@ export default function ArchiveIndexPage() {
       }
 
       setInspectionIntentId(null);
-      setControlledRevealOpen(false);
-      setMicroLegibilityOpen(false);
+      setActiveEventId(null);
+      
     }
 
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
-
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -470,12 +475,12 @@ export default function ArchiveIndexPage() {
         <ArchiveAmbientLayer />
         {prefaceDismissed &&
           archiveEventRegistry.map((event) => {
-            const alreadySeen = seenEventIds.includes(event.id);
+            const alreadySeen = normalizedSeenEventIds.includes(event.id);
 
             const visible =
               !alreadySeen &&
               (!event.visibleAfter ||
-                seenEventIds.includes(event.visibleAfter));
+                normalizedSeenEventIds.includes(event.visibleAfter));
 
             if (!visible) {
               return null;
@@ -500,7 +505,7 @@ export default function ArchiveIndexPage() {
 
         {prefaceDismissed &&
           archiveEventRegistry.every((event) =>
-            seenEventIds.includes(event.id)
+            normalizedSeenEventIds.includes(event.id)
           ) &&
           !activeEventId && (
             <div className="pointer-events-none fixed bottom-8 left-1/2 z-40 -translate-x-1/2 border border-neutral-800 bg-black/25 px-5 py-3 text-[10px] uppercase tracking-[0.28em] text-neutral-500 backdrop-blur-sm">
@@ -508,17 +513,15 @@ export default function ArchiveIndexPage() {
             </div>
           )}
 
-
         {prefaceDismissed && (
           <button
             type="button"
             onClick={() => {
               window.localStorage.removeItem("alder-cove.archive.reveals");
               setPrefaceDismissed(false);
-              setControlledRevealOpen(false);
-              setMicroLegibilityOpen(false);
-              setControlledRevealSeen(false);
-              setMicroLegibilitySeen(false);
+              setActiveEventId(null);
+              setSeenEventIds([]);
+
               setHandledArtifactIds(new Set());
             }}
             className="fixed left-8 top-8 z-50 border border-neutral-800 bg-black/30 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-neutral-500 backdrop-blur-sm transition hover:text-neutral-300"
@@ -551,7 +554,6 @@ export default function ArchiveIndexPage() {
 
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_62%_20%,rgba(255,205,120,0.12),transparent_28%),radial-gradient(circle_at_50%_80%,rgba(80,45,20,0.28),transparent_48%)]" />
         <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(rgba(255,255,255,.025)_1px,transparent_1px)] [background-size:36px_36px]" />
-
 
         <div
           className={[
@@ -630,7 +632,6 @@ export default function ArchiveIndexPage() {
               <div className="absolute right-[15%] top-[25%] h-52 w-52 rounded-full bg-black blur-3xl" />
               <div className="absolute bottom-[20%] left-[40%] h-44 w-44 rounded-full bg-black blur-3xl" />
             </div>
-
 
             <div className="relative grid gap-x-14 gap-y-16 xl:grid-cols-3">
               {visibleArtifacts.map((document) => (
@@ -794,7 +795,6 @@ export default function ArchiveIndexPage() {
           Memory breaks easily.
         </div>
 
-
         <div className="pointer-events-none absolute bottom-[75px] right-[90px] h-28 w-56 rotate-[8deg] border border-neutral-900/20 bg-[#8e7a55]/30 shadow-2xl opacity-55">
           <div className="absolute left-6 top-6 h-px w-36 bg-neutral-950/20" />
           <p className="absolute left-6 top-10 rotate-[-2deg] font-serif text-xl italic text-neutral-950/55">
@@ -804,7 +804,6 @@ export default function ArchiveIndexPage() {
           </p>
           <div className="absolute right-8 top-5 h-8 w-3 rotate-[12deg] bg-neutral-200/25" />
         </div>
-
 
         <div className="pointer-events-none absolute right-[340px] top-[120px] rotate-[5deg] border border-neutral-900/20 bg-[#8f7b58]/55 px-5 py-3 shadow-xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-950/60">
@@ -845,7 +844,6 @@ export default function ArchiveIndexPage() {
           </p>
         </div>
 
-
         <div className="pointer-events-none absolute right-[510px] bottom-[145px] rotate-[-4deg] border border-neutral-900/20 bg-[#d5c4a0]/70 px-6 py-4 shadow-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-neutral-950/45">
             active comparison
@@ -879,7 +877,6 @@ export default function ArchiveIndexPage() {
           </p>
         </div>
 
-
         <div className="pointer-events-none absolute left-[720px] top-[640px] h-24 w-24 rounded-full border border-neutral-900/10 opacity-20" />
 
         <div className="pointer-events-none absolute left-[1110px] top-[410px] h-10 w-10 rounded-full border border-neutral-900/10 opacity-10" />
@@ -903,7 +900,6 @@ export default function ArchiveIndexPage() {
         <div className="pointer-events-none absolute right-[210px] bottom-[145px] rotate-[9deg] text-[9px] uppercase tracking-[0.2em] text-neutral-950/10">
           clipped here before
         </div>
-
 
         <div className="pointer-events-none absolute left-[650px] top-[720px] rotate-[2deg] border border-neutral-900/15 bg-[#cab892]/35 px-5 py-3 shadow-xl opacity-55">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-950/45">
@@ -945,11 +941,9 @@ export default function ArchiveIndexPage() {
           </p>
         </div>
 
-
         <div className="pointer-events-none absolute left-[860px] top-[455px] h-3 w-20 rotate-[-8deg] bg-[#f1e2bb]/10 shadow-sm" />
 
         <div className="pointer-events-none absolute left-[980px] top-[720px] h-3 w-24 rotate-[5deg] bg-[#f1e2bb]/10 shadow-sm" />
-
 
         <div className="pointer-events-none absolute left-[945px] top-[250px] rotate-[2deg] border border-neutral-900/15 bg-[#8e7a58]/35 px-5 py-3 shadow-xl">
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-950/28">
@@ -977,7 +971,6 @@ export default function ArchiveIndexPage() {
           </p>
         </div>
 
-
         <div className="pointer-events-none absolute right-[210px] top-[310px] h-10 w-40 rotate-[3deg] rounded-full bg-black/6 blur-2xl" />
 
         <div className="pointer-events-none absolute right-[245px] top-[360px] rotate-[-4deg] border border-neutral-900/15 bg-[#a89266]/35 px-5 py-3 shadow-xl">
@@ -998,7 +991,6 @@ export default function ArchiveIndexPage() {
           </p>
         </div>
 
-
         <div className="pointer-events-none absolute left-[430px] bottom-[470px] rotate-[2deg] text-[8px] uppercase tracking-[0.18em] text-neutral-950/14">
           recopied twice
         </div>
@@ -1018,7 +1010,6 @@ export default function ArchiveIndexPage() {
             until someone asks
           </p>
         </div>
-
 
         <div className="pointer-events-none absolute left-[390px] top-[118px] h-2 w-2 rounded-full bg-black/20 shadow-sm" />
         <div className="pointer-events-none absolute left-[392px] top-[124px] h-1.5 w-1.5 rounded-full bg-black/10" />
@@ -1047,9 +1038,6 @@ export default function ArchiveIndexPage() {
         <div className="pointer-events-none absolute right-[370px] bottom-[420px] rotate-[-5deg] text-[8px] uppercase tracking-[0.18em] text-red-100/9">
           pressure mark remains
         </div>
-
-
-
 
         {inspectionIntentId && (
           <button
