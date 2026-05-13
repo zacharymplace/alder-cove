@@ -80,6 +80,18 @@ function artifactMockup(tone: string) {
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 rounded bg-red-950/60 px-4 py-1 text-[10px] uppercase tracking-[0.28em] text-red-100/70">
           sealed
         </div>
+
+        <div className="absolute right-12 bottom-8 rotate-[4deg] text-[9px] uppercase tracking-[0.22em] text-red-100/20">
+          not prepared for reading
+        </div>
+
+        <div className="absolute right-12 bottom-8 rotate-[4deg] text-[9px] uppercase tracking-[0.22em] text-red-100/20">
+          not prepared for reading
+        </div>
+
+        <div className="absolute right-12 bottom-8 rotate-[4deg] text-[9px] uppercase tracking-[0.22em] text-red-100/20">
+          not prepared for reading
+        </div>
       </div>
     );
   }
@@ -121,9 +133,9 @@ export default async function ArchiveDocumentRoute({
       <div className="mx-auto max-w-5xl">
         <Link
           href="/archive"
-          className="text-xs uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-300"
+          className="inline-flex items-center gap-3 border border-amber-100/15 bg-black/25 px-4 py-3 text-xs uppercase tracking-[0.3em] text-neutral-400 transition hover:bg-black/45 hover:text-neutral-200"
         >
-          ← return to archive
+          ← set object down
         </Link>
 
         <section
@@ -187,7 +199,26 @@ export default async function ArchiveDocumentRoute({
               </p>
             )}
 
-            <div className="mt-10 border border-neutral-800/80 bg-black/20 p-5">
+  
+          {document.accessClass === "private" && (
+            <div className="mt-10 rotate-[-1deg] border border-red-100/10 bg-red-950/5 p-5 shadow-xl">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-red-100/35">
+                handling restriction
+              </p>
+
+              <p className="mt-4 font-serif text-2xl italic leading-relaxed text-red-100/60">
+                The archive has not decided whether preserving readability here
+                causes more harm than withholding it.
+              </p>
+
+              <p className="mt-5 max-w-xl text-sm leading-relaxed text-red-100/40">
+                Some materials remain physically indexed while intentionally
+                resisting legibility.
+              </p>
+            </div>
+          )}
+
+          <div className="mt-10 border border-neutral-800/80 bg-black/20 p-5">
               <p className="text-xs uppercase tracking-[0.28em] text-neutral-500">
                 archive decision
               </p>
@@ -203,6 +234,14 @@ export default async function ArchiveDocumentRoute({
             </div>
           </div>
         </section>
+
+        <Link
+          href="/archive"
+          className="fixed bottom-8 right-8 z-50 border border-amber-100/15 bg-black/45 px-5 py-3 text-[10px] uppercase tracking-[0.3em] text-neutral-300 shadow-2xl backdrop-blur-sm transition hover:bg-black/65"
+        >
+          set object down
+        </Link>
+
       </div>
     </main>
   );

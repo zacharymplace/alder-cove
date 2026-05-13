@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useNotebookState } from "../../systems/notebook/inspectionState";
 
 import { motion } from "framer-motion";
@@ -1968,6 +1970,13 @@ export function NotebookSpread() {
             First sacred spread prototype: care systems, contradiction logic, and emotional preservation.
           </p>
         </header>
+
+        <Link
+          href="/archive"
+          className="fixed bottom-8 right-8 z-[80] border border-amber-100/15 bg-black/45 px-5 py-3 text-[10px] uppercase tracking-[0.3em] text-neutral-300 shadow-2xl backdrop-blur-sm transition hover:bg-black/65"
+        >
+          set notebook down
+        </Link>
 
         <NotebookReaderControls />
 
