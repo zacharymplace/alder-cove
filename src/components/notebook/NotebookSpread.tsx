@@ -9,7 +9,6 @@ import clsx from "clsx";
 
 import { notebookOneSpread, type NotebookNote } from "@/data/notebook/notebookOne";
 import { getSpreadDefinition } from "@/data/notebook/spreadDefinitions";
-import { notebookContaminationNotes } from "@/data/crossArtifact/notebookContamination";
 import { getArchiveDocument } from "@/data/archive/archiveDocuments";
 import { getNotebookPage } from "@/data/notebook/pages";
 
