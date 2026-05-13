@@ -61,3 +61,15 @@ Avoid:
 - [x] build now
 - [ ] defer
 - [ ] reject
+
+---
+
+## Implementation Notes
+
+Phase 2 added:
+- conflicting Box 1 / Tray 4 labels
+- a downgraded adjacency claim
+- a removed/misgrouped private graphite fragment
+- an archivist note that review increased uncertainty
+
+This phase should be evaluated against smoke checks 16–19.

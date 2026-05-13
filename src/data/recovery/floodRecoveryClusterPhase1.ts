@@ -60,3 +60,49 @@ export const floodRecoveryClusterPhase1: FloodRecoveryClusterEntry[] = [
       "I no longer trust adjacency as evidence.",
   },
 ];
+
+export const floodRecoveryClusterPhase2: FloodRecoveryClusterEntry[] = [
+  {
+    id: "label-conflict-001",
+    type: "recovery-inventory",
+    title: "Conflicting Label — Box 1 / Tray 4",
+    condition: "unstable",
+    text:
+      "Box label identifies these scraps as shoreline map material. Drying tray label identifies the same grouping as meeting overflow.",
+    emotionalPressure:
+      "One label may describe where the fragments came from. The other may describe where we placed them after panic.",
+  },
+
+  {
+    id: "downgraded-adjacency-001",
+    type: "archivist-annotation",
+    title: "Adjacency Claim Downgraded",
+    condition: "copied-later",
+    text:
+      "Do not cite recovered contact as evidence of original contact. Water pressure may have created the relationship.",
+    emotionalPressure:
+      "This connection became less certain the longer I studied it.",
+  },
+
+  {
+    id: "misgrouped-fragment-001",
+    type: "adjacency-fragment",
+    title: "Fragment Removed From Grouping",
+    condition: "water-damaged",
+    text:
+      "Private graphite transfer was initially grouped with shoreline material, then removed after handwriting pressure failed to match.",
+    emotionalPressure:
+      "It should not have been placed here. But now that it was, I cannot stop seeing the connection.",
+  },
+
+  {
+    id: "uncertainty-increased-001",
+    type: "archivist-annotation",
+    title: "Uncertainty Increased After Review",
+    condition: "unstable",
+    text:
+      "Second review did not clarify sequence. It widened the number of possible histories.",
+    emotionalPressure:
+      "Review made the archive less stable, not more.",
+  },
+];
