@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   calculateArchivistInstability,
   getHighestUnlockedStage,
@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 
 import { archiveDocuments } from "@/data/archive/archiveDocuments";
+import { ArchiveAmbientLayer } from "@/components/archive/ArchiveAmbientLayer";
 
 function dotClass(accessClass: string) {
   switch (accessClass) {
@@ -247,19 +248,82 @@ function artifactVisual(type: string, title: string) {
 }
 
 export default function ArchiveIndexPage() {
+  const [clientReady, setClientReady] = useState(false);
   const [focusedArtifactId, setFocusedArtifactId] = useState<string | null>(null);
-  const [handledArtifactIds, setHandledArtifactIds] = useState<Set<string>>(
-    () => new Set()
-  );
+  const [handledArtifactIds, setHandledArtifactIds] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") {
+      return new Set();
+    }
+
+    try {
+      const saved = window.localStorage.getItem("alder-cove.archive.reveals");
+      const parsed = saved ? JSON.parse(saved) : {};
+      return Array.isArray(parsed.handledArtifactIds)
+        ? new Set(parsed.handledArtifactIds)
+        : new Set();
+    } catch {
+      return new Set();
+    }
+  });
   const [inspectionIntentId, setInspectionIntentId] = useState<string | null>(
     null
   );
   const [accessFilter, setAccessFilter] = useState<string>("all");
-  const [prefaceDismissed, setPrefaceDismissed] = useState(false);
+  const [prefaceDismissed, setPrefaceDismissed] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    try {
+      const saved = window.localStorage.getItem("alder-cove.archive.reveals");
+      const parsed = saved ? JSON.parse(saved) : {};
+      return Boolean(parsed.prefaceDismissed);
+    } catch {
+      return false;
+    }
+  });
   const [controlledRevealOpen, setControlledRevealOpen] = useState(false);
   const [microLegibilityOpen, setMicroLegibilityOpen] = useState(false);
-  const [controlledRevealSeen, setControlledRevealSeen] = useState(false);
-  const [microLegibilitySeen, setMicroLegibilitySeen] = useState(false);
+  const [controlledRevealSeen, setControlledRevealSeen] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    try {
+      const saved = window.localStorage.getItem("alder-cove.archive.reveals");
+      const parsed = saved ? JSON.parse(saved) : {};
+      return Boolean(parsed.controlledRevealSeen);
+    } catch {
+      return false;
+    }
+  });
+
+  const [microLegibilitySeen, setMicroLegibilitySeen] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    try {
+      const saved = window.localStorage.getItem("alder-cove.archive.reveals");
+      const parsed = saved ? JSON.parse(saved) : {};
+      return Boolean(parsed.microLegibilitySeen);
+    } catch {
+      return false;
+    }
+  });
+
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      "alder-cove.archive.reveals",
+      JSON.stringify({
+        prefaceDismissed,
+        controlledRevealSeen,
+        microLegibilitySeen,
+        handledArtifactIds: Array.from(handledArtifactIds),
+      })
+    );
+  }, [prefaceDismissed, controlledRevealSeen, microLegibilitySeen]);
 
   const unlockedRevealIds: ArchiveRevealId[] = [
     "archive-preface",
@@ -271,6 +335,27 @@ export default function ArchiveIndexPage() {
 
   const archivistInstability =
     calculateArchivistInstability(unlockedRevealIds);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setInspectionIntentId(null);
+      setControlledRevealOpen(false);
+      setMicroLegibilityOpen(false);
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+
+  useEffect(() => {
+    setClientReady(true);
+  }, []);
 
   function markHandled(id: string) {
     setHandledArtifactIds((current) => {
@@ -348,9 +433,17 @@ export default function ArchiveIndexPage() {
     (document) => document.id === inspectionIntentId
   );
 
+  if (!clientReady) {
+    return (
+      <main className="min-h-screen bg-[#080706] text-neutral-100" />
+    );
+  }
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#080706] text-neutral-100">
+
       <div className="relative min-h-screen px-8 py-7">
+        <ArchiveAmbientLayer />
 
 
         {prefaceDismissed &&
@@ -527,9 +620,28 @@ export default function ArchiveIndexPage() {
           !controlledRevealOpen &&
           !microLegibilityOpen && (
             <div className="pointer-events-none fixed bottom-8 left-1/2 z-40 -translate-x-1/2 border border-neutral-800 bg-black/25 px-5 py-3 text-[10px] uppercase tracking-[0.28em] text-neutral-500 backdrop-blur-sm">
-              archive handling resumed · {archiveStage.replaceAll("-", " ")}
+              archive handling resumed · {archiveStage.replaceAll("-", " ")} · instability {archivistInstability}
             </div>
           )}
+
+
+        {prefaceDismissed && (
+          <button
+            type="button"
+            onClick={() => {
+              window.localStorage.removeItem("alder-cove.archive.reveals");
+              setPrefaceDismissed(false);
+              setControlledRevealOpen(false);
+              setMicroLegibilityOpen(false);
+              setControlledRevealSeen(false);
+              setMicroLegibilitySeen(false);
+              setHandledArtifactIds(new Set());
+            }}
+            className="fixed left-8 top-8 z-50 border border-neutral-800 bg-black/30 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-neutral-500 backdrop-blur-sm transition hover:text-neutral-300"
+          >
+            reset handling
+          </button>
+        )}
 
         {!prefaceDismissed && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
@@ -589,6 +701,7 @@ export default function ArchiveIndexPage() {
 
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_62%_20%,rgba(255,205,120,0.12),transparent_28%),radial-gradient(circle_at_50%_80%,rgba(80,45,20,0.28),transparent_48%)]" />
         <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(rgba(255,255,255,.025)_1px,transparent_1px)] [background-size:36px_36px]" />
+
 
         <div
           className={[
@@ -706,7 +819,12 @@ export default function ArchiveIndexPage() {
                   ].join(" ")}
                 >
                   {inspectionIntentId === document.id && (
-                    <div className="pointer-events-none absolute inset-x-4 top-[-10px] z-30 h-px bg-amber-100/30" />
+                    <>
+                      <div className="pointer-events-none absolute inset-x-4 top-[-10px] z-30 h-px bg-amber-100/30" />
+                      <div className="pointer-events-none absolute left-6 top-[-34px] z-40 border border-amber-100/15 bg-black/55 px-3 py-2 text-[9px] uppercase tracking-[0.22em] text-neutral-300 shadow-xl">
+                        object in hand
+                      </div>
+                    </>
                   )}
 
                   {document.accessClass === "private" && (
@@ -1082,15 +1200,38 @@ export default function ArchiveIndexPage() {
 
 
 
+
+        {inspectionIntentId && (
+          <button
+            type="button"
+            onClick={() => {
+              setInspectionIntentId(null);
+              setFocusedArtifactId(null);
+            }}
+            className="fixed right-8 bottom-8 z-[60] border border-amber-100/15 bg-black/45 px-5 py-3 text-[10px] uppercase tracking-[0.3em] text-neutral-300 shadow-2xl backdrop-blur-sm transition hover:bg-black/65"
+          >
+            set object down
+          </button>
+        )}
+
         {inspectedArtifact && (
           <aside className="fixed right-8 top-24 z-50 max-h-[calc(100vh-8rem)] w-[380px] overflow-y-auto border border-amber-100/15 bg-[#11100d]/95 p-5 text-sm text-neutral-200 shadow-[0_30px_90px_rgba(0,0,0,0.8)] backdrop-blur-md">
-            <button
-              type="button"
-              onClick={() => setInspectionIntentId(null)}
-              className="mb-5 text-[10px] uppercase tracking-[0.28em] text-neutral-500 hover:text-neutral-300"
-            >
-              set down
-            </button>
+            <div className="mb-5 flex items-center justify-between gap-4 border-b border-neutral-800 pb-4">
+              <p className="text-[10px] uppercase tracking-[0.35em] text-amber-100/45">
+                object in hand
+              </p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setInspectionIntentId(null);
+                  setFocusedArtifactId(null);
+                }}
+                className="border border-amber-100/15 bg-black/30 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-neutral-300 transition hover:bg-black/50"
+              >
+                set down
+              </button>
+            </div>
 
             <p className="text-[10px] uppercase tracking-[0.35em] text-amber-100/45">
               handling note
@@ -1141,7 +1282,7 @@ export default function ArchiveIndexPage() {
                 ? " · approach slowly"
                 : focusedArtifact.accessClass === "illicitly-acquired"
                 ? " · acquisition unclear"
-                : ""}
+                : " · paper shifts slightly"}
             </p>
           </div>
         )}
