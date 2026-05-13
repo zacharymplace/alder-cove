@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { getArchiveDocument } from "@/data/archive/archiveDocuments";
+import { floodRecoveryPacket001 } from "@/data/recovery/floodRecoveryPacket001";
+import { getLinksForDocument } from "@/systems/archive/crossArtifactLinks";
 
 type ArchiveDocumentRouteProps = {
   params: Promise<{
@@ -127,6 +129,7 @@ export default async function ArchiveDocumentRoute({
   }
 
   const copy = handlingCopy(document);
+  const crossLinks = getLinksForDocument(document.id);
 
   return (
     <main className="min-h-screen bg-[#080706] px-8 py-10 text-neutral-100">
@@ -215,6 +218,76 @@ export default async function ArchiveDocumentRoute({
                 Some materials remain physically indexed while intentionally
                 resisting legibility.
               </p>
+            </div>
+          )}
+
+
+          {document.id === "flood-recovery-packet-001" && (
+            <div className="mt-10 border border-blue-100/10 bg-black/20 p-6">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-blue-100/35">
+                recovery contamination review
+              </p>
+
+              <div className="mt-6 space-y-5">
+                {floodRecoveryPacket001.map((fragment) => (
+                  <div
+                    key={fragment.id}
+                    className="rotate-[-1deg] border border-neutral-800 bg-[#cdbb95]/10 p-5"
+                  >
+                    <div className="flex items-center justify-between gap-6">
+                      <p className="text-[10px] uppercase tracking-[0.24em] text-neutral-500">
+                        {fragment.sourceType.replaceAll("-", " ")}
+                      </p>
+
+                      <p className="text-[10px] uppercase tracking-[0.24em] text-blue-100/35">
+                        {fragment.condition.replaceAll("-", " ")}
+                      </p>
+                    </div>
+
+                    <p className="mt-4 leading-relaxed text-neutral-300">
+                      {fragment.summary}
+                    </p>
+
+                    {fragment.archivistConcern && (
+                      <p className="mt-4 border-l border-red-100/10 pl-4 italic leading-relaxed text-red-100/45">
+                        {fragment.archivistConcern}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+
+          {crossLinks.length > 0 && (
+            <div className="mt-10 border border-amber-100/10 bg-black/20 p-6">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-amber-100/35">
+                cross-artifact relationship review
+              </p>
+
+              <div className="mt-6 space-y-4">
+                {crossLinks.map((link) => (
+                  <div
+                    key={link.id}
+                    className="border-l border-neutral-700/60 pl-4"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500">
+                        {link.relationship.replaceAll("-", " ")}
+                      </p>
+
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-red-100/35">
+                        confidence · {link.confidence}
+                      </p>
+                    </div>
+
+                    <p className="mt-3 leading-relaxed text-neutral-400">
+                      {link.note}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
