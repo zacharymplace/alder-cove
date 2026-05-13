@@ -11,8 +11,6 @@ import Link from "next/link";
 import { archiveDocuments } from "@/data/archive/archiveDocuments";
 import { ArchiveAmbientLayer } from "@/components/archive/ArchiveAmbientLayer";
 import { ArchivePrefaceOverlay } from "@/components/archive/ArchivePrefaceOverlay";
-import { UnresolvedWordingReveal } from "@/components/archive/events/UnresolvedWordingReveal";
-import { PartialFragmentReveal } from "@/components/archive/events/PartialFragmentReveal";
 
 function dotClass(accessClass: string) {
   switch (accessClass) {
@@ -306,13 +304,14 @@ export default function ArchiveIndexPage() {
 
   const handledArtifactIdList = Array.from(handledArtifactIds).sort();
   const handledArtifactIdKey = handledArtifactIdList.join("|");
+  const seenEventIdKey = [...seenEventIds].sort().join("|");
 
   useEffect(() => {
     window.localStorage.setItem(
       "alder-cove.archive.reveals",
       JSON.stringify({
         prefaceDismissed,
-        seenEventIds,
+        seenEventIds: seenEventIdKey ? seenEventIdKey.split("|") : [],
         handledArtifactIds: handledArtifactIdKey
           ? handledArtifactIdKey.split("|")
           : [],
