@@ -1,4 +1,5 @@
 import { floodRecoveryPacket001 } from "@/data/recovery/floodRecoveryPacket001";
+import { FloodRecoveryPacketContents } from "./FloodRecoveryPacketContents";
 import {
   floodRecoveryClusterPhase1,
   floodRecoveryClusterPhase2,
@@ -17,6 +18,8 @@ export function RecoveryContaminationReview({
 
   return (
     <>
+      <FloodRecoveryPacketContents />
+
       <div className="mt-10 border border-blue-100/10 bg-black/20 p-6">
         <p className="text-[10px] uppercase tracking-[0.3em] text-blue-100/35">
           flood recovery cluster · phase 1
