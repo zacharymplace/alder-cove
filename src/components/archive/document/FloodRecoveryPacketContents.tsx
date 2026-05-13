@@ -4,6 +4,30 @@ import {
   type FloodRecoveryClusterEntry,
 } from "@/data/recovery/floodRecoveryClusterPhase1";
 
+
+function packetHandlingClass(state?: FloodRecoveryClusterEntry["packetHandlingState"]) {
+  switch (state) {
+    case "clipped-down":
+      return "after:absolute after:right-4 after:top-3 after:h-5 after:w-12 after:rotate-[5deg] after:bg-white/25";
+    case "recently-moved":
+      return "translate-y-[-3px] shadow-[0_25px_70px_rgba(0,0,0,0.55)]";
+    case "drying-separately":
+      return "border-blue-900/25 bg-[#c9bd9b]";
+    case "isolated":
+      return "border-red-900/25 bg-[#c8b293]";
+    case "flagged-for-review":
+      return "border-red-100/20 bg-[#bfae8c]";
+    case "unstable-loose":
+      return "rotate-[2deg] border-red-900/20";
+    default:
+      return "";
+  }
+}
+
+function packetHandlingLabel(state?: FloodRecoveryClusterEntry["packetHandlingState"]) {
+  return state ? state.replaceAll("-", " ") : "packet item";
+}
+
 type PacketZone = {
   id: string;
   title: string;
@@ -46,12 +70,17 @@ function PacketItem({ entry, index }: { entry: FloodRecoveryClusterEntry; index:
       className={[
         "relative min-h-28 border border-neutral-900/25 bg-[#d2c19a] p-4 text-neutral-950 shadow-xl",
         index % 2 === 0 ? "rotate-[-1.5deg]" : "rotate-[1.2deg]",
+        packetHandlingClass(entry.packetHandlingState),
       ].join(" ")}
     >
       <div className="absolute right-3 top-2 h-3 w-12 rotate-[4deg] bg-white/20" />
 
       <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-700/55">
         {entry.type.replaceAll("-", " ")} · {entry.condition.replaceAll("-", " ")}
+      </p>
+
+      <p className="mt-2 text-[9px] uppercase tracking-[0.2em] text-red-900/45">
+        {packetHandlingLabel(entry.packetHandlingState)}
       </p>
 
       <h4 className="mt-3 font-serif text-xl italic leading-tight">
@@ -97,6 +126,11 @@ export function FloodRecoveryPacketContents() {
               {zone.subtitle}
             </p>
 
+            <p className="relative mt-4 border-l border-blue-100/10 pl-4 text-xs italic leading-relaxed text-blue-100/35">
+              Items in this area are grouped by current recovery handling, not
+              by confirmed original relationship.
+            </p>
+
             <div className="relative mt-8 grid gap-5">
               {zone.entries.map((entry, index) => (
                 <PacketItem key={entry.id} entry={entry} index={index} />
@@ -123,8 +157,8 @@ export function FloodRecoveryPacketContents() {
           </div>
 
           <p className="mt-6 border-l border-red-100/10 pl-4 font-serif text-xl italic leading-relaxed text-red-100/45">
-            These items sit inside the packet, but the packet may be the reason
-            they appear related.
+            These items have been deliberately separated from the main packet
+            order, but the separation itself may be another form of editing.
           </p>
         </section>
       )}

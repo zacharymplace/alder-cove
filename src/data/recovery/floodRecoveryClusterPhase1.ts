@@ -12,6 +12,14 @@ export type FloodRecoveryClusterEntry = {
     | "copied-later"
     | "unstable";
   text: string;
+  packetHandlingState?:
+    | "clipped-down"
+    | "recently-moved"
+    | "drying-separately"
+    | "isolated"
+    | "flagged-for-review"
+    | "unstable-loose";
+  packetZone?: "box-1-sleeve" | "drying-tray-4" | "loose";
   emotionalPressure?: string;
 };
 
@@ -21,6 +29,8 @@ export const floodRecoveryClusterPhase1: FloodRecoveryClusterEntry[] = [
     type: "drying-note",
     title: "Drying Note — Tray 4",
     condition: "flattened",
+    packetHandlingState: "drying-separately",
+    packetZone: "drying-tray-4",
     text:
       "Several notebook scraps adhered to unrelated meeting copies during overnight drying.",
     emotionalPressure:
@@ -32,6 +42,8 @@ export const floodRecoveryClusterPhase1: FloodRecoveryClusterEntry[] = [
     type: "recovery-inventory",
     title: "Recovery Inventory — Box 1",
     condition: "copied-later",
+    packetHandlingState: "clipped-down",
+    packetZone: "box-1-sleeve",
     text:
       "Contents relabeled after lower storage room collapse shifted multiple packets together.",
     emotionalPressure:
@@ -43,6 +55,8 @@ export const floodRecoveryClusterPhase1: FloodRecoveryClusterEntry[] = [
     type: "adjacency-fragment",
     title: "Adjacency Fragment",
     condition: "water-damaged",
+    packetHandlingState: "unstable-loose",
+    packetZone: "drying-tray-4",
     text:
       "Private journal graphite appears pressed into a copied shoreline map fragment.",
     emotionalPressure:
@@ -54,6 +68,8 @@ export const floodRecoveryClusterPhase1: FloodRecoveryClusterEntry[] = [
     type: "archivist-annotation",
     title: "Archivist Annotation",
     condition: "unstable",
+    packetHandlingState: "flagged-for-review",
+    packetZone: "box-1-sleeve",
     text:
       "The packet keeps creating relationships between fragments that may never have touched before recovery.",
     emotionalPressure:
@@ -67,6 +83,8 @@ export const floodRecoveryClusterPhase2: FloodRecoveryClusterEntry[] = [
     type: "recovery-inventory",
     title: "Conflicting Label — Box 1 / Tray 4",
     condition: "unstable",
+    packetHandlingState: "flagged-for-review",
+    packetZone: "box-1-sleeve",
     text:
       "Box label identifies these scraps as shoreline map material. Drying tray label identifies the same grouping as meeting overflow.",
     emotionalPressure:
@@ -78,6 +96,8 @@ export const floodRecoveryClusterPhase2: FloodRecoveryClusterEntry[] = [
     type: "archivist-annotation",
     title: "Adjacency Claim Downgraded",
     condition: "copied-later",
+    packetHandlingState: "clipped-down",
+    packetZone: "box-1-sleeve",
     text:
       "Do not cite recovered contact as evidence of original contact. Water pressure may have created the relationship.",
     emotionalPressure:
@@ -89,6 +109,8 @@ export const floodRecoveryClusterPhase2: FloodRecoveryClusterEntry[] = [
     type: "adjacency-fragment",
     title: "Fragment Removed From Grouping",
     condition: "water-damaged",
+    packetHandlingState: "isolated",
+    packetZone: "loose",
     text:
       "Private graphite transfer was initially grouped with shoreline material, then removed after handwriting pressure failed to match.",
     emotionalPressure:
@@ -100,6 +122,8 @@ export const floodRecoveryClusterPhase2: FloodRecoveryClusterEntry[] = [
     type: "archivist-annotation",
     title: "Uncertainty Increased After Review",
     condition: "unstable",
+    packetHandlingState: "recently-moved",
+    packetZone: "loose",
     text:
       "Second review did not clarify sequence. It widened the number of possible histories.",
     emotionalPressure:

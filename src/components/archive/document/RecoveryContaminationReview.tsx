@@ -1,9 +1,5 @@
 import { floodRecoveryPacket001 } from "@/data/recovery/floodRecoveryPacket001";
 import { FloodRecoveryPacketContents } from "./FloodRecoveryPacketContents";
-import {
-  floodRecoveryClusterPhase1,
-  floodRecoveryClusterPhase2,
-} from "@/data/recovery/floodRecoveryClusterPhase1";
 
 type RecoveryContaminationReviewProps = {
   documentId: string;
