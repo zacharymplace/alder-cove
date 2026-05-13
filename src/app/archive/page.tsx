@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import {
+  calculateArchivistInstability,
+  getHighestUnlockedStage,
+  type ArchiveRevealId,
+} from "@/systems/archive/progression";
 import Link from "next/link";
 
 import { archiveDocuments } from "@/data/archive/archiveDocuments";
@@ -250,6 +255,22 @@ export default function ArchiveIndexPage() {
     null
   );
   const [accessFilter, setAccessFilter] = useState<string>("all");
+  const [prefaceDismissed, setPrefaceDismissed] = useState(false);
+  const [controlledRevealOpen, setControlledRevealOpen] = useState(false);
+  const [microLegibilityOpen, setMicroLegibilityOpen] = useState(false);
+  const [controlledRevealSeen, setControlledRevealSeen] = useState(false);
+  const [microLegibilitySeen, setMicroLegibilitySeen] = useState(false);
+
+  const unlockedRevealIds: ArchiveRevealId[] = [
+    "archive-preface",
+    ...(controlledRevealSeen ? (["unresolved-wording"] as ArchiveRevealId[]) : []),
+    ...(microLegibilitySeen ? (["partial-fragment"] as ArchiveRevealId[]) : []),
+  ];
+
+  const archiveStage = getHighestUnlockedStage(unlockedRevealIds);
+
+  const archivistInstability =
+    calculateArchivistInstability(unlockedRevealIds);
 
   function markHandled(id: string) {
     setHandledArtifactIds((current) => {
@@ -330,10 +351,251 @@ export default function ArchiveIndexPage() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#080706] text-neutral-100">
       <div className="relative min-h-screen px-8 py-7">
+
+
+        {prefaceDismissed &&
+          !controlledRevealSeen &&
+          !controlledRevealOpen &&
+          !microLegibilityOpen && (
+            <button
+              type="button"
+              onClick={() => setControlledRevealOpen(true)}
+              className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 border border-amber-100/15 bg-black/45 px-5 py-3 text-[10px] uppercase tracking-[0.3em] text-neutral-300 shadow-2xl backdrop-blur-sm transition hover:bg-black/65"
+            >
+              review unresolved wording
+            </button>
+          )}
+
+        {controlledRevealOpen && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/65 px-6 backdrop-blur-sm">
+            <section className="relative w-full max-w-2xl border border-amber-100/10 bg-[#11100d]/95 p-9 shadow-[0_40px_140px_rgba(0,0,0,0.85)]">
+              <p className="text-[10px] uppercase tracking-[0.38em] text-amber-100/45">
+                unresolved wording comparison
+              </p>
+
+              <div className="mt-8 grid gap-5">
+                <div className="rotate-[-1deg] border border-neutral-800 bg-[#d4c4a4] p-5 text-neutral-950 shadow-xl">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-700/60">
+                    earlier copy
+                  </p>
+                  <p className="mt-4 font-serif text-3xl italic">
+                    he was scared
+                  </p>
+                </div>
+
+                <div className="ml-8 rotate-[1deg] border border-neutral-800 bg-[#c7b58e] p-5 text-neutral-950 shadow-xl">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-700/60">
+                    later copy
+                  </p>
+                  <p className="mt-4 font-serif text-3xl italic">
+                    he sounded scared
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-8 border-l border-red-100/15 pl-5">
+                <p className="font-serif text-2xl italic leading-relaxed text-red-100/55">
+                  I no longer know which version arrived first.
+                </p>
+
+                <p className="mt-4 text-sm leading-relaxed text-neutral-500">
+                  The softer wording appears in later handling notes, but the
+                  earlier copy was already water-damaged when it reached the
+                  archive.
+                </p>
+              </div>
+
+              <div className="mt-9 flex items-center justify-between border-t border-neutral-800 pt-5">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-600">
+                  contradiction preserved
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setControlledRevealOpen(false);
+                    setControlledRevealSeen(true);
+                  }}
+                  className="border border-amber-100/15 bg-black/20 px-5 py-3 text-xs uppercase tracking-[0.3em] text-neutral-200 transition hover:bg-black/35"
+                >
+                  return to archive
+                </button>
+              </div>
+
+              <div className="pointer-events-none absolute right-8 top-8 rotate-[4deg] text-[10px] uppercase tracking-[0.22em] text-red-100/18">
+                copied again
+              </div>
+            </section>
+          </div>
+        )}
+
+
+        {prefaceDismissed &&
+          controlledRevealSeen &&
+          !microLegibilitySeen &&
+          !controlledRevealOpen &&
+          !microLegibilityOpen && (
+            <button
+              type="button"
+              onClick={() => setMicroLegibilityOpen(true)}
+              className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 border border-red-100/10 bg-black/40 px-5 py-3 text-[10px] uppercase tracking-[0.3em] text-red-100/55 shadow-2xl backdrop-blur-sm transition hover:bg-black/60"
+            >
+              inspect partial fragment
+            </button>
+          )}
+
+        {microLegibilityOpen && (
+          <div className="fixed inset-0 z-[115] flex items-center justify-center bg-black/72 px-6 backdrop-blur-sm">
+            <section className="relative w-full max-w-3xl overflow-hidden border border-red-100/10 bg-[#100d0c]/96 p-10 shadow-[0_40px_140px_rgba(0,0,0,0.9)]">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_40%_25%,rgba(255,220,160,0.05),transparent_35%)]" />
+
+              <p className="text-[10px] uppercase tracking-[0.38em] text-red-100/35">
+                partial readability event
+              </p>
+
+              <div className="mt-10 rotate-[-1deg] border border-neutral-800 bg-[#d3c29d] p-8 text-neutral-950 shadow-[0_25px_80px_rgba(0,0,0,0.65)]">
+                <p className="text-[10px] uppercase tracking-[0.24em] text-neutral-700/60">
+                  recovered edge fragment
+                </p>
+
+                <div className="mt-8 space-y-5 font-serif text-3xl italic leading-relaxed">
+                  <p>
+                    we said not to
+                    <span className="mx-2 inline-block h-[1px] w-24 bg-black/20 align-middle" />
+                    after the storm
+                  </p>
+
+                  <p className="text-neutral-950/55">
+                    Eli kept saying the tunnel
+                    <span className="mx-2 inline-block h-[1px] w-14 bg-black/20 align-middle" />
+                    wrong
+                  </p>
+
+                  <p className="text-neutral-950/40">
+                    Mara said if anyone wrote it down
+                    <span className="mx-2 inline-block h-[1px] w-28 bg-black/20 align-middle" />
+                  </p>
+                </div>
+
+                <div className="mt-10 border-t border-neutral-900/15 pt-5">
+                  <p className="text-sm italic leading-relaxed text-neutral-800/65">
+                    lower-right portion fused during drying. reconstruction attempts remain incomplete.
+                  </p>
+                </div>
+
+                <div className="pointer-events-none absolute right-10 top-14 rotate-[6deg] text-[10px] uppercase tracking-[0.22em] text-red-900/20">
+                  partially legible
+                </div>
+
+                <div className="pointer-events-none absolute left-10 bottom-10 h-12 w-40 rotate-[2deg] rounded-full bg-black/6 blur-xl" />
+              </div>
+
+              <div className="mt-10 border-l border-red-100/15 pl-5">
+                <p className="font-serif text-2xl italic leading-relaxed text-red-100/50">
+                  Some fragments resist reconstruction more aggressively than others.
+                </p>
+
+                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-500">
+                  The archive occasionally preserves emotional pressure more clearly than language itself.
+                </p>
+              </div>
+
+              <div className="mt-10 flex items-center justify-between border-t border-neutral-800 pt-5">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-600">
+                  readability unstable
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMicroLegibilityOpen(false);
+                    setMicroLegibilitySeen(true);
+                  }}
+                  className="border border-red-100/10 bg-black/20 px-5 py-3 text-xs uppercase tracking-[0.3em] text-neutral-200 transition hover:bg-black/35"
+                >
+                  return to archive
+                </button>
+              </div>
+            </section>
+          </div>
+        )}
+
+
+        {prefaceDismissed &&
+          controlledRevealSeen &&
+          microLegibilitySeen &&
+          !controlledRevealOpen &&
+          !microLegibilityOpen && (
+            <div className="pointer-events-none fixed bottom-8 left-1/2 z-40 -translate-x-1/2 border border-neutral-800 bg-black/25 px-5 py-3 text-[10px] uppercase tracking-[0.28em] text-neutral-500 backdrop-blur-sm">
+              archive handling resumed · {archiveStage.replaceAll("-", " ")}
+            </div>
+          )}
+
+        {!prefaceDismissed && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+            <div className="relative w-full max-w-3xl overflow-hidden border border-amber-100/10 bg-[#11100d]/95 p-10 shadow-[0_40px_140px_rgba(0,0,0,0.85)]">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,220,160,0.08),transparent_35%)]" />
+
+              <p className="text-[10px] uppercase tracking-[0.42em] text-amber-100/45">
+                archivist preface
+              </p>
+
+              <div className="mt-10 max-w-2xl space-y-7 font-serif text-2xl italic leading-relaxed text-neutral-200">
+                <p>
+                  I used to believe preservation meant keeping things from disappearing.
+                </p>
+
+                <p>
+                  I know now it also means deciding what remains survivable to remember.
+                </p>
+
+                <p className="text-neutral-400">
+                  These materials were not gathered all at once. Some were shared freely. Some were copied later. Some only survived because someone could not bear to throw them away.
+                </p>
+
+                <p className="text-neutral-400">
+                  I have tried to preserve the order honestly. I do not think I succeeded everywhere.
+                </p>
+
+                <p className="text-neutral-500">
+                  If a line sounds gentler than it should, that may be because it became gentler over time.
+                </p>
+
+                <p className="text-neutral-500">
+                  Start with the shared notebook. Everyone touched that one.
+                </p>
+              </div>
+
+              <div className="mt-12 flex items-center justify-between border-t border-neutral-800 pt-6">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-500">
+                  preservation environment active
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => setPrefaceDismissed(true)}
+                  className="border border-amber-100/15 bg-black/20 px-5 py-3 text-xs uppercase tracking-[0.3em] text-neutral-200 transition hover:bg-black/35"
+                >
+                  begin handling archive
+                </button>
+              </div>
+
+              <div className="pointer-events-none absolute right-10 top-10 rotate-[3deg] text-[10px] uppercase tracking-[0.2em] text-red-100/18">
+                copied later
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_62%_20%,rgba(255,205,120,0.12),transparent_28%),radial-gradient(circle_at_50%_80%,rgba(80,45,20,0.28),transparent_48%)]" />
         <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(rgba(255,255,255,.025)_1px,transparent_1px)] [background-size:36px_36px]" />
 
-        <div className="relative mx-auto grid max-w-[1500px] grid-cols-[310px_1fr] gap-10">
+        <div
+          className={[
+            "relative mx-auto grid max-w-[1500px] grid-cols-[310px_1fr] gap-10 transition duration-700",
+            prefaceDismissed ? "opacity-100 blur-0" : "opacity-35 blur-[1px]",
+          ].join(" ")}
+        >
           <aside className="pt-3">
             <p className="text-xs uppercase tracking-[0.45em] text-amber-100/55">
               Alder Cove Archive
@@ -410,6 +672,9 @@ export default function ArchiveIndexPage() {
             <div className="relative grid gap-x-14 gap-y-16 xl:grid-cols-3">
               {visibleArtifacts.map((document) => (
                 <article
+                  style={{
+                    pointerEvents: prefaceDismissed ? "auto" : "none",
+                  }}
                   key={document.id}
                   onMouseEnter={() => setFocusedArtifactId(document.id)}
                   onMouseLeave={() => setFocusedArtifactId(null)}
