@@ -11,6 +11,8 @@ import Link from "next/link";
 import { archiveDocuments } from "@/data/archive/archiveDocuments";
 import { ArchiveAmbientLayer } from "@/components/archive/ArchiveAmbientLayer";
 import { ArchivePrefaceOverlay } from "@/components/archive/ArchivePrefaceOverlay";
+import { UnresolvedWordingReveal } from "@/components/archive/events/UnresolvedWordingReveal";
+import { PartialFragmentReveal } from "@/components/archive/events/PartialFragmentReveal";
 
 function dotClass(accessClass: string) {
   switch (accessClass) {
@@ -459,68 +461,13 @@ export default function ArchiveIndexPage() {
               review unresolved wording
             </button>
           )}
-
         {controlledRevealOpen && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/65 px-6 backdrop-blur-sm">
-            <section className="relative w-full max-w-2xl border border-amber-100/10 bg-[#11100d]/95 p-9 shadow-[0_40px_140px_rgba(0,0,0,0.85)]">
-              <p className="text-[10px] uppercase tracking-[0.38em] text-amber-100/45">
-                unresolved wording comparison
-              </p>
-
-              <div className="mt-8 grid gap-5">
-                <div className="rotate-[-1deg] border border-neutral-800 bg-[#d4c4a4] p-5 text-neutral-950 shadow-xl">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-700/60">
-                    earlier copy
-                  </p>
-                  <p className="mt-4 font-serif text-3xl italic">
-                    he was scared
-                  </p>
-                </div>
-
-                <div className="ml-8 rotate-[1deg] border border-neutral-800 bg-[#c7b58e] p-5 text-neutral-950 shadow-xl">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-700/60">
-                    later copy
-                  </p>
-                  <p className="mt-4 font-serif text-3xl italic">
-                    he sounded scared
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-8 border-l border-red-100/15 pl-5">
-                <p className="font-serif text-2xl italic leading-relaxed text-red-100/55">
-                  I no longer know which version arrived first.
-                </p>
-
-                <p className="mt-4 text-sm leading-relaxed text-neutral-500">
-                  The softer wording appears in later handling notes, but the
-                  earlier copy was already water-damaged when it reached the
-                  archive.
-                </p>
-              </div>
-
-              <div className="mt-9 flex items-center justify-between border-t border-neutral-800 pt-5">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-600">
-                  contradiction preserved
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setControlledRevealOpen(false);
-                    setControlledRevealSeen(true);
-                  }}
-                  className="border border-amber-100/15 bg-black/20 px-5 py-3 text-xs uppercase tracking-[0.3em] text-neutral-200 transition hover:bg-black/35"
-                >
-                  return to archive
-                </button>
-              </div>
-
-              <div className="pointer-events-none absolute right-8 top-8 rotate-[4deg] text-[10px] uppercase tracking-[0.22em] text-red-100/18">
-                copied again
-              </div>
-            </section>
-          </div>
+          <UnresolvedWordingReveal
+            onClose={() => {
+              setControlledRevealOpen(false);
+              setControlledRevealSeen(true);
+            }}
+          />
         )}
 
 
@@ -537,81 +484,13 @@ export default function ArchiveIndexPage() {
               inspect partial fragment
             </button>
           )}
-
         {microLegibilityOpen && (
-          <div className="fixed inset-0 z-[115] flex items-center justify-center bg-black/72 px-6 backdrop-blur-sm">
-            <section className="relative w-full max-w-3xl overflow-hidden border border-red-100/10 bg-[#100d0c]/96 p-10 shadow-[0_40px_140px_rgba(0,0,0,0.9)]">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_40%_25%,rgba(255,220,160,0.05),transparent_35%)]" />
-
-              <p className="text-[10px] uppercase tracking-[0.38em] text-red-100/35">
-                partial readability event
-              </p>
-
-              <div className="mt-10 rotate-[-1deg] border border-neutral-800 bg-[#d3c29d] p-8 text-neutral-950 shadow-[0_25px_80px_rgba(0,0,0,0.65)]">
-                <p className="text-[10px] uppercase tracking-[0.24em] text-neutral-700/60">
-                  recovered edge fragment
-                </p>
-
-                <div className="mt-8 space-y-5 font-serif text-3xl italic leading-relaxed">
-                  <p>
-                    we said not to
-                    <span className="mx-2 inline-block h-[1px] w-24 bg-black/20 align-middle" />
-                    after the storm
-                  </p>
-
-                  <p className="text-neutral-950/55">
-                    Eli kept saying the tunnel
-                    <span className="mx-2 inline-block h-[1px] w-14 bg-black/20 align-middle" />
-                    wrong
-                  </p>
-
-                  <p className="text-neutral-950/40">
-                    Mara said if anyone wrote it down
-                    <span className="mx-2 inline-block h-[1px] w-28 bg-black/20 align-middle" />
-                  </p>
-                </div>
-
-                <div className="mt-10 border-t border-neutral-900/15 pt-5">
-                  <p className="text-sm italic leading-relaxed text-neutral-800/65">
-                    lower-right portion fused during drying. reconstruction attempts remain incomplete.
-                  </p>
-                </div>
-
-                <div className="pointer-events-none absolute right-10 top-14 rotate-[6deg] text-[10px] uppercase tracking-[0.22em] text-red-900/20">
-                  partially legible
-                </div>
-
-                <div className="pointer-events-none absolute left-10 bottom-10 h-12 w-40 rotate-[2deg] rounded-full bg-black/6 blur-xl" />
-              </div>
-
-              <div className="mt-10 border-l border-red-100/15 pl-5">
-                <p className="font-serif text-2xl italic leading-relaxed text-red-100/50">
-                  Some fragments resist reconstruction more aggressively than others.
-                </p>
-
-                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-500">
-                  The archive occasionally preserves emotional pressure more clearly than language itself.
-                </p>
-              </div>
-
-              <div className="mt-10 flex items-center justify-between border-t border-neutral-800 pt-5">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-600">
-                  readability unstable
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMicroLegibilityOpen(false);
-                    setMicroLegibilitySeen(true);
-                  }}
-                  className="border border-red-100/10 bg-black/20 px-5 py-3 text-xs uppercase tracking-[0.3em] text-neutral-200 transition hover:bg-black/35"
-                >
-                  return to archive
-                </button>
-              </div>
-            </section>
-          </div>
+          <PartialFragmentReveal
+            onClose={() => {
+              setMicroLegibilityOpen(false);
+              setMicroLegibilitySeen(true);
+            }}
+          />
         )}
 
 
