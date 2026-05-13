@@ -285,9 +285,9 @@ export default function ArchiveIndexPage() {
       return false;
     }
   });
-  const [controlledRevealOpen, setControlledRevealOpen] = useState(false);
-  const [microLegibilityOpen, setMicroLegibilityOpen] = useState(false);
-  const [controlledRevealSeen, setControlledRevealSeen] = useState(() => {
+  const [activeEventId, setActiveEventId] =
+    useState<ArchiveEventId | null>(null);
+  const [seenEventIds, setSeenEventIds] = useState<ArchiveEventId[]>(() => {
     if (typeof window === "undefined") {
       return false;
     }
@@ -295,21 +295,9 @@ export default function ArchiveIndexPage() {
     try {
       const saved = window.localStorage.getItem("alder-cove.archive.reveals");
       const parsed = saved ? JSON.parse(saved) : {};
-      return Boolean(parsed.controlledRevealSeen);
-    } catch {
-      return false;
-    }
-  });
-
-  const [microLegibilitySeen, setMicroLegibilitySeen] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    try {
-      const saved = window.localStorage.getItem("alder-cove.archive.reveals");
-      const parsed = saved ? JSON.parse(saved) : {};
-      return Boolean(parsed.microLegibilitySeen);
+      return Array.isArray(parsed.seenEventIds)
+        ? parsed.seenEventIds
+        : [];
     } catch {
       return false;
     }
@@ -324,19 +312,18 @@ export default function ArchiveIndexPage() {
       "alder-cove.archive.reveals",
       JSON.stringify({
         prefaceDismissed,
-        controlledRevealSeen,
-        microLegibilitySeen,
+        seenEventIds,
         handledArtifactIds: handledArtifactIdKey
           ? handledArtifactIdKey.split("|")
           : [],
       })
     );
-  }, [prefaceDismissed, controlledRevealSeen, microLegibilitySeen]);
+  }, [prefaceDismissed, seenEventIds.includes("unresolved-wording"), seenEventIds.includes("partial-fragment")]);
 
    const unlockedRevealIds: ArchiveRevealId[] = [
     "archive-preface",
-    ...(controlledRevealSeen ? (["unresolved-wording"] as ArchiveRevealId[]) : []),
-    ...(microLegibilitySeen ? (["partial-fragment"] as ArchiveRevealId[]) : []),
+    ...(seenEventIds.includes("unresolved-wording") ? (["unresolved-wording"] as ArchiveRevealId[]) : []),
+    ...(seenEventIds.includes("partial-fragment") ? (["partial-fragment"] as ArchiveRevealId[]) : []),
   ];
 
   const archiveStage = getHighestUnlockedStage(unlockedRevealIds);
@@ -456,58 +443,41 @@ export default function ArchiveIndexPage() {
 
       <div className="relative min-h-screen px-8 py-7">
         <ArchiveAmbientLayer />
+        {prefaceDismissed &&
+          archiveEventRegistry.map((event) => {
+            const alreadySeen = seenEventIds.includes(event.id);
 
+            const visible =
+              !alreadySeen &&
+              (!event.visibleAfter ||
+                seenEventIds.includes(event.visibleAfter));
+
+            if (!visible) {
+              return null;
+            }
+
+            return (
+              <button
+                key={event.id}
+                type="button"
+                onClick={() => setActiveEventId(event.id)}
+                className={[
+                  "fixed left-1/2 z-50 -translate-x-1/2 border bg-black/40 px-5 py-3 text-[10px] uppercase tracking-[0.3em] shadow-2xl backdrop-blur-sm transition hover:bg-black/60",
+                  event.id === "partial-fragment"
+                    ? "bottom-24 border-red-100/10 text-red-100/55"
+                    : "bottom-8 border-amber-100/15 text-neutral-300",
+                ].join(" ")}
+              >
+                {event.label}
+              </button>
+            );
+          })}
 
         {prefaceDismissed &&
-          !controlledRevealSeen &&
-          !controlledRevealOpen &&
-          !microLegibilityOpen && (
-            <button
-              type="button"
-              onClick={() => setControlledRevealOpen(true)}
-              className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 border border-amber-100/15 bg-black/45 px-5 py-3 text-[10px] uppercase tracking-[0.3em] text-neutral-300 shadow-2xl backdrop-blur-sm transition hover:bg-black/65"
-            >
-              review unresolved wording
-            </button>
-          )}
-        {controlledRevealOpen && (
-          <UnresolvedWordingReveal
-            onClose={() => {
-              setControlledRevealOpen(false);
-              setControlledRevealSeen(true);
-            }}
-          />
-        )}
-
-
-        {prefaceDismissed &&
-          controlledRevealSeen &&
-          !microLegibilitySeen &&
-          !controlledRevealOpen &&
-          !microLegibilityOpen && (
-            <button
-              type="button"
-              onClick={() => setMicroLegibilityOpen(true)}
-              className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 border border-red-100/10 bg-black/40 px-5 py-3 text-[10px] uppercase tracking-[0.3em] text-red-100/55 shadow-2xl backdrop-blur-sm transition hover:bg-black/60"
-            >
-              inspect partial fragment
-            </button>
-          )}
-        {microLegibilityOpen && (
-          <PartialFragmentReveal
-            onClose={() => {
-              setMicroLegibilityOpen(false);
-              setMicroLegibilitySeen(true);
-            }}
-          />
-        )}
-
-
-        {prefaceDismissed &&
-          controlledRevealSeen &&
-          microLegibilitySeen &&
-          !controlledRevealOpen &&
-          !microLegibilityOpen && (
+          archiveEventRegistry.every((event) =>
+            seenEventIds.includes(event.id)
+          ) &&
+          !activeEventId && (
             <div className="pointer-events-none fixed bottom-8 left-1/2 z-40 -translate-x-1/2 border border-neutral-800 bg-black/25 px-5 py-3 text-[10px] uppercase tracking-[0.28em] text-neutral-500 backdrop-blur-sm">
               archive handling resumed · {archiveStage.replaceAll("-", " ")} · instability {archivistInstability}
             </div>
@@ -531,6 +501,25 @@ export default function ArchiveIndexPage() {
             reset handling
           </button>
         )}
+
+        {activeEventId &&
+          (() => {
+            const event = getArchiveEvent(activeEventId);
+            const EventComponent = event.Component;
+
+            return (
+              <EventComponent
+                onClose={() => {
+                  setSeenEventIds((current) => [
+                    ...new Set([...current, activeEventId]),
+                  ]);
+
+                  setActiveEventId(null);
+                }}
+              />
+            );
+          })()}
+
         {!prefaceDismissed && (
           <ArchivePrefaceOverlay onDismiss={() => setPrefaceDismissed(true)} />
         )}
