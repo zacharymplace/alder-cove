@@ -316,6 +316,8 @@ export default function ArchiveIndexPage() {
   });
 
 
+  const handledArtifactIdList = Array.from(handledArtifactIds).sort();
+
   useEffect(() => {
     window.localStorage.setItem(
       "alder-cove.archive.reveals",
@@ -323,12 +325,12 @@ export default function ArchiveIndexPage() {
         prefaceDismissed,
         controlledRevealSeen,
         microLegibilitySeen,
-        handledArtifactIds: Array.from(handledArtifactIds),
+        handledArtifactIds: handledArtifactIdList,
       })
     );
   }, [prefaceDismissed, controlledRevealSeen, microLegibilitySeen]);
 
-  const unlockedRevealIds: ArchiveRevealId[] = [
+   const unlockedRevealIds: ArchiveRevealId[] = [
     "archive-preface",
     ...(controlledRevealSeen ? (["unresolved-wording"] as ArchiveRevealId[]) : []),
     ...(microLegibilitySeen ? (["partial-fragment"] as ArchiveRevealId[]) : []),
