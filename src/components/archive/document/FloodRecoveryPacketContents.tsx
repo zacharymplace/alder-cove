@@ -68,7 +68,7 @@ function PacketItem({ entry, index }: { entry: FloodRecoveryClusterEntry; index:
   return (
     <div
       className={[
-        "relative min-h-28 border border-neutral-900/25 bg-[#d2c19a] p-4 text-neutral-950 shadow-xl",
+        "relative min-h-20 border border-neutral-900/20 bg-[#d2c19a] p-3 text-neutral-950 shadow-lg",
         index % 2 === 0 ? "rotate-[-1.5deg]" : "rotate-[1.2deg]",
         packetHandlingClass(entry.packetHandlingState),
       ].join(" ")}
@@ -79,16 +79,14 @@ function PacketItem({ entry, index }: { entry: FloodRecoveryClusterEntry; index:
         {entry.type.replaceAll("-", " ")} · {entry.condition.replaceAll("-", " ")}
       </p>
 
-      <p className="mt-2 text-[9px] uppercase tracking-[0.2em] text-red-900/45">
-        {packetHandlingLabel(entry.packetHandlingState)}
-      </p>
 
-      <h4 className="mt-3 font-serif text-xl italic leading-tight">
+
+      <h4 className="mt-2 font-serif text-base italic leading-tight">
         {entry.title}
       </h4>
 
-      <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-neutral-800/75">
-        {entry.text}
+      <p className="mt-2 line-clamp-1 text-[10px] leading-relaxed text-neutral-800/55">
+        {entry.condition.replaceAll("-", " ")} · {packetHandlingLabel(entry.packetHandlingState)}
       </p>
     </div>
   );
@@ -105,18 +103,35 @@ export function FloodRecoveryPacketContents() {
         packet contents visualization
       </p>
 
-      <p className="mt-4 max-w-2xl font-serif text-2xl italic leading-relaxed text-neutral-300">
-        The packet is not a single document. It is a container of damaged
-        relationships.
+      <p className="mt-4 max-w-xl font-serif text-xl italic leading-relaxed text-neutral-300">
+        A container of damaged relationships.
       </p>
 
       <div className="mt-8 grid gap-8 xl:grid-cols-2">
         {packetZones.map((zone) => (
           <section
             key={zone.id}
-            className="relative min-h-[440px] rounded-lg border border-neutral-800 bg-[#6f6048]/55 p-6 shadow-[0_25px_90px_rgba(0,0,0,0.55)]"
+            className={[
+              "relative min-h-[360px] overflow-hidden rounded-lg border p-6 shadow-[0_25px_90px_rgba(0,0,0,0.55)]",
+              zone.id === "box-1-sleeve"
+                ? "border-amber-950/50 bg-[#746243]/65"
+                : "border-blue-950/40 bg-[#3f3c31]/70",
+            ].join(" ")}
           >
-            <div className="absolute inset-4 rounded border border-neutral-950/20" />
+            {zone.id === "box-1-sleeve" ? (
+              <>
+                <div className="absolute inset-5 rounded border border-neutral-950/25 bg-[#8a7650]/20" />
+                <div className="absolute bottom-5 left-5 right-5 h-20 rounded-b-lg border border-neutral-950/20 bg-black/10" />
+                <div className="absolute right-8 top-8 h-20 w-2 rounded bg-black/20" />
+              </>
+            ) : (
+              <>
+                <div className="absolute inset-4 rounded border border-blue-100/10 bg-blue-950/5" />
+                <div className="absolute inset-x-8 top-16 h-px bg-blue-100/10" />
+                <div className="absolute inset-y-8 left-1/2 w-px bg-blue-100/10" />
+                <div className="absolute bottom-6 left-8 right-8 h-3 rounded-full bg-black/20" />
+              </>
+            )}
 
             <p className="relative text-[10px] uppercase tracking-[0.28em] text-blue-100/35">
               {zone.title}
@@ -131,9 +146,31 @@ export function FloodRecoveryPacketContents() {
               by confirmed original relationship.
             </p>
 
-            <div className="relative mt-8 grid gap-5">
+            <div
+              className={[
+                "relative mt-8",
+                zone.id === "box-1-sleeve"
+                  ? "grid gap-3"
+                  : "grid grid-cols-2 gap-3",
+              ].join(" ")}
+            >
               {zone.entries.map((entry, index) => (
-                <PacketItem key={entry.id} entry={entry} index={index} />
+                <div
+                  key={entry.id}
+                  className={[
+                    zone.id === "drying-tray-4" && index === 0
+                      ? "translate-y-3"
+                      : "",
+                    zone.id === "drying-tray-4" && index === 1
+                      ? "-translate-y-2"
+                      : "",
+                    zone.id === "drying-tray-4" && index === 2
+                      ? "col-span-2 mx-auto w-[72%]"
+                      : "",
+                  ].join(" ")}
+                >
+                  <PacketItem entry={entry} index={index} />
+                </div>
               ))}
             </div>
 
@@ -150,15 +187,26 @@ export function FloodRecoveryPacketContents() {
             loose / unstable grouping
           </p>
 
-          <div className="mt-6 grid gap-5 md:grid-cols-2">
+          <div className="relative mt-6 min-h-[170px]">
+            <div className="absolute inset-0 rounded border border-red-100/5 bg-black/10" />
+
             {unstableEntries.map((entry, index) => (
-              <PacketItem key={entry.id} entry={entry} index={index} />
+              <div
+                key={entry.id}
+                className={[
+                  "absolute w-[46%]",
+                  index === 0
+                    ? "left-6 top-8 rotate-[-2deg]"
+                    : "right-6 top-16 rotate-[2deg]",
+                ].join(" ")}
+              >
+                <PacketItem entry={entry} index={index} />
+              </div>
             ))}
           </div>
 
-          <p className="mt-6 border-l border-red-100/10 pl-4 font-serif text-xl italic leading-relaxed text-red-100/45">
-            These items have been deliberately separated from the main packet
-            order, but the separation itself may be another form of editing.
+          <p className="mt-5 border-l border-red-100/10 pl-4 font-serif text-lg italic leading-relaxed text-red-100/40">
+            Separated from the packet order. Separation may also be editing.
           </p>
         </section>
       )}
