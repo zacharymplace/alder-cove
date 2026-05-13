@@ -2,10 +2,11 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { getArchiveDocument } from "@/data/archive/archiveDocuments";
-import { floodRecoveryPacket001 } from "@/data/recovery/floodRecoveryPacket001";
-import { floodRecoveryClusterPhase1 } from "@/data/recovery/floodRecoveryClusterPhase1";
 import { getLinksForDocument } from "@/systems/archive/crossArtifactLinks";
 import { getArchivistFingerprintsForDocument } from "@/data/archivist/fingerprints";
+import { ArchivistFingerprintReview } from "@/components/archive/document/ArchivistFingerprintReview";
+import { CrossArtifactRelationshipReview } from "@/components/archive/document/CrossArtifactRelationshipReview";
+import { RecoveryContaminationReview } from "@/components/archive/document/RecoveryContaminationReview";
 
 type ArchiveDocumentRouteProps = {
   params: Promise<{
@@ -223,156 +224,9 @@ export default async function ArchiveDocumentRoute({
               </p>
             </div>
           )}
-
-
-          {document.id === "flood-recovery-packet-001" && (
-            <div className="mt-10 border border-blue-100/10 bg-black/20 p-6">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-blue-100/35">
-                recovery contamination review
-              </p>
-
-              <div className="mt-6 space-y-5">
-                {floodRecoveryPacket001.map((fragment) => (
-                  <div
-                    key={fragment.id}
-                    className="rotate-[-1deg] border border-neutral-800 bg-[#cdbb95]/10 p-5"
-                  >
-                    <div className="flex items-center justify-between gap-6">
-                      <p className="text-[10px] uppercase tracking-[0.24em] text-neutral-500">
-                        {fragment.sourceType.replaceAll("-", " ")}
-                      </p>
-
-                      <p className="text-[10px] uppercase tracking-[0.24em] text-blue-100/35">
-                        {fragment.condition.replaceAll("-", " ")}
-                      </p>
-                    </div>
-
-                    <p className="mt-4 leading-relaxed text-neutral-300">
-                      {fragment.summary}
-                    </p>
-
-                    {fragment.archivistConcern && (
-                      <p className="mt-4 border-l border-red-100/10 pl-4 italic leading-relaxed text-red-100/45">
-                        {fragment.archivistConcern}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-
-
-          {document.id === "flood-recovery-packet-001" && (
-            <div className="mt-10 border border-blue-100/10 bg-black/20 p-6">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-blue-100/35">
-                flood recovery cluster · phase 1
-              </p>
-
-              <div className="mt-6 grid gap-5">
-                {floodRecoveryClusterPhase1.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="rotate-[-1deg] border border-neutral-800 bg-[#cdbb95]/10 p-5"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500">
-                        {entry.type.replaceAll("-", " ")}
-                      </p>
-
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-blue-100/35">
-                        {entry.condition.replaceAll("-", " ")}
-                      </p>
-                    </div>
-
-                    <h3 className="mt-4 font-serif text-2xl italic text-neutral-200">
-                      {entry.title}
-                    </h3>
-
-                    <p className="mt-4 leading-relaxed text-neutral-300">
-                      {entry.text}
-                    </p>
-
-                    {entry.emotionalPressure && (
-                      <p className="mt-4 border-l border-red-100/10 pl-4 italic leading-relaxed text-red-100/45">
-                        {entry.emotionalPressure}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-
-          {fingerprints.length > 0 && (
-            <div className="mt-10 border border-red-100/10 bg-black/20 p-6">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-red-100/35">
-                archivist fingerprints
-              </p>
-
-              <div className="mt-6 space-y-5">
-                {fingerprints.map((fingerprint) => (
-                  <div
-                    key={fingerprint.id}
-                    className="rotate-[-1deg] border border-neutral-800 bg-[#2a211a]/70 p-5"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500">
-                        {fingerprint.markType.replaceAll("-", " ")}
-                      </p>
-
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-red-100/30">
-                        {fingerprint.label}
-                      </p>
-                    </div>
-
-                    <p className="mt-4 leading-relaxed text-neutral-300">
-                      {fingerprint.text}
-                    </p>
-
-                    {fingerprint.emotionalLeak && (
-                      <p className="mt-4 border-l border-red-100/15 pl-4 font-serif text-lg italic leading-relaxed text-red-100/45">
-                        {fingerprint.emotionalLeak}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {crossLinks.length > 0 && (
-            <div className="mt-10 border border-amber-100/10 bg-black/20 p-6">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-amber-100/35">
-                cross-artifact relationship review
-              </p>
-
-              <div className="mt-6 space-y-4">
-                {crossLinks.map((link) => (
-                  <div
-                    key={link.id}
-                    className="border-l border-neutral-700/60 pl-4"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500">
-                        {link.relationship.replaceAll("-", " ")}
-                      </p>
-
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-red-100/35">
-                        confidence · {link.confidence}
-                      </p>
-                    </div>
-
-                    <p className="mt-3 leading-relaxed text-neutral-400">
-                      {link.note}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <RecoveryContaminationReview documentId={document.id} />
+          <ArchivistFingerprintReview fingerprints={fingerprints} />
+          <CrossArtifactRelationshipReview links={crossLinks} />
 
           <div className="mt-10 border border-neutral-800/80 bg-black/20 p-5">
               <p className="text-xs uppercase tracking-[0.28em] text-neutral-500">
