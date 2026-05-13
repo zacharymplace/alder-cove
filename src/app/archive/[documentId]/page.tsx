@@ -7,6 +7,9 @@ import { getArchivistFingerprintsForDocument } from "@/data/archivist/fingerprin
 import { ArchivistFingerprintReview } from "@/components/archive/document/ArchivistFingerprintReview";
 import { CrossArtifactRelationshipReview } from "@/components/archive/document/CrossArtifactRelationshipReview";
 import { RecoveryContaminationReview } from "@/components/archive/document/RecoveryContaminationReview";
+import { ArchiveDocumentDecisionPanel } from "@/components/archive/document/ArchiveDocumentDecisionPanel";
+import { ArchiveDocumentHeader } from "@/components/archive/document/ArchiveDocumentHeader";
+import { ArchiveDocumentMockup } from "@/components/archive/document/ArchiveDocumentMockup";
 
 type ArchiveDocumentRouteProps = {
   params: Promise<{
@@ -71,49 +74,6 @@ function shellClass(tone: string) {
   }
 }
 
-function artifactMockup(tone: string) {
-  if (tone === "private") {
-    return (
-      <div className="relative mx-auto h-72 max-w-sm rounded border border-neutral-800 bg-[#171412] shadow-[0_30px_90px_rgba(0,0,0,0.8)]">
-        <div className="absolute inset-6 rounded border border-red-900/15" />
-        <div className="absolute left-14 right-14 top-20 rotate-[-4deg] bg-[#c9b995] px-5 py-5 text-center font-serif text-2xl italic text-neutral-950 shadow-lg">
-          private
-          <br />
-          fragment
-        </div>
-        <div className="absolute inset-x-10 top-1/2 h-2 rounded-full bg-black/70" />
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 rounded bg-red-950/60 px-4 py-1 text-[10px] uppercase tracking-[0.28em] text-red-100/70">
-          sealed
-        </div>
-
-        <div className="absolute right-12 bottom-8 rotate-[4deg] text-[9px] uppercase tracking-[0.22em] text-red-100/20">
-          not prepared for reading
-        </div>
-
-        <div className="absolute right-12 bottom-8 rotate-[4deg] text-[9px] uppercase tracking-[0.22em] text-red-100/20">
-          not prepared for reading
-        </div>
-
-        <div className="absolute right-12 bottom-8 rotate-[4deg] text-[9px] uppercase tracking-[0.22em] text-red-100/20">
-          not prepared for reading
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative mx-auto h-72 max-w-sm rounded border border-neutral-800 bg-[#aa956a] shadow-[0_30px_90px_rgba(0,0,0,0.7)]">
-      <div className="absolute inset-y-0 left-8 w-4 bg-black/30" />
-      <div className="absolute left-24 top-20 rotate-[-2deg] font-serif text-3xl italic text-neutral-950">
-        preserved
-        <br />
-        material
-      </div>
-      <div className="absolute bottom-14 left-24 right-12 h-px bg-neutral-950/25" />
-    </div>
-  );
-}
-
 export default async function ArchiveDocumentRoute({
   params,
 }: ArchiveDocumentRouteProps) {
@@ -151,97 +111,18 @@ export default async function ArchiveDocumentRoute({
             shellClass(copy.tone),
           ].join(" ")}
         >
-          <div>{artifactMockup(copy.tone)}</div>
+          <ArchiveDocumentMockup tone={copy.tone} />
 
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-amber-100/45">
-              {copy.eyebrow}
-            </p>
+            <ArchiveDocumentHeader document={document} copy={copy} />
 
-            <h1 className="mt-5 font-serif text-5xl italic">
-              {document.title}
-            </h1>
-
-            <p className="mt-6 max-w-2xl font-serif text-2xl italic leading-relaxed text-neutral-300">
-              {copy.title}
-            </p>
-
-            <p className="mt-5 max-w-2xl leading-relaxed text-neutral-400">
-              {copy.body}
-            </p>
-
-            <div className="mt-8 grid gap-3 text-sm text-neutral-400">
-              <p>
-                access:{" "}
-                <span className="text-neutral-200">
-                  {document.accessClass.replaceAll("-", " ")}
-                </span>
-              </p>
-
-              <p>
-                acquisition:{" "}
-                <span className="text-neutral-200">
-                  {document.acquisitionMethod.replaceAll("-", " ")}
-                </span>
-              </p>
-
-              <p>
-                handling:{" "}
-                <span className="text-neutral-200">
-                  {(document.handlingState ?? "awaiting-review").replaceAll(
-                    "-",
-                    " "
-                  )}
-                </span>
-              </p>
-
-              <p>
-                status: <span className="text-neutral-200">{copy.status}</span>
-              </p>
-            </div>
-
-            {document.ethicalPressure && (
-              <p className="mt-8 border-l border-red-100/15 pl-5 italic leading-relaxed text-red-100/55">
-                {document.ethicalPressure}
-              </p>
-            )}
-
-  
-          {document.accessClass === "private" && (
-            <div className="mt-10 rotate-[-1deg] border border-red-100/10 bg-red-950/5 p-5 shadow-xl">
-              <p className="text-[10px] uppercase tracking-[0.28em] text-red-100/35">
-                handling restriction
-              </p>
-
-              <p className="mt-4 font-serif text-2xl italic leading-relaxed text-red-100/60">
-                The archive has not decided whether preserving readability here
-                causes more harm than withholding it.
-              </p>
-
-              <p className="mt-5 max-w-xl text-sm leading-relaxed text-red-100/40">
-                Some materials remain physically indexed while intentionally
-                resisting legibility.
-              </p>
-            </div>
-          )}
           <RecoveryContaminationReview documentId={document.id} />
           <ArchivistFingerprintReview fingerprints={fingerprints} />
           <CrossArtifactRelationshipReview links={crossLinks} />
 
-          <div className="mt-10 border border-neutral-800/80 bg-black/20 p-5">
-              <p className="text-xs uppercase tracking-[0.28em] text-neutral-500">
-                archive decision
-              </p>
-
-              <p className="mt-4 font-serif text-2xl italic text-neutral-300">
-                The archive can hold the object without opening it yet.
-              </p>
-
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-neutral-500">
-                Preservation does not always imply permission. Some materials
-                need to remain present before they become readable.
-              </p>
-            </div>
+          <ArchiveDocumentDecisionPanel
+            isPrivate={document.accessClass === "private"}
+          />
           </div>
         </section>
 
