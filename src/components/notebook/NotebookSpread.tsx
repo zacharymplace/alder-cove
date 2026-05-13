@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import clsx from "clsx";
 
 import { notebookOneSpread, type NotebookNote } from "@/data/notebook/notebookOne";
-import { getSpreadDefinition, spreadDefinitions } from "@/data/notebook/spreadDefinitions";
+import { getSpreadDefinition } from "@/data/notebook/spreadDefinitions";
 import { getArchiveDocument } from "@/data/archive/archiveDocuments";
 import { getNotebookPage } from "@/data/notebook/pages";
 
@@ -153,7 +153,6 @@ export function Note({
     instabilityLevel,
     collapseTriggered,
     revisionPhase,
-    advanceRevision,
   } = useNotebookState();
   const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
   const selectedNote = allNotes.find((candidate) => candidate.id === selectedId);
@@ -504,16 +503,6 @@ export function Note({
   );
 }
 
-function FoundingPhrase({ note }: { note: NotebookNote }) {
-  return (
-    <div className="relative">
-      <Note note={note} rotate="rotate-[-1.5deg]" />
-      <p className="absolute -bottom-4 left-4 rotate-[-2deg] text-xs text-neutral-700">
-        written hard enough to dent the next page
-      </p>
-    </div>
-  );
-}
 
 export function RuleEdits() {
   return (
@@ -653,7 +642,6 @@ function CannerySketch() {
 }
 
 function Page({
-  side,
   title,
   pageNumber,
   notes,
@@ -662,7 +650,6 @@ function Page({
   paperTone = "aged",
   residueDensity = "light",
 }: {
-  side: "left" | "right";
   title?: string;
   pageNumber?: number;
   notes: NotebookNote[];
@@ -802,30 +789,6 @@ function HandlingSmudge({ className }: { className?: string }) {
   );
 }
 
-function ArgumentMarks() {
-  return (
-    <div className="pointer-events-none absolute inset-0">
-      <p className="absolute right-8 top-[42%] rotate-[8deg] text-xs font-black text-red-950/35">
-        NO
-      </p>
-      <p className="absolute right-14 top-[48%] rotate-[-4deg] text-[10px] italic text-neutral-800/35">
-        ask him then
-      </p>
-      <p className="absolute left-8 top-[52%] rotate-[-7deg] text-xs text-neutral-800/30">
-        wait no
-      </p>
-      <svg className="absolute right-12 top-[50%] h-16 w-28" viewBox="0 0 120 70">
-        <path
-          d="M8 55 C38 10, 70 12, 112 18"
-          fill="none"
-          stroke="rgba(127,29,29,.35)"
-          strokeWidth="2"
-          strokeDasharray="4 5"
-        />
-      </svg>
-    </div>
-  );
-}
 
 function EdgeWear() {
   return (
@@ -898,7 +861,6 @@ function HiddenLayerPage() {
     instabilityLevel,
     collapseTriggered,
     revisionPhase,
-    advanceRevision,
   } = useNotebookState();
 
   return (
@@ -1186,346 +1148,8 @@ function HiddenLayerPage() {
   );
 }
 
-function EliChainProgress({ revisionPhase }: { revisionPhase: number }) {
-  const stages = [
-    ["1", "first wording", "Eli notices the tunnels feel wrong."],
-    ["2", "later wording", "The group starts documenting his behavior."],
-    ["3", "copied wording", "The archivist preserves a narrower version."],
-    ["4", "softened wording", "Kinder wording begins replacing sharper truth."],
-    ["5", "preserved identity", "The preserved versions no longer agree on where Eli ends and the story begins."],
-  ];
-
-  const activeStage = Math.min(Math.max(revisionPhase, 0), stages.length - 1);
-
-  return (
-    <div className="mt-5 rounded-lg border border-neutral-800 bg-neutral-950/40 p-4">
-      <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-400">
-        Eli Review Notes
-      </p>
-
-      <div className="mt-4 space-y-3">
-        {stages.map(([number, label, description], index) => (
-          <div
-            key={label}
-            className={clsx(
-              "rounded border p-3 transition-all duration-700",
-              index <= activeStage
-                ? "border-red-900/30 bg-red-950/10 text-red-100/80"
-                : "border-neutral-800 bg-neutral-950/30 text-neutral-400"
-            )}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-[10px] uppercase tracking-[0.25em]">
-                {number}. {label}
-              </span>
-
-              {index === activeStage && (
-                <span className="rounded bg-red-900/15 px-2 py-1 text-[9px] uppercase tracking-[0.2em] text-red-100/50">
-                  held
-                </span>
-              )}
-            </div>
-
-            <p className="mt-2 text-xs italic">{description}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 
-function InspectionPanel() {
-  const {
-    selectedId,
-    unstable,
-    toggleUnstable,
-    memoryLayer,
-    setMemoryLayer,
-    pinnedEvidence,
-    instabilityLevel,
-    collapseTriggered,
-    revisionPhase,
-    advanceRevision,
-  } = useNotebookState();
-  const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
-  const selected = allNotes.find((note) => note.id === selectedId);
-  const related = selected?.relatedNoteIds
-    ?.map((id) => allNotes.find((note) => note.id === id))
-    .filter(Boolean) as NotebookNote[] | undefined;
-
-  if (!selected) {
-    return (
-      <aside className="rounded-xl border border-neutral-900/5 bg-neutral-950/14 p-5 text-sm text-neutral-400 backdrop-blur-[1px]">
-        <p className="italic opacity-70">
-          deeper review becomes available after the page is handled long enough
-        </p>
-      </aside>
-    );
-  }
-
-  return (
-    <aside className="rounded-xl border border-neutral-900/40 bg-neutral-950/70 p-5 shadow-xl backdrop-blur-[1px]">
-      <p className="text-xs uppercase tracking-[0.3em] text-neutral-400">
-        Inspecting Fragment
-      </p>
-
-      <h2 className="mt-3 text-xl font-semibold text-neutral-100">
-        {selected.variant ?? "fragment"}
-      </h2>
-
-      <div className="mt-3 rounded-lg bg-neutral-950/70 p-3 text-sm text-neutral-200">
-        <p className="whitespace-pre-line">
-          {unstable && selected.id === "eli-contradiction-a"
-            ? "Eli doesnt go below after storms anymore."
-            : selected.text}
-        </p>
-
-        {selected.pressureReveal && (
-          <motion.p
-            initial={{ opacity: 0, filter: "blur(4px)" }}
-            animate={{ opacity: 0.55, filter: "blur(0px)" }}
-            transition={{ delay: 1.0, duration: 2.4 }}
-            className="mt-4 text-xs italic text-neutral-400 line-through decoration-neutral-600"
-          >
-            pressure reveal: {selected.pressureReveal}
-          </motion.p>
-        )}
-      </div>
-
-      <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-        <div className="rounded-lg border border-neutral-800 p-3">
-          <p className="uppercase tracking-widest text-neutral-400">Memory Pressure</p>
-          <p className="mt-2 text-neutral-100">{selected.memoryPressure ?? "unknown"}</p>
-        </div>
-
-        <div className="rounded-lg border border-neutral-800 p-3">
-          <p className="uppercase tracking-widest text-neutral-400">State</p>
-          <p className="mt-2 text-neutral-100">{unstable ? "drifting" : "stable"}</p>
-        </div>
-      </div>
-
-      {selected.contradictionChain === "eli-tunnels" && (
-        <EliChainProgress revisionPhase={revisionPhase} />
-      )}
-
-      {related && related.length > 0 && (
-        <div className="mt-5">
-          <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">
-            Related Fragments
-          </p>
-          <ul className="mt-3 space-y-2">
-            {related.map((note) => (
-              <li key={note.id} className="rounded border border-neutral-800 bg-neutral-950/50 p-2 text-xs text-neutral-300">
-                {note.text}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-
-
-
-      {instabilityLevel >= 4 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mt-5 rounded-lg border border-red-900/10 bg-red-950/3 p-4 text-xs text-red-100/60"
-        >
-          preservation layers no longer fully agree
-
-          <div className="mt-3 space-y-2">
-            <p>• preserved wording varies between layers</p>
-            <p>• social corrections appear within recovered memory</p>
-            <p>• reconstruction layers preserve conflicting emphasis</p>
-            <p>• later wording may soften earlier phrasing</p>
-          </div>
-        </motion.div>
-      )}
-
-
-      {revisionPhase >= 1 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mt-5 rounded-lg border border-red-900/10 bg-red-950/3 p-4 text-xs text-red-100/60"
-        >
-          preserved wording differs slightly across recovery layers
-
-          <div className="mt-3 space-y-2">
-            <p>• recovered wording differs between review passes</p>
-            <p>• archivist copies differ slightly from recovered wording</p>
-            <p>• related fragments preserve different emotional interpretations</p>
-          </div>
-        </motion.div>
-      )}
-
-
-      {revisionPhase >= 5 &&
-        selected?.contradictionChain === "eli-tunnels" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-5 rounded-lg bg-red-950/8 p-4 text-sm text-red-100/55"
-          >
-            Eli wording differs here
-
-            <div className="mt-4 space-y-3 text-xs">
-              <p>
-                • childhood fear gradually became categorized behavior
-              </p>
-
-              <p>
-                • archivist copies preserved a narrower emotional framing
-              </p>
-
-              <p>
-                • later copies appear emotionally softened
-              </p>
-
-              <p className="italic">
-                maybe the notebook got there first
-              </p>
-            </div>
-          </motion.div>
-        )}
-
-      {collapseTriggered && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mt-5 rounded-lg border border-red-900/30 bg-red-950/20 p-4 text-xs text-red-100/80"
-        >
-          preservation conflict unresolved
-
-          <div className="mt-3 space-y-2">
-            <p>• recovered wording no longer aligns with archivist copy</p>
-            <p>• sibling reconstruction diverges from preserved version</p>
-            <p>• cannery references spreading across unrelated fragments</p>
-            <p>• source confidence critically degraded</p>
-          </div>
-        </motion.div>
-      )}
-
-      {instabilityLevel >= 1 && (
-        <div className="mt-5 rounded-lg border border-red-900/20 bg-red-950/10 p-3 text-[11px] text-red-100/70">
-          some wording became less certain after repeated handling
-        </div>
-      )}
-
-      {pinnedEvidence.length > 0 && (
-        <div className="mt-5">
-          <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">
-            Pinned Excavation Evidence
-          </p>
-          <ul className="mt-3 space-y-2">
-            {pinnedEvidence.map((evidence) => (
-              <li
-                key={evidence}
-                className="rounded bg-amber-950/5 p-2 text-xs italic text-amber-100/55"
-              >
-                {evidence}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <p className="mt-5 border-t border-neutral-800 pt-4 text-xs italic text-neutral-400">
-        Interpretation unresolved. Source confidence degraded by revision, handling, and recovery context.
-      </p>
-
-      <div className="mt-4 space-y-3">
-        <div className="rounded-lg border border-neutral-800 bg-neutral-950/40 p-3 text-[11px] text-neutral-400">
-          pressure marks indicate repeated handling
-        </div>
-
-        {selected.recoveredFrom && (
-          <div className="rounded-lg border border-amber-900/20 bg-amber-950/10 p-3 text-[11px] text-amber-100/80">
-            recovered from: {selected.recoveredFrom}
-          </div>
-        )}
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button
-          onClick={() => setMemoryLayer("recovered")}
-          className={clsx(
-            "rounded border px-3 py-2 text-xs",
-            memoryLayer === "recovered"
-              ? "border-blue-400 bg-blue-950/30"
-              : "border-neutral-700"
-          )}
-        >
-          recovered
-        </button>
-
-        <button
-          onClick={() => setMemoryLayer("original")}
-          className={clsx(
-            "rounded border px-3 py-2 text-xs",
-            memoryLayer === "original"
-              ? "border-amber-400 bg-amber-950/30"
-              : "border-neutral-700"
-          )}
-        >
-          original
-        </button>
-
-        <button
-          onClick={() => setMemoryLayer("reconstructed")}
-          className={clsx(
-            "rounded border px-3 py-2 text-xs",
-            memoryLayer === "reconstructed"
-              ? "border-red-400 bg-red-950/30"
-              : "border-neutral-700"
-          )}
-        >
-          reconstructed
-        </button>
-      </div>
-
-
-      <div className="mt-4 rounded-lg border border-neutral-800 bg-neutral-950/40 p-3">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-400">
-          reconstruction divergence
-        </p>
-
-        <div className="mt-3 flex gap-2">
-          {[0,1,2,3,4].map((level) => (
-            <div
-              key={level}
-              className={clsx(
-                "h-2 flex-1 rounded-full",
-                instabilityLevel > level
-                  ? "bg-red-700"
-                  : "bg-neutral-800"
-              )}
-            />
-          ))}
-        </div>
-      </div>
-
-
-
-      <button
-        onClick={advanceRevision}
-        className="mt-3 rounded-lg border border-red-900/30 bg-red-950/10 px-4 py-2 text-xs text-red-100/80 hover:bg-red-950/20"
-      >
-        re-read
-      </button>
-
-
-      <button
-        onClick={toggleUnstable}
-        className="mt-3 rounded-lg border border-neutral-700 bg-neutral-950 px-4 py-2 text-xs hover:bg-neutral-800"
-      >
-        {unstable ? "return to recovered wording" : "compare recovered wording"}
-      </button>
-    </aside>
-  );
-}
 
 
 function HandledPage({
@@ -1534,7 +1158,6 @@ function HandledPage({
   focused,
 }: {
   children: React.ReactNode;
-  side: "left" | "right";
   focused?: boolean;
 }) {
   return (
@@ -1609,12 +1232,8 @@ function NotebookReader() {
     zoomedPage,
     pageTurnDirection,
     clearPageTurn,
-    activeDocumentId,
   } = useNotebookState();
 
-  const activeDocument = getArchiveDocument(activeDocumentId);
-
-  const totalSpreads = spreadDefinitions.length;
   const spread = getSpreadDefinition(spreadIndex);
 
   const leftPageDefinition = getNotebookPage(spread.leftPageId);
