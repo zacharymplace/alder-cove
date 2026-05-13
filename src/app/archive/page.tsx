@@ -357,7 +357,11 @@ export default function ArchiveIndexPage() {
 
 
   useEffect(() => {
-    setClientReady(true);
+    const timeout = window.setTimeout(() => {
+      setClientReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
   }, []);
 
   function markHandled(id: string) {
