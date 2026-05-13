@@ -317,7 +317,7 @@ export default function ArchiveIndexPage() {
           : [],
       })
     );
-  }, [prefaceDismissed, seenEventIds.includes("unresolved-wording"), seenEventIds.includes("partial-fragment")]);
+  }, [prefaceDismissed, seenEventIdKey, handledArtifactIdKey]);
 
    const unlockedRevealIds: ArchiveRevealId[] = [
     "archive-preface",
