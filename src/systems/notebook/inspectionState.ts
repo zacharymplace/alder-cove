@@ -1,6 +1,8 @@
 import { create } from "zustand";
 
-export const TOTAL_NOTEBOOK_SPREADS = 3;
+import { spreadDefinitions } from "@/data/notebook/spreadDefinitions";
+
+export const TOTAL_NOTEBOOK_SPREADS = spreadDefinitions.length;
 
 export type NotebookState = {
   selectedId: string | null;
@@ -89,7 +91,7 @@ export const useNotebookState = create<NotebookState>((set) => ({
 
   nextSpread: () =>
     set((state) => ({
-      spreadIndex: Math.min(state.spreadIndex + 1, 2),
+      spreadIndex: Math.min(state.spreadIndex + 1, TOTAL_NOTEBOOK_SPREADS - 1),
       zoomedPage: null,
       pageTurnDirection: "next",
     })),

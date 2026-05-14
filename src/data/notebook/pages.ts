@@ -4,9 +4,13 @@ export type NotebookPageId =
   | "recovered-left"
   | "recovered-right"
   | "summer-left"
-  | "summer-right";
+  | "summer-right"
+  | "rules-left"
+  | "rules-right"
+  | "copy-left"
+  | "copy-right";
 
-export type NotebookSpreadId = "opening" | "recovered" | "summer";
+export type NotebookSpreadId = "opening" | "recovered" | "summer" | "rules" | "copy";
 
 export type NotebookPageDefinition = {
   id: NotebookPageId;
@@ -17,7 +21,9 @@ export type NotebookPageDefinition = {
     | "opening-map"
     | "eli-chain"
     | "recovered-rules"
-    | "continuation-support";
+    | "continuation-support"
+    | "group-rules"
+    | "copy-drift";
   noteIds: string[];
   components?: Array<"map" | "cannerySketch" | "symbolLegend" | "checkInLog" | "missingPhoto">;
   provenance?: {
@@ -104,6 +110,70 @@ export const notebookPages: NotebookPageDefinition[] = [
     role: "eli-chain",
     noteIds: ["nickname-list", "cannery-game", "tiny-drift-line"],
   },
+  {
+    id: "rules-left",
+    spreadId: "rules",
+    side: "left",
+    title: "group rules circle",
+    role: "group-rules",
+    noteIds: ["group-rule-circle", "mara-care-rule", "cal-joke-rule"],
+    components: ["checkInLog", "symbolLegend"],
+    provenance: {
+      source: "original notebook",
+      confidence: "medium",
+      handledBy: "unknown",
+      note: "rule page appears copied around original child handwriting",
+      conflictingSource: "later check marks do not align with original spacing",
+    },
+  },
+  {
+    id: "rules-right",
+    spreadId: "rules",
+    side: "right",
+    title: "missing check mark",
+    role: "group-rules",
+    noteIds: ["missing-check-mark", "going-salt-first", "stop-saying-that"],
+    components: ["missingPhoto"],
+    provenance: {
+      source: "archivist copy",
+      confidence: "low",
+      handledBy: "archivist",
+      note: "missing check mark reconstructed from pressure marks",
+      conflictingSource: "one copied version omits the missing mark entirely",
+    },
+  },
+  {
+    id: "copy-left",
+    spreadId: "copy",
+    side: "left",
+    title: "later copied version",
+    role: "copy-drift",
+    noteIds: ["softened-copy-note", "eli-contradiction-a", "eli-contradiction-b"],
+    provenance: {
+      source: "archivist copy",
+      confidence: "disputed",
+      handledBy: "archivist",
+      note: "copy sequence preserves disagreement more than certainty",
+      conflictingSource: "earlier pressure marks suggest harsher wording",
+    },
+  },
+  {
+    id: "copy-right",
+    spreadId: "copy",
+    side: "right",
+    title: "torn index trace",
+    role: "copy-drift",
+    noteIds: ["page-torn-index", "cannery-line", "tiny-drift-line"],
+    components: ["missingPhoto"],
+    provenance: {
+      source: "reconstructed packet",
+      confidence: "low",
+      handledBy: "copied later by someone from town",
+      note: "page removal inferred from numbering gap",
+      conflictingSource: "flood packet labels disagree about sequence",
+    },
+  },
+
 ];
 
 export function getNotebookPage(id: NotebookPageId) {

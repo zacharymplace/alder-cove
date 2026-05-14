@@ -10,7 +10,9 @@ export type NotebookSpreadDefinition = {
   preservationState:
     | "careful-opening"
     | "flood-recovered"
-    | "warm-precollapse";
+    | "warm-precollapse"
+    | "care-system"
+    | "copy-drift";
   paperTone: "aged" | "water-damaged" | "warm";
   residueDensity: "light" | "heavy" | "soft";
 };
@@ -52,6 +54,31 @@ export const spreadDefinitions: NotebookSpreadDefinition[] = [
     preservationState: "warm-precollapse",
     paperTone: "warm",
     residueDensity: "soft",
+  },
+
+  {
+    id: "rules",
+    title: "Rules Spread",
+    leftPageId: "rules-left",
+    rightPageId: "rules-right",
+    emotionalFunction:
+      "Show the children building care systems before the archive knows which rule failed.",
+    revealCadence: "medium",
+    preservationState: "care-system",
+    paperTone: "warm",
+    residueDensity: "soft",
+  },
+  {
+    id: "copy",
+    title: "Copied Version Spread",
+    leftPageId: "copy-left",
+    rightPageId: "copy-right",
+    emotionalFunction:
+      "Make softened language, missing pages, and copied certainty feel materially unstable.",
+    revealCadence: "late",
+    preservationState: "copy-drift",
+    paperTone: "water-damaged",
+    residueDensity: "heavy",
   },
 
 ];

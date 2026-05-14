@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 
-import { useNotebookState } from "../../systems/notebook/inspectionState";
+import { TOTAL_NOTEBOOK_SPREADS, useNotebookState } from "../../systems/notebook/inspectionState";
 
 import { motion } from "framer-motion";
 import clsx from "clsx";
 
 import { notebookOneSpread, type NotebookNote } from "@/data/notebook/notebookOne";
 import { getSpreadDefinition } from "@/data/notebook/spreadDefinitions";
+import { notebookHandlingNotes } from "@/data/notebook/notebookHandlingNotes";
 import { getArchiveDocument } from "@/data/archive/archiveDocuments";
 import { getNotebookPage } from "@/data/notebook/pages";
 
@@ -1399,7 +1400,7 @@ function NotebookReader() {
 
       <aside
         className={clsx(
-          "relative min-h-[900px] overflow-hidden rounded-xl border border-neutral-800/40 bg-[#16130f] px-6 py-8 shadow-2xl transition-opacity duration-700",
+          "relative min-h-[900px] overflow-hidden border border-amber-100/10 bg-[#16130f] px-6 py-8 shadow-[0_30px_100px_rgba(0,0,0,0.65)] transition-opacity duration-700",
           zoomedPage && "opacity-65"
         )}
       >
@@ -1411,7 +1412,7 @@ function NotebookReader() {
 
         <div className="relative z-10">
           <p className="text-[10px] uppercase tracking-[0.38em] text-neutral-600">
-            preservation review
+            preservation review · copied object
           </p>
 
           <div className="mt-10 space-y-8">
@@ -1463,7 +1464,7 @@ function NotebookReader() {
 
 
 function NotebookReaderControls() {
-  const totalSpreads = 3;
+  const totalSpreads = TOTAL_NOTEBOOK_SPREADS;
   const {
     spreadIndex,
     zoomedPage,
@@ -1510,7 +1511,7 @@ function NotebookReaderControls() {
 
   return (
     <div className={clsx(
-        "mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-900/20 bg-neutral-950/18 px-4 py-3 text-xs text-neutral-500 transition-opacity duration-700",
+        "mb-5 flex flex-wrap items-center justify-between gap-3 border border-amber-100/10 bg-[#0f0c09] px-4 py-3 text-xs text-neutral-500 shadow-[0_20px_70px_rgba(0,0,0,0.45)] transition-opacity duration-700",
         zoomedPage && "opacity-60 hover:opacity-100"
       )}>
       <div className="flex items-center gap-2">
@@ -1582,12 +1583,32 @@ export function NotebookSpread() {
   return (
     <main className="min-h-screen bg-neutral-950 px-6 py-10 text-neutral-100">
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8">
-          <p className="text-sm uppercase tracking-[0.35em] text-neutral-400">Alder Cove</p>
-          <h1 className="mt-2 text-4xl font-semibold">{notebookOneSpread.title}</h1>
-          <p className="mt-3 max-w-[430px] text-neutral-300">
-            First sacred spread prototype: care systems, contradiction logic, and emotional preservation.
-          </p>
+        <header className="mb-8 border border-amber-100/10 bg-[#14110d] p-6 shadow-[0_25px_90px_rgba(0,0,0,0.55)]">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.38em] text-amber-100/45">
+                archive object · shared notebook
+              </p>
+
+              <h1 className="mt-3 font-serif text-5xl italic text-neutral-100">
+                {notebookOneSpread.title}
+              </h1>
+
+              <p className="mt-4 max-w-2xl font-serif text-2xl italic leading-relaxed text-neutral-300/80">
+                This notebook is no longer only a childhood object. It is a
+                reviewed copy of one.
+              </p>
+            </div>
+
+            <div className="rotate-[2deg] border border-neutral-900/25 bg-[#c8b58c] px-5 py-3 text-neutral-950 shadow-xl">
+              <p className="text-[9px] uppercase tracking-[0.24em] text-neutral-700/60">
+                handling status
+              </p>
+              <p className="mt-2 font-serif text-xl italic">
+                copied / softened / reviewed
+              </p>
+            </div>
+          </div>
         </header>
 
         <Link
@@ -1599,7 +1620,17 @@ export function NotebookSpread() {
 
         <NotebookReaderControls />
 
-        <NotebookReader />
+        <div className="relative">
+          <div className="pointer-events-none absolute -top-5 left-8 z-40 rotate-[-2deg] border border-neutral-900/20 bg-[#cdbb95] px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-neutral-950 shadow-xl">
+            copied for flood recovery review
+          </div>
+
+          <div className="pointer-events-none absolute -top-4 right-12 z-40 rotate-[2deg] border border-red-900/20 bg-[#b89f78] px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-red-950/70 shadow-xl">
+            original order confidence degraded
+          </div>
+
+          <NotebookReader />
+        </div>
       </div>
     </main>
   );
