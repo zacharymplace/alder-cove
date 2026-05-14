@@ -10,6 +10,7 @@ import clsx from "clsx";
 import { notebookOneSpread, type NotebookNote } from "@/data/notebook/notebookOne";
 import { getSpreadDefinition } from "@/data/notebook/spreadDefinitions";
 import { notebookHandlingNotes } from "@/data/notebook/notebookHandlingNotes";
+import { handwritingProfiles } from "@/data/notebook/handwritingProfiles";
 import { getArchiveDocument } from "@/data/archive/archiveDocuments";
 import { getNotebookPage } from "@/data/notebook/pages";
 
@@ -743,8 +744,7 @@ function Page({
               <div className="mt-3 rounded border border-red-900/10 bg-red-950/5 p-2">
                 <p className="uppercase tracking-[0.18em] text-red-100/35">
                   later handling note
-                </p>
-
+                    </p>
                 <p className="mt-2 italic leading-relaxed text-red-100/45">
                   {provenance.conflictingSource}
                 </p>
