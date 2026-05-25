@@ -40,6 +40,10 @@ This document records the current archive vertical slice routes and the expected
 21. Confirm it remains sealed/restricted and does not expose readable journal text.
 22. Use `reset handling` on `/archive`.
 23. Confirm preface and reveal sequence can be replayed.
+24. Navigate to `/archive/east-shore-shelter-map`.
+25. Confirm the in-world archive handling note renders ("Material Not Located"), not a generic 404 page.
+26. Confirm both "set object down" links return to `/archive`.
+27. Repeat steps 24–26 with `/archive/council-meeting-fragments`.
 
 ## Current Narrative Systems Covered
 
@@ -56,6 +60,7 @@ This document records the current archive vertical slice routes and the expected
 - Cross-artifact links
 - Archivist fingerprints
 - Private readability withholding
+- In-world not-found handling for unindexed document routes
 
 ## Expansion Rule
 
