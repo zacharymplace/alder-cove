@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check": "npm run lint && npm run build",
+    "agent:preflight": "bash scripts/agent-preflight.sh",
+    "release:ready": "npm run check"
   },
   "dependencies": {
     "clsx": "^2.1.1",
