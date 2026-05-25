@@ -82,10 +82,32 @@ export const archiveDocuments: ArchiveDocument[] = [
       "The packet preserves fragments that were never meant to sit together, but became adjacent during recovery.",
   },
 
+  {
+    id: "mara-private-journal-fragment",
+    title: "Mara — Private Journal Fragment",
+    type: "private-journal",
+    accessClass: "private",
+    acquisitionMethod: "copied-without-permission",
+    emotionalRisk: "intrusive",
+    handlingState: "awaiting-review",
+    pageIds: [],
+    description:
+      "A sealed private journal fragment preserved as a presence in the archive without being made readable.",
+    ethicalPressure:
+      "The archive can acknowledge that the fragment exists without treating existence as permission.",
+  },
+
 ];
 
+const archiveDocumentAliases: Record<string, string> = {
+  "mara-private-fragment": "mara-private-journal-fragment",
+};
+
 export function getArchiveDocument(id: string) {
-  const document = archiveDocuments.find((candidate) => candidate.id === id);
+  const normalizedId = archiveDocumentAliases[id] ?? id;
+  const document = archiveDocuments.find(
+    (candidate) => candidate.id === normalizedId
+  );
 
   if (!document) {
     throw new Error(`Unknown archive document: ${id}`);

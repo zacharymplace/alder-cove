@@ -746,10 +746,10 @@ export default function ArchiveIndexPage() {
                     <p
                       className={[
                         "mt-3 text-[10px] uppercase tracking-[0.24em]",
-                        handlingStateClass(document.handlingState ?? "awaiting-review"),
+                        handlingStateClass("handlingState" in document ? document.handlingState : "awaiting-review"),
                       ].join(" ")}
                     >
-                      {handlingStateLabel(document.handlingState)}
+                      {"handlingState" in document ? handlingStateLabel(document.handlingState) : handlingStateLabel("awaiting-review")}
                     </p>
 
                     {(focusedArtifactId === document.id ||
@@ -891,7 +891,7 @@ export default function ArchiveIndexPage() {
 
         <div className="pointer-events-none absolute left-[1080px] bottom-[210px] h-12 w-12 rounded-full border border-amber-100/10 opacity-10" />
 
-        <div className="pointer-events-none absolute left-[615px] top-[345px] rotate-[-4deg] text-[9px] uppercase tracking-[0.2em] text-red-100/18">
+        <div className="pointer-events-none absolute left-[615px] top-[345px] rotate-[-4deg] text-[9px] uppercase tracking-[0.2em] text-red-100/10">
           compare against dry-box copy
         </div>
 
@@ -1097,7 +1097,7 @@ export default function ArchiveIndexPage() {
               </p>
               <p>
                 handling:{" "}
-                {handlingStateLabel(inspectedArtifact.handlingState)}
+                {handlingStateLabel("handlingState" in inspectedArtifact ? inspectedArtifact.handlingState : undefined)}
               </p>
               <p>risk: {inspectedArtifact.emotionalRisk}</p>
               <p>{inspectedArtifact.pageIds.length} pages indexed</p>
@@ -1115,7 +1115,7 @@ export default function ArchiveIndexPage() {
             </p>
             <p className="mt-2 leading-relaxed text-neutral-400">
               {focusedArtifact.accessClass.replaceAll("-", " ")} ·{" "}
-              {handlingStateLabel(focusedArtifact.handlingState)}
+              {handlingStateLabel("handlingState" in focusedArtifact ? focusedArtifact.handlingState : undefined)}
               {focusedArtifact.accessClass === "private"
                 ? " · approach slowly"
                 : focusedArtifact.accessClass === "illicitly-acquired"
