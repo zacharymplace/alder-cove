@@ -32,9 +32,9 @@ export const handwritingProfiles: Record<
     id: "coauthor",
     label: "coauthor hand",
     textClass:
-      "font-serif tracking-[0.01em] text-neutral-950/90",
+      "font-serif text-[1.08rem] font-semibold tracking-[0.015em] text-neutral-950/95 [word-spacing:0.08em]",
     containerClass:
-      "rotate-[-0.6deg]",
+      "rotate-[-1.2deg] origin-left",
     emotionalBehavior: "hurried",
     characteristics: [
       "uneven pressure",
@@ -47,9 +47,9 @@ export const handwritingProfiles: Record<
     id: "sibling",
     label: "sibling hand",
     textClass:
-      "font-sans tracking-[0.015em] text-neutral-950/85",
+      "font-sans text-[0.95rem] font-bold tracking-[0.03em] text-neutral-950/85 [word-spacing:-0.03em]",
     containerClass:
-      "rotate-[1deg]",
+      "rotate-[1.8deg] origin-left",
     emotionalBehavior: "sarcastic",
     characteristics: [
       "interruptive notes",
@@ -62,9 +62,9 @@ export const handwritingProfiles: Record<
     id: "archivist",
     label: "archivist reconstruction",
     textClass:
-      "font-serif tracking-[0.025em] text-neutral-900/75 italic",
+      "font-serif text-[0.9rem] tracking-[0.055em] text-neutral-900/65 italic [word-spacing:0.16em]",
     containerClass:
-      "rotate-[-0.2deg]",
+      "rotate-[-0.15deg] origin-left",
     emotionalBehavior: "softened",
     characteristics: [
       "careful wording",
@@ -77,9 +77,9 @@ export const handwritingProfiles: Record<
     id: "skeptic",
     label: "skeptic annotation",
     textClass:
-      "font-sans uppercase tracking-[0.08em] text-neutral-950/80",
+      "font-sans text-[0.78rem] font-black uppercase tracking-[0.14em] text-neutral-950/80",
     containerClass:
-      "rotate-[1.6deg]",
+      "rotate-[2.4deg] origin-left",
     emotionalBehavior: "careful",
     characteristics: [
       "short interruption notes",
@@ -92,9 +92,9 @@ export const handwritingProfiles: Record<
     id: "copied-town",
     label: "copied town hand",
     textClass:
-      "font-serif tracking-[0.03em] text-neutral-900/65",
+      "font-serif text-[0.88rem] tracking-[0.08em] text-neutral-900/55 [word-spacing:0.2em]",
     containerClass:
-      "rotate-[0.4deg]",
+      "rotate-[0.4deg] origin-left opacity-85",
     emotionalBehavior: "softened",
     characteristics: [
       "cleaned-up wording",
@@ -107,9 +107,9 @@ export const handwritingProfiles: Record<
     id: "reconstructed",
     label: "reconstructed hand",
     textClass:
-      "font-serif tracking-[0.04em] text-neutral-900/55 italic",
+      "font-serif text-[0.86rem] tracking-[0.1em] text-neutral-900/45 italic blur-[0.15px] [word-spacing:0.22em]",
     containerClass:
-      "rotate-[-1deg]",
+      "rotate-[-1.4deg] origin-left opacity-75",
     emotionalBehavior: "reconstructed",
     characteristics: [
       "uncertain pressure",

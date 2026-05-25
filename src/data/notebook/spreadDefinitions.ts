@@ -12,7 +12,10 @@ export type NotebookSpreadDefinition = {
     | "flood-recovered"
     | "warm-precollapse"
     | "care-system"
-    | "copy-drift";
+    | "copy-drift"
+    | "privacy-boundary"
+    | "incident-adjacent"
+    | "missing-index";
   paperTone: "aged" | "water-damaged" | "warm";
   residueDensity: "light" | "heavy" | "soft";
 };
@@ -77,6 +80,43 @@ export const spreadDefinitions: NotebookSpreadDefinition[] = [
       "Make softened language, missing pages, and copied certainty feel materially unstable.",
     revealCadence: "late",
     preservationState: "copy-drift",
+    paperTone: "water-damaged",
+    residueDensity: "heavy",
+  },
+
+  {
+    id: "mara-boundary",
+    title: "Mara Boundary Spread",
+    leftPageId: "mara-boundary-left",
+    rightPageId: "mara-boundary-right",
+    emotionalFunction:
+      "Introduce privacy as an active boundary inside shared memory.",
+    revealCadence: "late",
+    preservationState: "privacy-boundary",
+    paperTone: "aged",
+    residueDensity: "soft",
+  },
+  {
+    id: "eli-adjacent",
+    title: "Incident-Adjacent Spread",
+    leftPageId: "eli-adjacent-left",
+    rightPageId: "eli-adjacent-right",
+    emotionalFunction:
+      "Approach the incident indirectly through wording drift, storm counts, and silence.",
+    revealCadence: "late",
+    preservationState: "incident-adjacent",
+    paperTone: "water-damaged",
+    residueDensity: "heavy",
+  },
+  {
+    id: "index-closure",
+    title: "Index Closure Spread",
+    leftPageId: "index-closure-left",
+    rightPageId: "index-closure-right",
+    emotionalFunction:
+      "End Notebook One by preserving absence rather than solving it.",
+    revealCadence: "late",
+    preservationState: "missing-index",
     paperTone: "water-damaged",
     residueDensity: "heavy",
   },

@@ -9,8 +9,6 @@ import clsx from "clsx";
 
 import { notebookOneSpread, type NotebookNote } from "@/data/notebook/notebookOne";
 import { getSpreadDefinition } from "@/data/notebook/spreadDefinitions";
-import { notebookHandlingNotes } from "@/data/notebook/notebookHandlingNotes";
-import { handwritingProfiles } from "@/data/notebook/handwritingProfiles";
 import { getArchiveDocument } from "@/data/archive/archiveDocuments";
 import { getNotebookPage } from "@/data/notebook/pages";
 
@@ -859,6 +857,7 @@ function HiddenLayerPage() {
     toggleFolded,
     pinEvidence,
     increaseInstability,
+    triggerCollapse,
     instabilityLevel,
     collapseTriggered,
     revisionPhase,
@@ -1159,6 +1158,7 @@ function HandledPage({
   focused,
 }: {
   children: React.ReactNode;
+  side: "left" | "right";
   focused?: boolean;
 }) {
   return (
@@ -1228,6 +1228,7 @@ function PageTurnVeil({ direction }: { direction: "previous" | "next" | null }) 
 }
 
 function NotebookReader() {
+
   const {
     spreadIndex,
     zoomedPage,
@@ -1425,6 +1426,44 @@ function NotebookReader() {
                 deeper review becomes available after the page is handled long enough
               </p>
             </div>
+
+
+            <div className="rounded border border-amber-100/10 bg-black/15 p-4">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-amber-100/45">
+                handwriting key
+              </p>
+
+              <div className="mt-4 space-y-3 text-xs leading-relaxed">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-serif font-bold text-neutral-300">
+                    child hand
+                  </span>
+                  <span className="text-neutral-600">fast / uneven</span>
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-sans font-black tracking-wide text-neutral-300">
+                    sibling hand
+                  </span>
+                  <span className="text-neutral-600">interruptive</span>
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-sans text-[10px] font-black uppercase tracking-[0.16em] text-red-100/55">
+                    skeptic mark
+                  </span>
+                  <span className="text-neutral-600">pushback</span>
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-serif italic tracking-[0.12em] text-neutral-500">
+                    archivist copy
+                  </span>
+                  <span className="text-neutral-600">softened</span>
+                </div>
+              </div>
+            </div>
+
 
             <div className="rounded border border-neutral-700/20 bg-black/10 p-4">
               <p className="text-[10px] uppercase tracking-[0.28em] text-neutral-600">

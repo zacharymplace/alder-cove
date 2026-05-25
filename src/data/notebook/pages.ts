@@ -8,9 +8,23 @@ export type NotebookPageId =
   | "rules-left"
   | "rules-right"
   | "copy-left"
-  | "copy-right";
+  | "copy-right"
+  | "mara-boundary-left"
+  | "mara-boundary-right"
+  | "eli-adjacent-left"
+  | "eli-adjacent-right"
+  | "index-closure-left"
+  | "index-closure-right";
 
-export type NotebookSpreadId = "opening" | "recovered" | "summer" | "rules" | "copy";
+export type NotebookSpreadId =
+  | "opening"
+  | "recovered"
+  | "summer"
+  | "rules"
+  | "copy"
+  | "mara-boundary"
+  | "eli-adjacent"
+  | "index-closure";
 
 export type NotebookPageDefinition = {
   id: NotebookPageId;
@@ -23,7 +37,10 @@ export type NotebookPageDefinition = {
     | "recovered-rules"
     | "continuation-support"
     | "group-rules"
-    | "copy-drift";
+    | "copy-drift"
+    | "privacy-boundary"
+    | "incident-adjacent"
+    | "missing-index";
   noteIds: string[];
   components?: Array<"map" | "cannerySketch" | "symbolLegend" | "checkInLog" | "missingPhoto">;
   provenance?: {
@@ -171,6 +188,100 @@ export const notebookPages: NotebookPageDefinition[] = [
       handledBy: "copied later by someone from town",
       note: "page removal inferred from numbering gap",
       conflictingSource: "flood packet labels disagree about sequence",
+    },
+  },
+
+  {
+    id: "mara-boundary-left",
+    spreadId: "mara-boundary",
+    side: "left",
+    title: "folded corner rule",
+    role: "privacy-boundary",
+    noteIds: ["mara-boundary-rule", "mara-folded-corner"],
+    components: ["symbolLegend"],
+    provenance: {
+      source: "archivist copy",
+      confidence: "disputed",
+      handledBy: "archivist",
+      note: "privacy rule copied into shared notebook record after private fragment was indexed",
+      conflictingSource: "Mara fragment remains sealed",
+    },
+  },
+  {
+    id: "mara-boundary-right",
+    spreadId: "mara-boundary",
+    side: "right",
+    title: "name rewritten lighter",
+    role: "privacy-boundary",
+    noteIds: ["mara-crossed-name", "page-torn-index"],
+    provenance: {
+      source: "reconstructed packet",
+      confidence: "low",
+      handledBy: "copied later by someone from town",
+      note: "name pressure appears overwritten after first copy",
+      conflictingSource: "private material may have shaped the shared record",
+    },
+  },
+  {
+    id: "eli-adjacent-left",
+    spreadId: "eli-adjacent",
+    side: "left",
+    title: "incident-adjacent wording",
+    role: "incident-adjacent",
+    noteIds: ["eli-incident-adjacent", "storm-counting"],
+    components: ["checkInLog"],
+    provenance: {
+      source: "flood recovery",
+      confidence: "low",
+      handledBy: "archivist",
+      note: "page is adjacent to incident language without confirming sequence",
+      conflictingSource: "later copy softens wait into hesitation",
+    },
+  },
+  {
+    id: "eli-adjacent-right",
+    spreadId: "eli-adjacent",
+    side: "right",
+    title: "three-day gap",
+    role: "incident-adjacent",
+    noteIds: ["nobody-wrote-after", "softened-copy-note", "cannery-line"],
+    provenance: {
+      source: "archivist copy",
+      confidence: "medium",
+      handledBy: "archivist",
+      note: "writing gap appears consistent across copies",
+      conflictingSource: "reason for gap remains unconfirmed",
+    },
+  },
+  {
+    id: "index-closure-left",
+    spreadId: "index-closure",
+    side: "left",
+    title: "missing page closure",
+    role: "missing-index",
+    noteIds: ["torn-index-closure", "last-shared-line"],
+    components: ["missingPhoto"],
+    provenance: {
+      source: "reconstructed packet",
+      confidence: "low",
+      handledBy: "archivist",
+      note: "index closure assembled from missing-page trace",
+      conflictingSource: "no recovered copy confirms page contents",
+    },
+  },
+  {
+    id: "index-closure-right",
+    spreadId: "index-closure",
+    side: "right",
+    title: "assembled ending",
+    role: "missing-index",
+    noteIds: ["archivist-final-copy-note", "mara-boundary-rule"],
+    provenance: {
+      source: "archivist copy",
+      confidence: "disputed",
+      handledBy: "archivist",
+      note: "ending preserves uncertainty rather than resolving it",
+      conflictingSource: "original order not recoverable",
     },
   },
 
