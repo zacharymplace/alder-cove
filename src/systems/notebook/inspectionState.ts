@@ -13,7 +13,14 @@ export type NotebookState = {
   pinnedEvidence: string[];
   instabilityLevel: number;
   collapseTriggered: boolean;
+  mutationPhase: number;
   revisionPhase: number;
+  spreadIndex: number;
+  zoomedPage: "left" | "right" | null;
+  pageTurnDirection: "previous" | "next" | null;
+  lingerReveal: boolean;
+  rememberedDrift: boolean;
+  activeDocumentId: string;
   select: (id: string | null) => void;
   toggleUnstable: () => void;
   setMemoryLayer: (
@@ -24,7 +31,15 @@ export type NotebookState = {
   pinEvidence: (evidence: string) => void;
   increaseInstability: () => void;
   triggerCollapse: () => void;
+  advanceMutation: () => void;
   advanceRevision: () => void;
+  nextSpread: () => void;
+  previousSpread: () => void;
+  setZoomedPage: (page: "left" | "right" | null) => void;
+  clearPageTurn: () => void;
+  setLingerReveal: (value: boolean) => void;
+  setRememberedDrift: (value: boolean) => void;
+  setActiveDocumentId: (id: string) => void;
 };
 
 export const useNotebookState = create<NotebookState>((set) => ({
@@ -37,6 +52,7 @@ export const useNotebookState = create<NotebookState>((set) => ({
   instabilityLevel: 0,
   collapseTriggered: false,
   mutationPhase: 0,
+  revisionPhase: 0,
   spreadIndex: 0,
   zoomedPage: null,
   pageTurnDirection: null,
@@ -87,6 +103,11 @@ export const useNotebookState = create<NotebookState>((set) => ({
   advanceMutation: () =>
     set((state) => ({
       mutationPhase: Math.min(state.mutationPhase + 1, 5),
+    })),
+
+  advanceRevision: () =>
+    set((state) => ({
+      revisionPhase: Math.min(state.revisionPhase + 1, 5),
     })),
 
   nextSpread: () =>

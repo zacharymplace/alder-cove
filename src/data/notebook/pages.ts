@@ -44,8 +44,8 @@ export type NotebookPageDefinition = {
   noteIds: string[];
   components?: Array<"map" | "cannerySketch" | "symbolLegend" | "checkInLog" | "missingPhoto">;
   provenance?: {
-    source: "original notebook" | "flood recovery" | "archivist copy" | "reconstructed packet";
-    confidence: "high" | "medium" | "low" | "disputed";
+    source: "original notebook" | "flood recovery" | "archivist copy" | "reconstructed packet" | "later copied version";
+    confidence: "high" | "medium" | "low" | "disputed" | "uncertain";
     handledBy?: string;
     note?: string;
     conflictingSource?: string;
