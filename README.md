@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Alder Cove
+
+Alder Cove is a narrative artifact prototype: an island, ferry-dependent fishing
+town where children build notebooks, maps, and rituals to protect each other
+from "Going Salt" — the town's slow erosion of memory, identity, and future
+selfhood. The player experiences this through a handled notebook and an
+archive of preserved documents, not combat or traditional dialogue.
+
+This is a narrative interface system, not a generic Next.js starter. Before
+making changes, read:
+
+- [`docs/design/ALDER_COVE.md`](docs/design/ALDER_COVE.md) — setting and tone
+- [`docs/design/GAME_DOCTRINE.md`](docs/design/GAME_DOCTRINE.md) — core thesis and emotional design
+- [`docs/design/NOTEBOOK_AUTHORING_RULES.md`](docs/design/NOTEBOOK_AUTHORING_RULES.md) — notebook artifact rules
+- [`docs/design/ARCHIVE_ACCESS_AND_INSPECTION_STRUCTURE.md`](docs/design/ARCHIVE_ACCESS_AND_INSPECTION_STRUCTURE.md) — archive access model
+- [`docs/design/ARCHIVE_PROGRESSION_DOCTRINE.md`](docs/design/ARCHIVE_PROGRESSION_DOCTRINE.md) — archive escalation structure
+- [`docs/playtest/NOTEBOOK_VERTICAL_SLICE_REVIEW.md`](docs/playtest/NOTEBOOK_VERTICAL_SLICE_REVIEW.md) — current playtest findings
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Core routes:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Route | Purpose |
+| --- | --- |
+| `/` | Archive-first landing page |
+| `/archive` | Main preservation environment |
+| `/archive/[documentId]` | Individual archive document handling |
+| `/notebook` | Notebook One reader |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See [`docs/qa/ARCHIVE_ROUTE_SMOKE.md`](docs/qa/ARCHIVE_ROUTE_SMOKE.md) for the
+manual verification sequence across these routes.
 
-## Learn More
+## Validation
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run check          # lint + build (preferred before finishing any change)
+npm run agent:preflight  # repo/environment sanity check
+npm run release:ready   # release-readiness gate
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Working on this repo
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This repo is a **Next.js 16 / React 19 project with breaking changes from
+what you may expect** — see [`AGENTS.md`](AGENTS.md) before writing code
+against unfamiliar APIs.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [`CLAUDE.md`](CLAUDE.md) for the full operating rules, including the list
+of protected areas (notebook geometry, archive access semantics, contradiction
+chain logic, etc.) that require small, justified, validated changes rather
+than broad rewrites.
