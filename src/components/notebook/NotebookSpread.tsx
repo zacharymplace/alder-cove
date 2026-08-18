@@ -13,7 +13,7 @@ import { getArchiveDocument } from "@/data/archive/archiveDocuments";
 import { getNotebookPage } from "@/data/notebook/pages";
 
 import { spreadShellClass, spreadResidueClass } from "./spread/styleHelpers";
-import { Tape, Sticker, TapedFragment } from "./spread/SpreadAtoms";
+import { Tape } from "./spread/SpreadAtoms";
 import {
   DamageOverlay,
   HandlingSmudge,
@@ -24,144 +24,13 @@ import {
 } from "./spread/PageWear";
 import { PageTurnVeil } from "./spread/PageTurnVeil";
 import { Note } from "./spread/Note";
+import { ChildMap } from "./spread/content/ChildMap";
+import { CannerySketch } from "./spread/content/CannerySketch";
+import { RuleEdits } from "./spread/content/RuleEdits";
+import { SymbolLegend } from "./spread/content/SymbolLegend";
+import { CheckInTable } from "./spread/content/CheckInTable";
 
-
-export function RuleEdits() {
-  return (
-    <TapedFragment className="rotate-[1deg] text-sm">
-      <h3 className="mb-2 text-xs uppercase tracking-[0.22em]">if someone doesnt check in</h3>
-      <ol className="ml-5 list-decimal space-y-1">
-        <li>wait 15 minutes</li>
-        <li>
-          <span className="line-through decoration-red-900/70 decoration-2">tell an adult</span>
-          <span className="ml-2">check last place they said</span>
-        </li>
-        <li>ask 2 people</li>
-        <li>go together</li>
-        <li className="text-neutral-700">then tell an adult if still missing</li>
-      </ol>
-      <p className="mt-3 rotate-[-1deg] text-xs italic">
-        dont make it a big thing unless it is a big thing
-      </p>
-    </TapedFragment>
-  );
-}
-
-function ChildMap() {
-  return (
-    <div className="relative h-72 rotate-[-0.5deg] rounded-sm border border-neutral-700/30 bg-blue-50/20 p-4">
-      <h3 className="text-center text-lg uppercase tracking-[0.15em]">Alder Cove Map</h3>
-      <p className="text-center text-xs italic">(not totally right)</p>
-
-      <div className="absolute left-8 top-14 text-xs">ferry dock</div>
-      <div className="absolute left-20 top-24 text-xs">ferry hill</div>
-      <div className="absolute left-52 top-32 rounded border border-neutral-800/40 px-3 py-2 text-sm font-bold">
-        CANNERY
-      </div>
-      <div className="absolute left-56 top-48 text-xs">waterline room</div>
-      <div className="absolute bottom-10 left-20 text-xs">echo tunnel ↓</div>
-      <div className="absolute right-16 top-20 text-xs">good rocks</div>
-      <div className="absolute bottom-12 right-20 text-xs uppercase">don’t go if fog ✕</div>
-
-      <Sticker className="absolute right-10 top-28 rotate-[12deg]">🐟</Sticker>
-      <Sticker className="absolute bottom-16 left-36 rotate-[-8deg]">⭐</Sticker>
-
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 500 300">
-        <path d="M55 55 C120 95, 140 70, 190 110 S290 145, 350 95 S440 120, 455 70" fill="none" stroke="rgba(30,64,175,.45)" strokeWidth="2" />
-        <path d="M85 80 C110 130, 150 155, 220 155 C285 155, 330 185, 390 230" fill="none" stroke="rgba(127,29,29,.55)" strokeWidth="2" strokeDasharray="6 8" />
-        <path d="M250 165 C230 205, 180 225, 120 245" fill="none" stroke="rgba(39,39,42,.45)" strokeWidth="2" strokeDasharray="3 7" />
-        <circle cx="275" cy="155" r="54" fill="none" stroke="rgba(127,29,29,.45)" strokeWidth="2" strokeDasharray="7 6" />
-      </svg>
-    </div>
-  );
-}
-
-export function SymbolLegend() {
-  const symbols = [
-    ["🐟", "safe route / someone checked"],
-    ["⭐", "still feels normal"],
-    ["⚓", "checked in recently"],
-    ["〰", "don’t go alone"],
-    ["◎", "argument happened here"],
-    ["📎", "memory dispute"],
-  ];
-
-  return (
-    <div className="rotate-[-0.8deg]">
-      <h3 className="mb-2 border-b border-neutral-800/50 text-sm uppercase tracking-[0.18em]">
-        Symbols <span className="text-xs normal-case italic">(so we know)</span>
-      </h3>
-      <div className="grid grid-cols-2 gap-2 text-sm">
-        {symbols.map(([icon, label]) => (
-          <div key={label} className="flex items-center gap-2">
-            <span className="text-lg">{icon}</span>
-            <span>= {label}</span>
-          </div>
-        ))}
-      </div>
-      <p className="mt-3 text-xs italic">we add more when we need to. that’s how it works.</p>
-    </div>
-  );
-}
-
-export function CheckInTable() {
-  const rows = [
-    ["Eli", "cannery roof", "Mara", "before lights"],
-    ["June", "ferry hill", "alone", "after dinner"],
-    ["Nora", "tide pools", "Ben", "when horn goes"],
-    ["Cal", "lower trail", "dont tell parents", "probably late"],
-  ];
-
-  return (
-    <TapedFragment className="rotate-[-0.6deg]">
-      <h3 className="mb-2 border-b border-neutral-800/50 text-sm uppercase tracking-[0.18em]">
-        Check-in Log
-      </h3>
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className="text-left text-[10px] uppercase tracking-widest">
-            <th className="border border-neutral-700/40 p-2">Name</th>
-            <th className="border border-neutral-700/40 p-2">Going To</th>
-            <th className="border border-neutral-700/40 p-2">With Who</th>
-            <th className="border border-neutral-700/40 p-2">Back By</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.join("-")}>
-              {row.map((cell) => (
-                <td key={cell} className="border border-neutral-700/30 p-2">
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p className="mt-2 text-xs italic">if plans change: cross it out + tell someone</p>
-    </TapedFragment>
-  );
-}
-
-function CannerySketch() {
-  return (
-    <div className="relative h-64 rotate-[0.6deg] border border-neutral-700/30 bg-white/15 p-4">
-      <h3 className="text-center text-base uppercase tracking-[0.16em]">Cannery Sketch</h3>
-      <svg className="mx-auto mt-4 h-36 w-72" viewBox="0 0 300 150">
-        <rect x="60" y="50" width="160" height="70" fill="none" stroke="rgba(20,20,20,.75)" strokeWidth="2" />
-        <rect x="80" y="30" width="40" height="20" fill="none" stroke="rgba(20,20,20,.75)" strokeWidth="2" />
-        <rect x="145" y="25" width="45" height="25" fill="none" stroke="rgba(20,20,20,.75)" strokeWidth="2" />
-        <line x1="50" y1="120" x2="235" y2="120" stroke="rgba(30,64,175,.6)" strokeWidth="3" />
-        <line x1="100" y1="120" x2="92" y2="145" stroke="rgba(20,20,20,.55)" />
-        <line x1="165" y1="120" x2="170" y2="145" stroke="rgba(20,20,20,.55)" />
-        <path d="M110 128 C135 138, 170 138, 195 128" fill="none" stroke="rgba(127,29,29,.55)" strokeDasharray="5 5" />
-      </svg>
-      <p className="absolute left-6 top-28 text-xs">flood line usually</p>
-      <p className="absolute bottom-5 left-8 text-xs">tunnels under here ↓</p>
-      <p className="absolute bottom-5 right-8 text-xs italic">water moves weird after storms</p>
-    </div>
-  );
-}
+export { RuleEdits, SymbolLegend, CheckInTable };
 
 function Page({
   title,
