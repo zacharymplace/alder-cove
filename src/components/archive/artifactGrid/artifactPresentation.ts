@@ -1,13 +1,23 @@
-import type { ArchiveDocument } from "@/data/archive/archiveDocuments";
-
 /**
  * The shape actually rendered by the archive index grid. Most entries are
  * full ArchiveDocument records, but a couple of synthetic/fallback entries
- * (see ArchiveIndexPage) omit `handlingState`, so it's optional here and
- * every consumer falls back to "awaiting-review" when absent.
+ * (see ArchiveIndexPage) are plain object literals whose string fields are
+ * widened (not narrowed to ArchiveDocument's literal unions) and which
+ * omit `handlingState` entirely — so every field here is intentionally
+ * looser than ArchiveDocument, and consumers fall back to
+ * "awaiting-review" when handlingState is absent.
  */
-export type ArchiveDisplayArtifact = Omit<ArchiveDocument, "handlingState"> & {
-  handlingState?: ArchiveDocument["handlingState"];
+export type ArchiveDisplayArtifact = {
+  id: string;
+  title: string;
+  type: string;
+  accessClass: string;
+  acquisitionMethod: string;
+  emotionalRisk: string;
+  handlingState?: string;
+  pageIds: string[];
+  description: string;
+  ethicalPressure?: string;
 };
 
 export function dotClass(accessClass: string) {

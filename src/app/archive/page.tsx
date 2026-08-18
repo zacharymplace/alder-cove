@@ -25,6 +25,9 @@ import {
 } from "@/components/archive/artifactGrid/artifactPresentation";
 import { ArtifactVisual } from "@/components/archive/artifactGrid/ArtifactVisual";
 import { ArchiveAtmosphereClutter } from "@/components/archive/artifactGrid/ArchiveAtmosphereClutter";
+import { ArchiveSidebar } from "@/components/archive/artifactGrid/ArchiveSidebar";
+import { InspectionPanel } from "@/components/archive/artifactGrid/InspectionPanel";
+import { FocusHint } from "@/components/archive/artifactGrid/FocusHint";
 
 export default function ArchiveIndexPage() {
   const [clientReady, setClientReady] = useState(false);
@@ -316,68 +319,14 @@ export default function ArchiveIndexPage() {
             prefaceDismissed ? "opacity-100 blur-0" : "opacity-35 blur-[1px]",
           ].join(" ")}
         >
-          <aside className="pt-3">
-            <p className="text-xs uppercase tracking-[0.45em] text-amber-100/55">
-              Alder Cove Archive
-            </p>
-
-            <h1 className="mt-20 font-serif text-6xl leading-[0.95] text-neutral-100">
-              Preserved
-              <br />
-              Materials
-            </h1>
-
-            <p className="mt-8 max-w-[250px] text-base leading-relaxed text-neutral-300/80">
-              Not every document entered the archive the same way. Some were
-              shared. Some were copied later. Some may not have been meant to
-              survive.
-            </p>
-
-            <div className="mt-14 h-px w-60 bg-neutral-700/40" />
-
-            <div className="mt-10">
-              <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
-                Filter by access
-              </p>
-
-              <div className="mt-5 space-y-3 text-sm text-neutral-300/80">
-                {["all", "shared", "semi-private", "private", "illicitly-acquired"].map(
-                  (item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => {
-                        setAccessFilter(item);
-                        setFocusedArtifactId(null);
-                        setInspectionIntentId(null);
-                      }}
-                      className={[
-                        "flex w-full items-center gap-3 rounded px-2 py-1 text-left transition",
-                        accessFilter === item
-                          ? "bg-neutral-100/10 text-neutral-100"
-                          : "hover:bg-neutral-100/5",
-                      ].join(" ")}
-                    >
-                      <span
-                        className={[
-                          "h-3 w-3 rounded-full",
-                          item === "all" ? "bg-neutral-300" : dotClass(item),
-                        ].join(" ")}
-                      />
-                      <span>{item.replaceAll("-", " ")}</span>
-                    </button>
-                  )
-                )}
-              </div>
-            </div>
-
-            <div className="mt-20 rotate-[-2deg] border border-amber-100/15 bg-[#ad9666] p-6 text-neutral-950 shadow-[0_25px_70px_rgba(0,0,0,0.55)]">
-              <p className="font-serif text-2xl italic">Archivist Note</p>
-              <p className="mt-5 font-serif text-lg italic leading-relaxed">
-                Some items remain unprocessed. Not all should be read.
-              </p>
-            </div>
-          </aside>
+          <ArchiveSidebar
+            accessFilter={accessFilter}
+            onSelectFilter={(item) => {
+              setAccessFilter(item);
+              setFocusedArtifactId(null);
+              setInspectionIntentId(null);
+            }}
+          />
 
           <section className="relative rounded-[2rem] border border-amber-950/45 bg-[#20140d]/80 px-10 pb-16 pt-10 shadow-[0_45px_140px_rgba(0,0,0,0.85)]">
             <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_45%_25%,rgba(255,218,150,0.09),transparent_30%)]" />
@@ -560,76 +509,17 @@ export default function ArchiveIndexPage() {
         )}
 
         {inspectedArtifact && (
-          <aside className="fixed right-8 top-24 z-50 max-h-[calc(100vh-8rem)] w-[380px] overflow-y-auto border border-amber-100/15 bg-[#11100d]/95 p-5 text-sm text-neutral-200 shadow-[0_30px_90px_rgba(0,0,0,0.8)] backdrop-blur-md">
-            <div className="mb-5 flex items-center justify-between gap-4 border-b border-neutral-800 pb-4">
-              <p className="text-[10px] uppercase tracking-[0.35em] text-amber-100/45">
-                object in hand
-              </p>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setInspectionIntentId(null);
-                  setFocusedArtifactId(null);
-                }}
-                className="border border-amber-100/15 bg-black/30 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-neutral-300 transition hover:bg-black/50"
-              >
-                set down
-              </button>
-            </div>
-
-            <p className="text-[10px] uppercase tracking-[0.35em] text-amber-100/45">
-              handling note
-            </p>
-
-            <h2 className="mt-3 font-serif text-2xl italic text-neutral-100">
-              {inspectedArtifact.title}
-            </h2>
-
-            <p className="mt-4 leading-relaxed text-neutral-400">
-              {inspectedArtifact.description}
-            </p>
-
-            {inspectedArtifact.ethicalPressure && (
-              <p className="mt-4 border-l border-red-200/15 pl-4 italic leading-relaxed text-red-100/55">
-                {inspectedArtifact.ethicalPressure}
-              </p>
-            )}
-
-            <div className="mt-5 space-y-2 border-t border-neutral-800 pt-4 text-xs text-neutral-500">
-              <p>access: {inspectedArtifact.accessClass.replaceAll("-", " ")}</p>
-              <p>
-                acquisition:{" "}
-                {inspectedArtifact.acquisitionMethod.replaceAll("-", " ")}
-              </p>
-              <p>
-                handling:{" "}
-                {handlingStateLabel("handlingState" in inspectedArtifact ? inspectedArtifact.handlingState : undefined)}
-              </p>
-              <p>risk: {inspectedArtifact.emotionalRisk}</p>
-              <p>{inspectedArtifact.pageIds.length} pages indexed</p>
-            </div>
-          </aside>
+          <InspectionPanel
+            artifact={inspectedArtifact}
+            onSetDown={() => {
+              setInspectionIntentId(null);
+              setFocusedArtifactId(null);
+            }}
+          />
         )}
 
         {focusedArtifact && !inspectionIntentId && (
-          <div className="pointer-events-none fixed right-8 top-24 z-40 max-w-[320px] rounded border border-amber-100/10 bg-black/35 px-4 py-3 text-xs text-neutral-300/80 shadow-2xl backdrop-blur-sm">
-            <p className="uppercase tracking-[0.28em] text-amber-100/45">
-              handling focus
-            </p>
-            <p className="mt-2 font-serif text-lg italic text-neutral-100/80">
-              {focusedArtifact.title}
-            </p>
-            <p className="mt-2 leading-relaxed text-neutral-400">
-              {focusedArtifact.accessClass.replaceAll("-", " ")} ·{" "}
-              {handlingStateLabel("handlingState" in focusedArtifact ? focusedArtifact.handlingState : undefined)}
-              {focusedArtifact.accessClass === "private"
-                ? " · approach slowly"
-                : focusedArtifact.accessClass === "illicitly-acquired"
-                ? " · acquisition unclear"
-                : " · paper shifts slightly"}
-            </p>
-          </div>
+          <FocusHint artifact={focusedArtifact} />
         )}
 
         <div className="absolute bottom-8 right-10 flex gap-7 text-xs text-neutral-400/70">
