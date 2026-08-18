@@ -128,3 +128,26 @@ for (const documentId of ["east-shore-shelter-map", "council-meeting-fragments"]
     await expect(page).toHaveURL(/\/archive$/);
   });
 }
+
+test("withdrawn document route shows in-world withdrawn handling, distinct from not-found", async ({
+  page,
+}) => {
+  // 28-30. Eli's interview note was indexed, then withdrawn at request --
+  // a different in-world state than "never indexed" (not-found above).
+  await page.goto("/archive/eli-interview-note");
+
+  await expect(
+    page.getByRole("heading", { name: "Withdrawn At Request" })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Material Not Located" })
+  ).toHaveCount(0);
+
+  const setObjectDownLinks = page.getByRole("link", {
+    name: "set object down",
+  });
+  await expect(setObjectDownLinks).toHaveCount(2);
+
+  await setObjectDownLinks.first().click();
+  await expect(page).toHaveURL(/\/archive$/);
+});

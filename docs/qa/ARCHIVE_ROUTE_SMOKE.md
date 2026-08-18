@@ -16,6 +16,7 @@ This sequence is also automated end-to-end in `e2e/archive-route-smoke.spec.ts` 
 | `/notebook` | Notebook One reader | Notebook reader opens; user can set notebook down back to `/archive` |
 | `/archive/flood-recovery-packet-001` | Flood recovery packet handling | Document handling view with recovery cluster, contamination review, archivist fingerprints, and cross-artifact relationship review |
 | `/archive/mara-private-journal-fragment` | Private journal handling | Restricted/private handling view; remains sealed and not prepared for reading |
+| `/archive/eli-interview-note` | Withdrawn document | In-world "Withdrawn At Request" handling note, distinct from the not-found state |
 
 ## Manual Smoke Sequence
 
@@ -46,6 +47,9 @@ This sequence is also automated end-to-end in `e2e/archive-route-smoke.spec.ts` 
 25. Confirm the in-world archive handling note renders ("Material Not Located"), not a generic 404 page.
 26. Confirm both "set object down" links return to `/archive`.
 27. Repeat steps 24–26 with `/archive/council-meeting-fragments`.
+28. Approach `Eli — Interview Note` from `/archive` (or navigate directly to `/archive/eli-interview-note`).
+29. Confirm the in-world "Withdrawn At Request" handling note renders, distinct in wording from the "Material Not Located" state.
+30. Confirm both "set object down" links return to `/archive`.
 
 ## Current Narrative Systems Covered
 
@@ -63,6 +67,7 @@ This sequence is also automated end-to-end in `e2e/archive-route-smoke.spec.ts` 
 - Archivist fingerprints
 - Private readability withholding
 - In-world not-found handling for unindexed document routes
+- In-world withdrawn-document handling, distinct from not-found
 
 ## Expansion Rule
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { getArchiveDocument } from "@/data/archive/archiveDocuments";
+import { isWithdrawnDocument } from "@/data/archive/withdrawnDocuments";
 import { getLinksForDocument } from "@/systems/archive/crossArtifactLinks";
 import { getArchivistFingerprintsForDocument } from "@/data/archivist/fingerprints";
 import { ArchivistFingerprintReview } from "@/components/archive/document/ArchivistFingerprintReview";
@@ -10,6 +11,7 @@ import { RecoveryContaminationReview } from "@/components/archive/document/Recov
 import { ArchiveDocumentDecisionPanel } from "@/components/archive/document/ArchiveDocumentDecisionPanel";
 import { ArchiveDocumentHeader } from "@/components/archive/document/ArchiveDocumentHeader";
 import { ArchiveDocumentMockup } from "@/components/archive/document/ArchiveDocumentMockup";
+import { WithdrawnNotice } from "@/components/archive/document/WithdrawnNotice";
 import {
   archiveDocumentShellClass,
   getArchiveDocumentPresentation,
@@ -30,6 +32,10 @@ export default async function ArchiveDocumentRoute({
   try {
     document = getArchiveDocument(documentId);
   } catch {
+    if (isWithdrawnDocument(documentId)) {
+      return <WithdrawnNotice />;
+    }
+
     notFound();
   }
 
