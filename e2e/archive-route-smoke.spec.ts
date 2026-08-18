@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 // Automates docs/qa/ARCHIVE_ROUTE_SMOKE.md. Step numbers in comments map to
 // that document's "Manual Smoke Sequence" so the two stay easy to compare.
@@ -13,14 +13,38 @@ function artifactCard(page: Page, title: string) {
 
 // Hovering an artifact card inserts focus-state copy into the DOM, which
 // reflows the card and shifts its "pick up" / "approach artifact" link.
-// A plain .click() computes its target position before that reflow, so
-// pick-up links are hovered first (letting the reflow settle) and clicked
-// as a separate step.
+// .hover() only waits for the mouseenter to dispatch, not for React to
+// finish re-rendering afterward, so a click right after can still land on
+// the pre-reflow position on a slow tick. Poll the link's own bounding box
+// until two consecutive reads agree before clicking, rather than trusting
+// hover-then-click timing alone.
+async function waitForStablePosition(locator: Locator, timeoutMs = 1000) {
+  const deadline = Date.now() + timeoutMs;
+  let previous = await locator.boundingBox();
+
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const current = await locator.boundingBox();
+
+    if (
+      previous &&
+      current &&
+      previous.x === current.x &&
+      previous.y === current.y
+    ) {
+      return;
+    }
+
+    previous = current;
+  }
+}
+
 async function pickUpArtifact(page: Page, cardTitle: string, linkName: string) {
   const link = artifactCard(page, cardTitle).getByRole("link", {
     name: linkName,
   });
   await link.hover();
+  await waitForStablePosition(link);
   await link.click();
 }
 
