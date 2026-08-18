@@ -124,6 +124,20 @@ export default function ArchiveIndexPage() {
         "Loose notes from a meeting that later copies reference indirectly.",
       ethicalPressure: undefined,
     },
+
+    {
+      id: "eli-interview-note",
+      title: "Eli — Interview Note",
+      type: "interview-note",
+      accessClass: "semi-private",
+      acquisitionMethod: "copied-with-permission",
+      emotionalRisk: "high",
+      handlingState: "awaiting-review",
+      pageIds: [],
+      description:
+        "Interview notes referenced by later copies of the shared notebook.",
+      ethicalPressure: undefined,
+    },
   ];
 
   const visibleArtifacts =
