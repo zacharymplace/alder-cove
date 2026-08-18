@@ -20,7 +20,7 @@ export function FocusHint({ artifact }: FocusHintProps) {
       </p>
       <p className="mt-2 leading-relaxed text-neutral-400">
         {artifact.accessClass.replaceAll("-", " ")} ·{" "}
-        {handlingStateLabel("handlingState" in artifact ? artifact.handlingState : undefined)}
+        {handlingStateLabel(artifact.handlingState)}
         {artifact.accessClass === "private"
           ? " · approach slowly"
           : artifact.accessClass === "illicitly-acquired"

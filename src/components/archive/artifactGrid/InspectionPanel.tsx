@@ -53,7 +53,7 @@ export function InspectionPanel({ artifact, onSetDown }: InspectionPanelProps) {
         </p>
         <p>
           handling:{" "}
-          {handlingStateLabel("handlingState" in artifact ? artifact.handlingState : undefined)}
+          {handlingStateLabel(artifact.handlingState)}
         </p>
         <p>risk: {artifact.emotionalRisk}</p>
         <p>{artifact.pageIds.length} pages indexed</p>

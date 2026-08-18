@@ -6,7 +6,6 @@ import {
   getHighestUnlockedStage,
   type ArchiveRevealId,
 } from "@/systems/archive/progression";
-import Link from "next/link";
 
 import { archiveDocuments } from "@/data/archive/archiveDocuments";
 import { ArchiveAmbientLayer } from "@/components/archive/ArchiveAmbientLayer";
@@ -16,16 +15,9 @@ import {
   getArchiveEvent,
   type ArchiveEventId,
 } from "@/components/archive/events/archiveEventRegistry";
-import {
-  artifactInteractionClass,
-  dotClass,
-  focusLanguage,
-  handlingStateClass,
-  handlingStateLabel,
-} from "@/components/archive/artifactGrid/artifactPresentation";
-import { ArtifactVisual } from "@/components/archive/artifactGrid/ArtifactVisual";
 import { ArchiveAtmosphereClutter } from "@/components/archive/artifactGrid/ArchiveAtmosphereClutter";
 import { ArchiveSidebar } from "@/components/archive/artifactGrid/ArchiveSidebar";
+import { ArtifactGrid } from "@/components/archive/artifactGrid/ArtifactGrid";
 import { InspectionPanel } from "@/components/archive/artifactGrid/InspectionPanel";
 import { FocusHint } from "@/components/archive/artifactGrid/FocusHint";
 
@@ -328,169 +320,18 @@ export default function ArchiveIndexPage() {
             }}
           />
 
-          <section className="relative rounded-[2rem] border border-amber-950/45 bg-[#20140d]/80 px-10 pb-16 pt-10 shadow-[0_45px_140px_rgba(0,0,0,0.85)]">
-            <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_45%_25%,rgba(255,218,150,0.09),transparent_30%)]" />
-
-            <div className="pointer-events-none absolute inset-0 rounded-[2rem] opacity-[0.06] mix-blend-overlay">
-              <div className="absolute left-[20%] top-[15%] h-40 w-40 rounded-full bg-black blur-3xl" />
-              <div className="absolute right-[15%] top-[25%] h-52 w-52 rounded-full bg-black blur-3xl" />
-              <div className="absolute bottom-[20%] left-[40%] h-44 w-44 rounded-full bg-black blur-3xl" />
-            </div>
-
-            <div className="relative grid gap-x-14 gap-y-16 xl:grid-cols-3">
-              {visibleArtifacts.map((document) => (
-                <article
-                  style={{
-                    pointerEvents: prefaceDismissed ? "auto" : "none",
-                  }}
-                  key={document.id}
-                  onMouseEnter={() => setFocusedArtifactId(document.id)}
-                  onMouseLeave={() => setFocusedArtifactId(null)}
-                  onFocus={() => setFocusedArtifactId(document.id)}
-                  onBlur={() => setFocusedArtifactId(null)}
-                  onClick={() =>
-                    setInspectionIntentId((current) =>
-                      current === document.id ? null : document.id
-                    )
-                  }
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      setInspectionIntentId((current) =>
-                        current === document.id ? null : document.id
-                      );
-                    }
-                  }}
-                  tabIndex={0}
-                  className={[
-                    "group relative outline-none transition duration-300",
-                    focusedArtifactId === document.id ? "z-30 scale-[1.015]" : "",
-                    inspectionIntentId === document.id ? "z-40 scale-[1.025]" : "",
-                    document.type === "private-journal"
-                      ? "mt-16"
-                      : document.type === "interview-note"
-                      ? "mt-24"
-                      : "",
-                  ].join(" ")}
-                >
-                  {inspectionIntentId === document.id && (
-                    <>
-                      <div className="pointer-events-none absolute inset-x-4 top-[-10px] z-30 h-px bg-amber-100/30" />
-                      <div className="pointer-events-none absolute left-6 top-[-34px] z-40 border border-amber-100/15 bg-black/55 px-3 py-2 text-[9px] uppercase tracking-[0.22em] text-neutral-300 shadow-xl">
-                        object in hand
-                      </div>
-                    </>
-                  )}
-
-                  {document.accessClass === "private" && (
-                    <div className="pointer-events-none absolute inset-x-8 top-8 z-20 h-px bg-red-100/10" />
-                  )}
-
-                  {document.accessClass === "illicitly-acquired" && (
-                    <div className="pointer-events-none absolute inset-6 z-20 border border-violet-200/10" />
-                  )}
-
-                  <div className="absolute right-6 top-5 z-20 flex h-6 w-6 items-center justify-center rounded-full border border-neutral-950/40 bg-black/25 shadow">
-                    <span
-                      className={`h-4 w-4 rounded-full ${dotClass(
-                        document.accessClass
-                      )}`}
-                    />
-                  </div>
-
-                  <div
-                    className={[
-                      "relative z-10 transition",
-                      artifactInteractionClass(document),
-                      inspectionIntentId === document.id
-                        ? "translate-y-[-10px] rotate-[0.4deg] drop-shadow-2xl"
-                        : focusedArtifactId === document.id
-                        ? "drop-shadow-2xl"
-                        : "",
-                    ].join(" ")}
-                  >
-                    <ArtifactVisual type={document.type} title={document.title} />
-                  </div>
-
-                  <div className={[
-                      "relative z-20 mx-7 mt-[-18px] min-h-[138px] border border-neutral-900/20 bg-[#d4c4a4] p-4 font-mono text-xs text-neutral-950 shadow-[0_15px_40px_rgba(0,0,0,0.35)]",
-                      document.type === "private-journal"
-                        ? "rotate-[0.8deg]"
-                        : document.type === "interview-note"
-                        ? "rotate-[-1.4deg]"
-                        : "rotate-[-0.4deg]",
-                    ].join(" ")}>
-
-                    <div className="absolute right-4 top-3 h-4 w-14 rotate-[4deg] rounded-sm bg-white/10" />
-                    <div className="absolute left-4 top-[-10px] h-5 w-20 rotate-[-3deg] bg-[#f1e2bb]/35 shadow-sm" />
-                    <div className="absolute bottom-3 right-4 text-[8px] uppercase tracking-[0.18em] text-neutral-950/10">
-                      revised
-                    </div>
-                    <div className="absolute left-3 bottom-2 h-px w-16 rotate-[-2deg] bg-neutral-950/10" />
-                    <div className="absolute left-4 top-[-10px] h-5 w-20 rotate-[-3deg] bg-[#f1e2bb]/35 shadow-sm" />
-
-                    <h2 className="font-sans text-base font-semibold leading-snug">
-                      {document.title}
-                    </h2>
-
-                    <p className="mt-3 text-[11px] leading-relaxed text-neutral-700">
-                      <span className="text-amber-900">
-                        {document.accessClass.replaceAll("-", " ")}
-                      </span>{" "}
-                      · {document.acquisitionMethod.replaceAll("-", " ")} · risk:{" "}
-                      {document.emotionalRisk}
-                    </p>
-
-                    <div className="my-4 h-px bg-neutral-900/20" />
-
-                    <p className="text-[11px] text-neutral-700">
-                      {document.pageIds.length} pages indexed
-                    </p>
-
-                    <p
-                      className={[
-                        "mt-3 text-[10px] uppercase tracking-[0.24em]",
-                        handlingStateClass("handlingState" in document ? document.handlingState : "awaiting-review"),
-                      ].join(" ")}
-                    >
-                      {"handlingState" in document ? handlingStateLabel(document.handlingState) : handlingStateLabel("awaiting-review")}
-                    </p>
-
-                    {(focusedArtifactId === document.id ||
-                      inspectionIntentId === document.id) && (
-                      <p className="mt-3 border-l border-neutral-900/20 pl-3 text-[10px] italic leading-relaxed text-neutral-800/55">
-                        {focusLanguage(document)}
-                      </p>
-                    )}
-
-                    {inspectionIntentId === document.id &&
-                      document.id !== "notebook-one-shared" && (
-                        <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-red-900/60">
-                          review withheld
-                        </p>
-                      )}
-
-                    <Link
-                      href={`/archive/${document.id}`}
-                      onClick={() => markHandled(document.id)}
-                      className={[
-                        "mt-4 inline-block uppercase tracking-[0.28em] underline-offset-4 hover:underline",
-                        document.id === "notebook-one-shared"
-                          ? "text-neutral-900"
-                          : "text-red-900/70",
-                      ].join(" ")}
-                    >
-                      {document.id === "notebook-one-shared"
-                        ? handledArtifactIds.has(document.id)
-                          ? "return to artifact"
-                          : "pick up"
-                        : "approach artifact"}
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
+          <ArtifactGrid
+            artifacts={visibleArtifacts}
+            focusedArtifactId={focusedArtifactId}
+            inspectionIntentId={inspectionIntentId}
+            prefaceDismissed={prefaceDismissed}
+            handledArtifactIds={handledArtifactIds}
+            onHover={(id) => setFocusedArtifactId(id)}
+            onToggleInspect={(id) =>
+              setInspectionIntentId((current) => (current === id ? null : id))
+            }
+            onPickUp={(id) => markHandled(id)}
+          />
         </div>
 
         <ArchiveAtmosphereClutter />
