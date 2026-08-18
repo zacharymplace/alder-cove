@@ -6,15 +6,12 @@ import {
   getHighestUnlockedStage,
   type ArchiveRevealId,
 } from "@/systems/archive/progression";
+import { useArchiveRevealState } from "@/systems/archive/useArchiveRevealState";
 
 import { archiveDocuments } from "@/data/archive/archiveDocuments";
 import { ArchiveAmbientLayer } from "@/components/archive/ArchiveAmbientLayer";
-import { ArchivePrefaceOverlay } from "@/components/archive/ArchivePrefaceOverlay";
-import {
-  archiveEventRegistry,
-  getArchiveEvent,
-  type ArchiveEventId,
-} from "@/components/archive/events/archiveEventRegistry";
+import { ArchiveRevealProgression } from "@/components/archive/events/ArchiveRevealProgression";
+import type { ArchiveEventId } from "@/components/archive/events/archiveEventRegistry";
 import { ArchiveAtmosphereClutter } from "@/components/archive/artifactGrid/ArchiveAtmosphereClutter";
 import { ArchiveSidebar } from "@/components/archive/artifactGrid/ArchiveSidebar";
 import { ArtifactGrid } from "@/components/archive/artifactGrid/ArtifactGrid";
@@ -24,82 +21,22 @@ import { FocusHint } from "@/components/archive/artifactGrid/FocusHint";
 export default function ArchiveIndexPage() {
   const [clientReady, setClientReady] = useState(false);
   const [focusedArtifactId, setFocusedArtifactId] = useState<string | null>(null);
-  const [handledArtifactIds, setHandledArtifactIds] = useState<Set<string>>(() => {
-    if (typeof window === "undefined") {
-      return new Set();
-    }
-
-    try {
-      const saved = window.localStorage.getItem("alder-cove.archive.reveals");
-      const parsed = saved ? JSON.parse(saved) : {};
-      return Array.isArray(parsed.handledArtifactIds)
-        ? new Set(parsed.handledArtifactIds)
-        : new Set();
-    } catch {
-      return new Set();
-    }
-  });
   const [inspectionIntentId, setInspectionIntentId] = useState<string | null>(
     null
   );
   const [accessFilter, setAccessFilter] = useState<string>("all");
-  const [prefaceDismissed, setPrefaceDismissed] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    try {
-      const saved = window.localStorage.getItem("alder-cove.archive.reveals");
-      const parsed = saved ? JSON.parse(saved) : {};
-      return Boolean(parsed.prefaceDismissed);
-    } catch {
-      return false;
-    }
-  });
   const [activeEventId, setActiveEventId] =
     useState<ArchiveEventId | null>(null);
-  const [seenEventIds, setSeenEventIds] = useState<ArchiveEventId[]>(() => {
-    if (typeof window === "undefined") {
-      return [];
-    }
 
-    try {
-      const saved = window.localStorage.getItem("alder-cove.archive.reveals");
-
-      if (!saved) {
-        return [];
-      }
-
-      const parsed = JSON.parse(saved);
-
-      return Array.isArray(parsed?.seenEventIds)
-        ? parsed.seenEventIds
-        : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const handledArtifactIdList = Array.from(handledArtifactIds).sort();
-  const handledArtifactIdKey = handledArtifactIdList.join("|");
-  const normalizedSeenEventIds = Array.isArray(seenEventIds)
-    ? seenEventIds
-    : [];
-
-  const seenEventIdKey = [...normalizedSeenEventIds].sort().join("|");
-
-  useEffect(() => {
-    window.localStorage.setItem(
-      "alder-cove.archive.reveals",
-      JSON.stringify({
-        prefaceDismissed,
-        seenEventIds: seenEventIdKey ? seenEventIdKey.split("|") : [],
-        handledArtifactIds: handledArtifactIdKey
-          ? handledArtifactIdKey.split("|")
-          : [],
-      })
-    );
-  }, [prefaceDismissed, seenEventIdKey, handledArtifactIdKey]);
+  const {
+    prefaceDismissed,
+    setPrefaceDismissed,
+    normalizedSeenEventIds,
+    setSeenEventIds,
+    handledArtifactIds,
+    markHandled,
+    resetHandling,
+  } = useArchiveRevealState();
 
    const unlockedRevealIds: ArchiveRevealId[] = [
     "archive-preface",
@@ -120,7 +57,7 @@ export default function ArchiveIndexPage() {
 
       setInspectionIntentId(null);
       setActiveEventId(null);
-      
+
     }
 
     window.addEventListener("keydown", handleKeyDown);
@@ -135,14 +72,6 @@ export default function ArchiveIndexPage() {
 
     return () => window.clearTimeout(timeout);
   }, []);
-
-  function markHandled(id: string) {
-    setHandledArtifactIds((current) => {
-      const next = new Set(current);
-      next.add(id);
-      return next;
-    });
-  }
 
   const privateJournal =
     archiveDocuments.find(
@@ -223,84 +152,23 @@ export default function ArchiveIndexPage() {
 
       <div className="relative min-h-screen px-8 py-7">
         <ArchiveAmbientLayer />
-        {prefaceDismissed &&
-          archiveEventRegistry.map((event) => {
-            const alreadySeen = normalizedSeenEventIds.includes(event.id);
-
-            const visible =
-              !alreadySeen &&
-              (!event.visibleAfter ||
-                normalizedSeenEventIds.includes(event.visibleAfter));
-
-            if (!visible) {
-              return null;
-            }
-
-            return (
-              <button
-                key={event.id}
-                type="button"
-                onClick={() => setActiveEventId(event.id)}
-                className={[
-                  "fixed left-1/2 z-50 -translate-x-1/2 border bg-black/40 px-5 py-3 text-[10px] uppercase tracking-[0.3em] shadow-2xl backdrop-blur-sm transition hover:bg-black/60",
-                  event.id === "partial-fragment"
-                    ? "bottom-24 border-red-100/10 text-red-100/55"
-                    : "bottom-8 border-amber-100/15 text-neutral-300",
-                ].join(" ")}
-              >
-                {event.label}
-              </button>
-            );
-          })}
-
-        {prefaceDismissed &&
-          archiveEventRegistry.every((event) =>
-            normalizedSeenEventIds.includes(event.id)
-          ) &&
-          !activeEventId && (
-            <div className="pointer-events-none fixed bottom-8 left-1/2 z-40 -translate-x-1/2 border border-neutral-800 bg-black/25 px-5 py-3 text-[10px] uppercase tracking-[0.28em] text-neutral-500 backdrop-blur-sm">
-              archive handling resumed · {archiveStage.replaceAll("-", " ")} · instability {archivistInstability}
-            </div>
-          )}
-
-        {prefaceDismissed && (
-          <button
-            type="button"
-            onClick={() => {
-              window.localStorage.removeItem("alder-cove.archive.reveals");
-              setPrefaceDismissed(false);
-              setActiveEventId(null);
-              setSeenEventIds([]);
-
-              setHandledArtifactIds(new Set());
-            }}
-            className="fixed left-8 top-8 z-50 border border-neutral-800 bg-black/30 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-neutral-500 backdrop-blur-sm transition hover:text-neutral-300"
-          >
-            reset handling
-          </button>
-        )}
-
-        {activeEventId &&
-          (() => {
-            const event = getArchiveEvent(activeEventId);
-            const EventComponent = event.Component;
-
-            return (
-              <EventComponent
-                onClose={() => {
-                  setSeenEventIds((current) => [
-                    ...new Set([...current, activeEventId]),
-                  ]);
-
-                  setActiveEventId(null);
-                }}
-              />
-            );
-          })()}
-
-        {!prefaceDismissed && (
-          <ArchivePrefaceOverlay onDismiss={() => setPrefaceDismissed(true)} />
-        )}
+        <ArchiveRevealProgression
+          prefaceDismissed={prefaceDismissed}
+          normalizedSeenEventIds={normalizedSeenEventIds}
+          activeEventId={activeEventId}
+          archiveStage={archiveStage}
+          archivistInstability={archivistInstability}
+          onTriggerEvent={(id) => setActiveEventId(id)}
+          onEventClose={(id) => {
+            setSeenEventIds((current) => [...new Set([...current, id])]);
+            setActiveEventId(null);
+          }}
+          onResetHandling={() => {
+            resetHandling();
+            setActiveEventId(null);
+          }}
+          onDismissPreface={() => setPrefaceDismissed(true)}
+        />
 
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_62%_20%,rgba(255,205,120,0.12),transparent_28%),radial-gradient(circle_at_50%_80%,rgba(80,45,20,0.28),transparent_48%)]" />
         <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(rgba(255,255,255,.025)_1px,transparent_1px)] [background-size:36px_36px]" />
