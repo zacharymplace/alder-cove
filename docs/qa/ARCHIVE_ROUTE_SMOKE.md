@@ -4,6 +4,8 @@
 
 This document records the current archive vertical slice routes and the expected manual verification flow before additional archive content is added.
 
+This sequence is also automated end-to-end in `e2e/archive-route-smoke.spec.ts` (run via `npm run test:e2e`), with comments mapping back to the numbered steps below. Keep both in sync when routes or flows change.
+
 ## Core Routes
 
 | Route | Purpose | Expected Result |

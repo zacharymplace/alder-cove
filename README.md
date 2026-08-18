@@ -33,15 +33,22 @@ Open [http://localhost:3000](http://localhost:3000). Core routes:
 | `/notebook` | Notebook One reader |
 
 See [`docs/qa/ARCHIVE_ROUTE_SMOKE.md`](docs/qa/ARCHIVE_ROUTE_SMOKE.md) for the
-manual verification sequence across these routes.
+manual verification sequence across these routes. That sequence is also
+automated end-to-end — see `e2e/archive-route-smoke.spec.ts`, whose comments
+map back to the doc's numbered steps.
 
 ## Validation
 
 ```bash
-npm run check          # lint + build (preferred before finishing any change)
+npm run check           # lint + unit tests + build (preferred before finishing any change)
+npm run test             # unit tests only (vitest)
+npm run test:e2e         # automated archive route smoke sequence (playwright)
 npm run agent:preflight  # repo/environment sanity check
-npm run release:ready   # release-readiness gate
+npm run release:ready    # release-readiness gate
 ```
+
+`npm run test:e2e` requires Playwright's browser binaries. Install them once
+with `npx playwright install --with-deps chromium`.
 
 ## Working on this repo
 
