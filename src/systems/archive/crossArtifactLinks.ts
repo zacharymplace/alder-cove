@@ -40,6 +40,15 @@ export const crossArtifactLinks: CrossArtifactLink[] = [
     note:
       "Meeting fragments may have been reorganized using packet labels added after drying.",
   },
+  {
+    id: "link-flood-mara-002",
+    fromDocumentId: "flood-recovery-packet-001",
+    toDocumentId: "mara-private-journal-fragment",
+    relationship: "ethically-adjacent",
+    confidence: "medium",
+    note:
+      "Recovery placed this packet close enough to private material that handling one now implicates handling the other.",
+  },
 ];
 
 export function getLinksForDocument(documentId: string) {

@@ -54,6 +54,26 @@ export const archivistFingerprints: ArchivistFingerprint[] = [
     emotionalLeak:
       "The notebook looked safer before the packet was opened.",
   },
+  {
+    id: "fingerprint-flood-004",
+    documentId: "flood-recovery-packet-001",
+    markType: "uncertainty-grade",
+    label: "uncertainty regraded",
+    text:
+      "Confidence lowered a second time. First grading assumed good faith. Second grading did not.",
+    emotionalLeak:
+      "I keep grading my own memory of handling this packet, not just the packet.",
+  },
+  {
+    id: "fingerprint-flood-005",
+    documentId: "flood-recovery-packet-001",
+    markType: "crossed-label",
+    label: "label crossed out",
+    text:
+      "Original grouping label crossed through and rewritten in my own hand, dated the same day.",
+    emotionalLeak:
+      "I do not remember deciding to change it.",
+  },
 ];
 
 export function getArchivistFingerprintsForDocument(documentId: string) {
