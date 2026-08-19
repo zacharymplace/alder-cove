@@ -58,6 +58,13 @@ export default function HomePage() {
       <div className="pointer-events-none absolute bottom-10 right-10 rotate-[-3deg] text-[10px] uppercase tracking-[0.22em] text-red-100/18">
         copied later
       </div>
+
+      <Link
+        href="/about"
+        className="absolute right-10 top-10 text-[10px] uppercase tracking-[0.28em] text-neutral-500 transition hover:text-neutral-300"
+      >
+        about this build
+      </Link>
     </main>
   );
 }
