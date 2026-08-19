@@ -4,11 +4,9 @@ import { resolveNoteText, type NoteTextDriftState } from "./noteTextDrift";
 import type { NotebookNote } from "@/data/notebook/notebookOne";
 
 const baseState: NoteTextDriftState = {
-  unstable: false,
   memoryLayer: "recovered",
   instabilityLevel: 0,
   collapseTriggered: false,
-  revisionPhase: 0,
 };
 
 function makeNote(overrides: Partial<NotebookNote> = {}): NotebookNote {
@@ -42,30 +40,29 @@ describe("resolveNoteText", () => {
     ).toBe("reconstructed wording");
   });
 
-  test("eli-contradiction-a drifts once unstable is toggled on", () => {
-    const note = makeNote({ id: "eli-contradiction-a", text: "original" });
-    expect(resolveNoteText(note, { ...baseState, unstable: true })).toBe(
-      "Eli doesnt go below after storms anymore."
-    );
-  });
-
-  test("collapseTriggered overrides the unstable-only wording for eli-contradiction-a", () => {
-    const note = makeNote({ id: "eli-contradiction-a", text: "original" });
+  test("eli-contradiction-b drifts once instabilityLevel reaches 2", () => {
+    const note = makeNote({ id: "eli-contradiction-b", text: "original" });
     expect(
-      resolveNoteText(note, { ...baseState, unstable: true, collapseTriggered: true })
-    ).toBe("Eli said the tunnels remembered things wrong.");
+      resolveNoteText(note, { ...baseState, instabilityLevel: 2 })
+    ).toBe("he always wanted to go first");
   });
 
-  test("later revisionPhase thresholds take precedence over earlier instabilityLevel drift", () => {
-    const note = makeNote({ id: "eli-contradiction-a", text: "original" });
+  test("collapseTriggered overrides the instabilityLevel wording for eli-contradiction-b", () => {
+    const note = makeNote({ id: "eli-contradiction-b", text: "original" });
     expect(
       resolveNoteText(note, {
         ...baseState,
-        unstable: true,
-        instabilityLevel: 3,
-        revisionPhase: 4,
+        instabilityLevel: 2,
+        collapseTriggered: true,
       })
-    ).toBe("Eli said the tunnels remembered things wrong.");
+    ).toBe("he wasnt scared until after the cannery");
+  });
+
+  test("collapseTriggered resolves eli-childhood-memory even at instabilityLevel 0", () => {
+    const note = makeNote({ id: "eli-childhood-memory", text: "original" });
+    expect(
+      resolveNoteText(note, { ...baseState, collapseTriggered: true })
+    ).toBe("maybe we already decided what he was becoming.");
   });
 
   test("unrelated notes are unaffected by drift thresholds", () => {
@@ -73,10 +70,8 @@ describe("resolveNoteText", () => {
     expect(
       resolveNoteText(note, {
         ...baseState,
-        unstable: true,
         instabilityLevel: 5,
         collapseTriggered: true,
-        revisionPhase: 5,
       })
     ).toBe("steady text");
   });
