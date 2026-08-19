@@ -58,13 +58,52 @@ All five targets from the previous pass are closed:
   anything, and was confirmed against this standard directly rather than
   left as an open question. See "What Is Working" above.
 
+## Fresh Playtest Pass — Notebook
+
+Actually played the current build rather than inspecting it. Confirmed
+firsthand:
+
+- The opening spread's delayed pressure reveal fires correctly and reads
+  as intended — holding the Eli note surfaces "the longer this is held,
+  the less certain the wording feels," then the pressure-reveal line
+  ("he wasnt trying to scare us"), on the documented delay.
+- The flashlight → instability → collapse escalation on the recovered
+  spread works exactly as authored under realistic play (real clicks with
+  natural pauses between them). Confirmed the collapse-state text
+  directly rather than by reading source: "Eli said the tunnels
+  remembered things wrong," "he wasnt scared until after the cannery,"
+  "maybe none of us remembered him right" — genuinely unresolved, matches
+  the "What Is Working" entry above.
+- Focus mode ("lift page closer") zooms the current page without
+  reshaping it, matches `NOTEBOOK_AUTHORING_RULES.md`. Page navigation
+  bounds are correct (previous/next disable at the first/last spread).
+
 ## Next Refinement Targets
 
-None identified from this pass. The five targets above came from actual
-play; closing them by inspection/decomposition rather than by playing the
-current build is a reasonable one-time catch-up, but it's not a substitute
-for a fresh playtest. The next entry in this document should come from
-actually playing the current vertical slice — including the archive
-content added since this review was last written (Flood Recovery Phases
-1–3, the withdrawn-document state, the archivist internal note) — not from
-further inspection.
+- **A meaningful slice of authored contradiction content is currently
+  unreachable by a player.** `revisionPhase`, `mutationPhase`, `unstable`,
+  and `memoryLayer` (beyond its "recovered" default) all gate real text
+  variants in `noteTextDrift.ts` and `Note.tsx` — five separate
+  `revisionPhase`-gated wording changes, an `unstable`-gated variant, and
+  the "original"/"reconstructed" memory-layer texts — but no button,
+  control, or interaction anywhere calls `advanceRevision()`,
+  `advanceMutation()`, `toggleUnstable()`, or `setMemoryLayer()`. This
+  was found by playing, not by reading the state file: the flashlight
+  path only ever touches `instabilityLevel` and `collapseTriggered`. This
+  is instability-mechanics territory (protected — needs explicit
+  direction before any fix): either wire these into real interactions,
+  or remove the dead branches if they were superseded by the
+  instability/collapse path and never cleaned up.
+- **Possible readability crowding, not confirmed as a bug.** With the
+  side light on, the flashlight-revealed marginalia ("he was scared
+  before we were") visually overlaps the printed rule list beneath it at
+  standard viewport width. This may be the intended "illuminated
+  handwriting crowds the page" effect (consistent with the physical-
+  artifact aesthetic) rather than a defect — flagging for a design call,
+  not proposing a fix.
+
+The archive side has grown substantially since this document was last
+written (Flood Recovery Phases 1–3, the withdrawn-document state, the
+archivist internal note) and has never had its own playtest review. See
+`ARCHIVE_SLICE_REVIEW.md` for that pass, done the same way — by playing
+it, not inspecting it.
