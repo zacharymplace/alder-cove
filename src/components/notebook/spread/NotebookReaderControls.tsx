@@ -12,6 +12,8 @@ export function NotebookReaderControls() {
     nextSpread,
     setZoomedPage,
     activeDocumentId,
+    memoryLayer,
+    setMemoryLayer,
   } = useNotebookState();
 
   const activeDocument = getArchiveDocument(activeDocumentId);
@@ -92,6 +94,25 @@ export function NotebookReaderControls() {
       </div>
 
       <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 border border-neutral-800 p-1">
+          {(["recovered", "original", "reconstructed"] as const).map(
+            (layer) => (
+              <button
+                key={layer}
+                onClick={() => setMemoryLayer(layer)}
+                className={clsx(
+                  "rounded-sm px-2 py-1.5 text-[10px] uppercase tracking-[0.2em]",
+                  memoryLayer === layer
+                    ? "bg-amber-950/30 text-amber-100/80"
+                    : "text-neutral-600 hover:text-neutral-300"
+                )}
+              >
+                {layer}
+              </button>
+            )
+          )}
+        </div>
+
         <button
           onClick={toggleFocus}
           className={clsx(
