@@ -42,6 +42,13 @@ export type ArchiveDocument = {
   pageIds: NotebookPageId[];
   description: string;
   ethicalPressure?: string;
+  /**
+   * A line that surfaces after the document has stayed "in hand" (the
+   * inspection panel open) long enough — the archive's equivalent of the
+   * notebook's pressureReveal. Optional and authored sparingly, not
+   * present on every document.
+   */
+  sustainedInspectionReveal?: string;
 };
 
 export const archiveDocuments: ArchiveDocument[] = [
@@ -95,6 +102,8 @@ export const archiveDocuments: ArchiveDocument[] = [
       "A sealed private journal fragment preserved as a presence in the archive without being made readable.",
     ethicalPressure:
       "The archive can acknowledge that the fragment exists without treating existence as permission.",
+    sustainedInspectionReveal:
+      "The longer this stays in hand, the more it feels like reading over someone's shoulder.",
   },
 
   {
@@ -110,6 +119,8 @@ export const archiveDocuments: ArchiveDocument[] = [
       "A private processing note, filed into the shared index by mistake. It was not written for anyone to read.",
     ethicalPressure:
       "The archive cannot un-file something once it has been filed. Removing it now would be its own kind of decision.",
+    sustainedInspectionReveal:
+      "The longer this stays in hand, the more it reads like something meant to be crossed out.",
   },
 
 ];

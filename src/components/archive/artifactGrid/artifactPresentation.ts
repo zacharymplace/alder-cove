@@ -18,6 +18,7 @@ export type ArchiveDisplayArtifact = {
   pageIds: string[];
   description: string;
   ethicalPressure?: string;
+  sustainedInspectionReveal?: string;
 };
 
 export function dotClass(accessClass: string) {
