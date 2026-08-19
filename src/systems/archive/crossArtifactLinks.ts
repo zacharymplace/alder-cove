@@ -49,6 +49,15 @@ export const crossArtifactLinks: CrossArtifactLink[] = [
     note:
       "Recovery placed this packet close enough to private material that handling one now implicates handling the other.",
   },
+  {
+    id: "link-flood-archivist-note-001",
+    fromDocumentId: "flood-recovery-packet-001",
+    toDocumentId: "archivist-internal-note-001",
+    relationship: "contaminated-by",
+    confidence: "medium",
+    note:
+      "Written during the second flood packet review. The packet's uncertainty appears to have carried into material that was never meant to enter the index.",
+  },
 ];
 
 export function getLinksForDocument(documentId: string) {

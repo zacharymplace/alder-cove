@@ -97,6 +97,21 @@ export const archiveDocuments: ArchiveDocument[] = [
       "The archive can acknowledge that the fragment exists without treating existence as permission.",
   },
 
+  {
+    id: "archivist-internal-note-001",
+    title: "Archivist Internal Note",
+    type: "archivist-internal-note",
+    accessClass: "private",
+    acquisitionMethod: "recovered-from-box",
+    emotionalRisk: "high",
+    handlingState: "awaiting-review",
+    pageIds: [],
+    description:
+      "A private processing note, filed into the shared index by mistake. It was not written for anyone to read.",
+    ethicalPressure:
+      "The archive cannot un-file something once it has been filed. Removing it now would be its own kind of decision.",
+  },
+
 ];
 
 const archiveDocumentAliases: Record<string, string> = {
