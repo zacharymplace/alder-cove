@@ -8,6 +8,8 @@ Claude is best used for narrow implementation, validation repair, documentation 
 
 Creative direction, artifact tone, notebook geometry, archive ethics, and instability mechanics require explicit approval before edits.
 
+See [`dependency-policy.md`](dependency-policy.md) before bumping any package version.
+
 ## Good Claude Tasks
 
 - Fix a failing check.
