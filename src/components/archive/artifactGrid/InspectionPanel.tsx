@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 import type { ArchiveDisplayArtifact } from "./artifactPresentation";
 import { handlingStateLabel } from "./artifactPresentation";
 
@@ -49,6 +51,18 @@ export function InspectionPanel({ artifact, onSetDown }: InspectionPanelProps) {
         <p className="mt-4 border-l border-red-900/20 pl-4 font-sans italic leading-relaxed text-red-900/70">
           {artifact.ethicalPressure}
         </p>
+      )}
+
+      {artifact.sustainedInspectionReveal && (
+        <motion.p
+          key={artifact.id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.75 }}
+          transition={{ delay: 3, duration: 1.2 }}
+          className="mt-4 font-sans text-xs italic leading-relaxed text-neutral-600"
+        >
+          {artifact.sustainedInspectionReveal}
+        </motion.p>
       )}
 
       <div className="mt-5 space-y-2 border-t border-neutral-900/20 pt-4 text-xs text-neutral-700">

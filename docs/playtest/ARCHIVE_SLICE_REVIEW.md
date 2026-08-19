@@ -44,6 +44,11 @@ from inspecting the code.
   component doesn't flatten them into feeling the same.
 - Reset handling genuinely resets: preface, reveal events, and handled
   state all return to first-visit condition.
+- Sustained inspection now has a real mechanic (`sustainedInspectionReveal`,
+  mirroring the notebook's `pressureReveal`): holding Mara's journal or
+  the archivist internal note long enough surfaces one additional line.
+  Confirmed live that the delay genuinely requires dwelling (not an
+  instant reveal) and restarts correctly when switching between the two.
 
 ## Current Design Rule
 
@@ -66,13 +71,7 @@ withholding to her, by the same mechanism, without her having chosen it.
   empty grid. Not necessarily a bug — could be a deliberate future beat —
   but worth a deliberate call rather than leaving a permanently-dead
   filter option unexamined.
-- **"Sustained inspection" exists in the notebook but not the archive.**
-  `ARCHIVE_ACCESS_AND_INSPECTION_STRUCTURE.md`'s inspection flow names
-  sustained inspection as a stage, and the notebook has a real dwell-based
-  mechanic for it (residue surfaces the longer a page is held). Archive
-  documents render everything instantly on approach — no equivalent
-  "handle long enough and something surfaces" moment. Flagged in the
-  SWOT-style review earlier this session as a possible gap; playing the
-  current build confirms the asymmetry is real, not just a documentation
-  oversight. Whether to build a matching mechanic for the archive is a
-  design call, not an obvious yes.
+- ~~"Sustained inspection" exists in the notebook but not the archive.~~
+  **Resolved.** See `docs/planning/ARCHIVE_SUSTAINED_INSPECTION_CANDIDATE.md` —
+  built as an optional per-document field rendered in the inspection
+  panel, authored on the two `private` documents to start.
