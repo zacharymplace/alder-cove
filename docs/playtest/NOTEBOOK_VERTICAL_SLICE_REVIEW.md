@@ -80,27 +80,26 @@ firsthand:
 
 ## Next Refinement Targets
 
-- **A meaningful slice of authored contradiction content is currently
-  unreachable by a player.** `revisionPhase`, `mutationPhase`, `unstable`,
-  and `memoryLayer` (beyond its "recovered" default) all gate real text
-  variants in `noteTextDrift.ts` and `Note.tsx` — five separate
-  `revisionPhase`-gated wording changes, an `unstable`-gated variant, and
-  the "original"/"reconstructed" memory-layer texts — but no button,
-  control, or interaction anywhere calls `advanceRevision()`,
-  `advanceMutation()`, `toggleUnstable()`, or `setMemoryLayer()`. This
-  was found by playing, not by reading the state file: the flashlight
-  path only ever touches `instabilityLevel` and `collapseTriggered`. This
-  is instability-mechanics territory (protected — needs explicit
-  direction before any fix): either wire these into real interactions,
-  or remove the dead branches if they were superseded by the
-  instability/collapse path and never cleaned up.
-- **Possible readability crowding, not confirmed as a bug.** With the
-  side light on, the flashlight-revealed marginalia ("he was scared
-  before we were") visually overlaps the printed rule list beneath it at
-  standard viewport width. This may be the intended "illuminated
-  handwriting crowds the page" effect (consistent with the physical-
-  artifact aesthetic) rather than a defect — flagging for a design call,
-  not proposing a fix.
+- ~~A meaningful slice of authored contradiction content is currently
+  unreachable by a player.~~ **Resolved.** `mutationPhase`, `unstable`,
+  `lingerReveal`, and `rememberedDrift` were dead weight, removed
+  outright. Two of `revisionPhase`'s gated lines ("maybe we changed him
+  first," "maybe the notebook got there first") were genuinely strong
+  writing, folded into the working `instabilityLevel`/`collapseTriggered`
+  system rather than deleted; the rest was exact-duplicate text already
+  reachable elsewhere. `memoryLayer` got a real three-way control in
+  `NotebookReaderControls`, completing the Core Loop's own step 4
+  ("Compare recovered, original, and reconstructed wording").
+- ~~Possible readability crowding, not confirmed as a bug.~~ **Resolved,
+  confirmed as a real (if minor) bug, not an intentional effect.**
+  Measured precisely rather than assumed: the box had no empty region
+  tall enough for the overlay text to land in without touching the
+  printed rules (top/bottom margins of only 21px each against a 32px-tall
+  overlay). Gave the box real bottom padding and repositioned both
+  flashlight-revealed lines into it — same absolute-positioned "overlaid,
+  no reflow" feel, now with 17.8px and 9.8px of genuine clearance.
+  Confirmed visually: both lines fully legible, no overlap with the text
+  or each other.
 
 The archive side has grown substantially since this document was last
 written (Flood Recovery Phases 1–3, the withdrawn-document state, the

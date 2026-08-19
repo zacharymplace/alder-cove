@@ -88,7 +88,7 @@ export function HiddenLayerPage() {
           </p>
         </div>
 
-        <div className="relative rounded-sm border border-neutral-700/30 bg-blue-50/20 p-5">
+        <div className="relative rounded-sm border border-neutral-700/30 bg-blue-50/20 p-5 pb-24">
           <Tape className="-top-2 left-12" />
           <p className="text-sm">
             If the water is past the third stair, dont go below.
@@ -118,7 +118,7 @@ export function HiddenLayerPage() {
                     triggerCollapse();
                   }
                 }}
-                className="absolute left-12 top-24 rotate-[-1deg] text-left text-lg text-neutral-700/68 hover:opacity-90"
+                className="absolute bottom-12 left-12 rotate-[-1deg] text-left text-lg text-neutral-700/68 hover:opacity-90"
               >
                 he was scared before we were
               </motion.button>
