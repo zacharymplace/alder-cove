@@ -18,11 +18,9 @@ export function Note({
   const {
     selectedId,
     select,
-    unstable,
     memoryLayer,
     instabilityLevel,
     collapseTriggered,
-    revisionPhase,
   } = useNotebookState();
   const allNotes = [...notebookOneSpread.leftPage, ...notebookOneSpread.rightPage];
   const selectedNote = allNotes.find((candidate) => candidate.id === selectedId);
@@ -34,11 +32,9 @@ export function Note({
   const related = selectedNote?.relatedNoteIds?.includes(note.id) ?? false;
 
   const unstableText = resolveNoteText(note, {
-    unstable,
     memoryLayer,
     instabilityLevel,
     collapseTriggered,
-    revisionPhase,
   });
 
   return (
@@ -90,15 +86,7 @@ export function Note({
       )}
 
 
-      {revisionPhase >= 2 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.08 }}
-          className="pointer-events-none absolute inset-0 bg-red-950/10"
-        />
-      )}
-
-      {revisionPhase >= 4 && (
+      {instabilityLevel >= 4 && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.22 }}

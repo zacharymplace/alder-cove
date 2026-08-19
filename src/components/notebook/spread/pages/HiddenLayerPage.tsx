@@ -29,7 +29,6 @@ export function HiddenLayerPage() {
     triggerCollapse,
     instabilityLevel,
     collapseTriggered,
-    revisionPhase,
   } = useNotebookState();
 
   return (
@@ -52,7 +51,7 @@ export function HiddenLayerPage() {
       )}
 
 
-        {revisionPhase >= 3 && (
+        {instabilityLevel >= 3 && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.22 }}
@@ -239,24 +238,7 @@ export function HiddenLayerPage() {
       )}
 
 
-      {revisionPhase >= 1 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mt-5 rounded-lg border border-red-900/10 bg-red-950/3 p-4 text-xs text-red-100/60"
-        >
-          preserved wording differs slightly across recovery layers
-
-          <div className="mt-3 space-y-2">
-            <p>• recovered wording differs between review passes</p>
-            <p>• archivist copies differ slightly from recovered wording</p>
-            <p>• related fragments preserve different emotional interpretations</p>
-          </div>
-        </motion.div>
-      )}
-
-
-      {revisionPhase >= 5 && (
+      {collapseTriggered && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

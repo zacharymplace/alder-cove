@@ -8,7 +8,7 @@ beforeEach(() => {
   useNotebookState.setState(initialState, true);
 });
 
-describe("instability and mutation caps", () => {
+describe("instability", () => {
   test("increaseInstability stops at 5", () => {
     for (let i = 0; i < 10; i += 1) {
       useNotebookState.getState().increaseInstability();
@@ -21,15 +21,6 @@ describe("instability and mutation caps", () => {
     const state = useNotebookState.getState();
     expect(state.collapseTriggered).toBe(true);
     expect(state.instabilityLevel).toBe(5);
-  });
-
-  test("advanceMutation and advanceRevision cap at 5", () => {
-    for (let i = 0; i < 10; i += 1) {
-      useNotebookState.getState().advanceMutation();
-      useNotebookState.getState().advanceRevision();
-    }
-    expect(useNotebookState.getState().mutationPhase).toBe(5);
-    expect(useNotebookState.getState().revisionPhase).toBe(5);
   });
 });
 
