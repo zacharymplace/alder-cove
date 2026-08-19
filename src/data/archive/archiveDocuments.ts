@@ -123,6 +123,21 @@ export const archiveDocuments: ArchiveDocument[] = [
       "The longer this stays in hand, the more it reads like something meant to be crossed out.",
   },
 
+  {
+    id: "cannery-waterline-fragment-001",
+    title: "Cannery — Waterline Room Fragment",
+    type: "copied-fragment",
+    accessClass: "illicitly-acquired",
+    acquisitionMethod: "taken-from-private-place",
+    emotionalRisk: "high",
+    handlingState: "sealed",
+    pageIds: [],
+    description:
+      "A fragment recovered from below the waterline. No record explains who went down to retrieve it, or why.",
+    ethicalPressure:
+      "Nothing about how this arrived here was authorized. The archive kept it anyway.",
+  },
+
 ];
 
 const archiveDocumentAliases: Record<string, string> = {

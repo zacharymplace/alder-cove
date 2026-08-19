@@ -65,12 +65,12 @@ withholding to her, by the same mechanism, without her having chosen it.
 
 ## Next Refinement Targets
 
-- **The `illicitly-acquired` access class has zero documents.** The
-  filter option exists in the sidebar, but nothing in the archive has
-  ever used that access class, so selecting it can only ever show an
-  empty grid. Not necessarily a bug — could be a deliberate future beat —
-  but worth a deliberate call rather than leaving a permanently-dead
-  filter option unexamined.
+- ~~The `illicitly-acquired` access class has zero documents.~~
+  **Resolved.** See `docs/planning/ILLICITLY_ACQUIRED_FRAGMENT_CANDIDATE.md` —
+  added one document (`cannery-waterline-fragment-001`), which activated
+  fully-written but previously-unreachable "illicit" tone copy and
+  styling that had been sitting in the code since before this access
+  class had any real user.
 - ~~"Sustained inspection" exists in the notebook but not the archive.~~
   **Resolved.** See `docs/planning/ARCHIVE_SUSTAINED_INSPECTION_CANDIDATE.md` —
   built as an optional per-document field rendered in the inspection
