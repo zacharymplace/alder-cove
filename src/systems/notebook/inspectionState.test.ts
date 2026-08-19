@@ -8,6 +8,18 @@ beforeEach(() => {
   useNotebookState.setState(initialState, true);
 });
 
+describe("setMemoryLayer", () => {
+  test("switches between recovered, original, and reconstructed", () => {
+    expect(useNotebookState.getState().memoryLayer).toBe("recovered");
+
+    useNotebookState.getState().setMemoryLayer("original");
+    expect(useNotebookState.getState().memoryLayer).toBe("original");
+
+    useNotebookState.getState().setMemoryLayer("reconstructed");
+    expect(useNotebookState.getState().memoryLayer).toBe("reconstructed");
+  });
+});
+
 describe("instability", () => {
   test("increaseInstability stops at 5", () => {
     for (let i = 0; i < 10; i += 1) {
