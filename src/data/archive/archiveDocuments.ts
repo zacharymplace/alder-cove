@@ -138,6 +138,21 @@ export const archiveDocuments: ArchiveDocument[] = [
       "Nothing about how this arrived here was authorized. The archive kept it anyway.",
   },
 
+  {
+    id: "folded-letter-to-eli-001",
+    title: "Folded Letter — To Eli",
+    type: "folded-letter",
+    accessClass: "semi-private",
+    acquisitionMethod: "given-for-copying",
+    emotionalRisk: "medium",
+    handlingState: "stable",
+    pageIds: [],
+    description:
+      "A folded letter addressed to Eli. Unlike most of what the archive holds, this wasn't found, taken, or misfiled — it was handed over so a copy could be kept.",
+    sustainedInspectionReveal:
+      "The longer this stays in hand, the more it reads like a promise the group wasn't sure they could keep.",
+  },
+
 ];
 
 const archiveDocumentAliases: Record<string, string> = {
