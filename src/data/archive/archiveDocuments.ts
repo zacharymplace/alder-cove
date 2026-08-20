@@ -153,6 +153,23 @@ export const archiveDocuments: ArchiveDocument[] = [
       "The longer this stays in hand, the more it reads like a promise the group wasn't sure they could keep.",
   },
 
+  {
+    id: "page-31-reconstruction-001",
+    title: "Page 31 — Group Reconstruction Attempt",
+    type: "copied-fragment",
+    accessClass: "semi-private",
+    acquisitionMethod: "reconstructed-from-memory",
+    emotionalRisk: "medium",
+    handlingState: "reconstructed",
+    pageIds: ["index-closure-left"],
+    description:
+      "An attempt, made by more than one person, to write down what page 31 said before it was lost. No physical trace of the original survived to check it against.",
+    ethicalPressure:
+      "The archive cannot verify this against anything. It preserves the attempt, not the page.",
+    sustainedInspectionReveal:
+      "The longer this stays in hand, the less it reads like agreement and the more it reads like several people hoping the others remembered it the same way.",
+  },
+
 ];
 
 const archiveDocumentAliases: Record<string, string> = {
