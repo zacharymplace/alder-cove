@@ -1,0 +1,70 @@
+{
+  "schema_version": "systems-builder-lifecycle-v1",
+  "system_id": "alder-cove",
+  "display_name": "Alder Cove",
+  "phase": "operate",
+  "condition": "held",
+  "source": {
+    "repository": "zacharymplace/alder-cove",
+    "path": ".",
+    "branch": "main",
+    "commit": "761e03c"
+  },
+  "evidence": [
+    {
+      "kind": "release-readiness",
+      "reference": "npm run release:ready",
+      "result": "pass"
+    },
+    {
+      "kind": "test-suite",
+      "reference": "6 test files / 51 tests",
+      "result": "pass"
+    },
+    {
+      "kind": "production-build",
+      "reference": "npm run build",
+      "result": "pass"
+    },
+    {
+      "kind": "playtest-and-route-review",
+      "reference": "docs/playtest and docs/qa verification records",
+      "result": "pass"
+    },
+    {
+      "kind": "expansion-governance",
+      "reference": "docs/planning/ARCHIVE_NEXT_EXPANSION_GATE.md",
+      "result": "pass"
+    }
+  ],
+  "progress": {
+    "latest_completed_expansion": "page-31-reconstruction",
+    "latest_commit": "761e03c",
+    "open_approved_candidate": null,
+    "open_undecided_candidate": null
+  },
+  "last_verified_at": "2026-08-21T19:32:02Z",
+  "next_action": {
+    "description": "Hold Alder Cove as the validated narrative artifact and archive-interaction prototype. Resume development only when a concrete new narrative expansion candidate is explicitly admitted through the archive expansion gate or a new gameplay, interaction, playtest, or release objective is adopted.",
+    "command": "npm run release:ready"
+  },
+  "blockers": [
+    "No currently approved but unimplemented archive expansion remains.",
+    "All surfaced planning candidates have implementation notes and the newest expansions are already merged.",
+    "Future archive growth should begin with a new explicit expansion decision rather than continuous speculative content addition."
+  ],
+  "capabilities": [
+    "archive-first-narrative-interface",
+    "handled-notebook-interface",
+    "artifact-inspection",
+    "private-readability-boundaries",
+    "cross-artifact-relationships",
+    "archive-progression",
+    "sustained-inspection-reveals",
+    "narrative-fragment-reconstruction",
+    "preservation-ethics-modeling",
+    "archive-expansion-governance",
+    "automated-route-smoke-testing",
+    "production-release-readiness"
+  ]
+}
