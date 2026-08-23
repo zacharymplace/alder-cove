@@ -1,8 +1,13 @@
 import clsx from "clsx";
 
 import type { NotebookNote } from "@/data/notebook/notebookOne";
+import { notebookContaminationNotes } from "@/data/crossArtifact/notebookContamination";
 
-import { spreadShellClass, spreadResidueClass } from "../styleHelpers";
+import {
+  spreadShellClass,
+  spreadResidueClass,
+  contaminationVisibilityClass,
+} from "../styleHelpers";
 import { DamageOverlay, EdgeWear } from "../PageWear";
 import { Note } from "../Note";
 import { ChildMap } from "../content/ChildMap";
@@ -41,6 +46,12 @@ export function StandardNotebookPage({
   paperTone = "aged",
   residueDensity = "light",
 }: StandardNotebookPageProps) {
+  const contaminationNotes = pageNumber
+    ? notebookContaminationNotes.filter(
+        (note) => note.affectedPage === pageNumber
+      )
+    : [];
+
   return (
     <section
       className={clsx(
@@ -126,6 +137,26 @@ export function StandardNotebookPage({
               </div>
             )}
 
+          </div>
+        )}
+
+        {contaminationNotes.length > 0 && (
+          <div className="rounded border border-blue-900/15 bg-blue-950/5 p-3 text-[10px] text-neutral-800/55">
+            <p className="uppercase tracking-[0.22em] text-blue-100/35">
+              recovery contamination
+            </p>
+
+            {contaminationNotes.map((note) => (
+              <p
+                key={note.id}
+                className={clsx(
+                  "mt-2 italic leading-relaxed",
+                  contaminationVisibilityClass(note.visibility)
+                )}
+              >
+                {note.note}
+              </p>
+            ))}
           </div>
         )}
 

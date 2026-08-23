@@ -1,4 +1,5 @@
 import type { NotebookNote } from "@/data/notebook/notebookOne";
+import type { NotebookContaminationNote } from "@/data/crossArtifact/notebookContamination";
 
 export function spreadShellClass(paperTone?: "aged" | "water-damaged" | "warm") {
   switch (paperTone) {
@@ -57,6 +58,21 @@ export function handwritingClass(handwriting?: NotebookNote["handwriting"]) {
       return "tracking-normal";
     default:
       return "";
+  }
+}
+
+export function contaminationVisibilityClass(
+  visibility: NotebookContaminationNote["visibility"]
+) {
+  switch (visibility) {
+    case "faint":
+      return "text-blue-100/25";
+    case "recoverable":
+      return "text-blue-100/45";
+    case "clear":
+      return "text-blue-100/70";
+    default:
+      return "text-blue-100/35";
   }
 }
 
