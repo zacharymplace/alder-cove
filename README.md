@@ -31,6 +31,7 @@ Open [http://localhost:3000](http://localhost:3000). Core routes:
 | `/archive` | Main preservation environment |
 | `/archive/[documentId]` | Individual archive document handling |
 | `/notebook` | Notebook One reader |
+| `/about` | Project presentation page |
 
 See [`docs/qa/ARCHIVE_ROUTE_SMOKE.md`](docs/qa/ARCHIVE_ROUTE_SMOKE.md) for the
 manual verification sequence across these routes. That sequence is also
