@@ -213,7 +213,7 @@ export const notebookPages: NotebookPageDefinition[] = [
     side: "right",
     title: "name rewritten lighter",
     role: "privacy-boundary",
-    noteIds: ["mara-crossed-name", "page-torn-index"],
+    noteIds: ["mara-crossed-name", "chameleon-first-note", "page-torn-index"],
     provenance: {
       source: "reconstructed packet",
       confidence: "low",

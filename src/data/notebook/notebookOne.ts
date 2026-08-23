@@ -344,6 +344,14 @@ export const notebookOneSpread = {
     pressureReveal: "lighter is not the same as kinder",
   },
   {
+    id: "chameleon-first-note",
+    variant: "margin",
+    text: "I write this different depending on who might read it.",
+    handwriting: "chameleon",
+    yearPhase: "early-adolescence",
+    memoryPressure: "medium",
+  },
+  {
     id: "eli-incident-adjacent",
     variant: "contradiction",
     text: "Eli said wait. Later copy says Eli hesitated.",
